@@ -1,0 +1,374 @@
+// PreparaOss — Schema Prisma completo
+// Neon PostgreSQL + Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────
+
+enum TipoPregunta {
+  FUNCIONAL_ESPECIFICA  // Juicio situacional: escenario + 3 preguntas, 3 opciones c/u
+  FUNCIONAL_TRANSVERSAL // Pregunta directa con 4 opciones
+  COMPORTAMENTAL        // Escala Likert 1-5 según nivel de responsabilidad
+}
+
+enum NivelDificultad {
+  BASICO
+  INTERMEDIO
+  AVANZADO
+}
+
+enum TipoSimulacro {
+  FUNCIONAL_ESPECIFICA
+  FUNCIONAL_TRANSVERSAL
+  COMPORTAMENTAL
+  MIXTO
+}
+
+enum EstadoSimulacro {
+  EN_PROGRESO
+  COMPLETADO
+  ABANDONADO
+}
+
+enum PlanSuscripcion {
+  GRATUITO  // 3 simulacros/mes, 10 preguntas
+  BASICO    // 10 simulacros/mes, 20 preguntas
+  PRO       // ilimitado, 40 preguntas, desafíos
+  PREMIUM   // todo + simulacros históricos oficiales
+}
+
+enum EstadoSuscripcion {
+  ACTIVA
+  VENCIDA
+  CANCELADA
+}
+
+enum TipoBadge {
+  RACHA
+  SIMULACROS
+  PRECISION
+  SOCIAL
+  ESPECIAL
+}
+
+enum EstadoOpec {
+  ACTIVA
+  CERRADA
+  VENCIDA
+}
+
+// ─────────────────────────────────────────────────────────
+// OPEC — Oferta Pública de Empleo de Carrera
+// ─────────────────────────────────────────────────────────
+
+model Opec {
+  id               String     @id @default(cuid())
+  simoId           String     @unique // ID interno de SIMO/CNSC
+  numerConvocatoria String?
+  nombreCargo      String
+  entidad          String
+  nivelJerarquico  String     // Profesional, Técnico, Auxiliar, Directivo, etc.
+  grado            String
+  numVacantes      Int
+  municipio        String
+  departamento     String
+  
+  requisitosEstudio String    @db.Text
+  requisitosExp     String    @db.Text
+  competencias      String[]  // Lista de competencias evaluadas
+  tipoPruebas       String[]  // ["Conocimientos", "Competencias", "Psicotécnica"]
+  
+  // Nivel de responsabilidad del cargo (impacta Likert comportamental)
+  // 1=Auxiliar 2=Técnico 3=Profesional 4=Asesor 5=Directivo
+  nivelResponsabilidad Int    @default(3)
+  
+  fechaLimiteInscripcion DateTime?
+  fechaExamen            DateTime?
+  estado                 EstadoOpec @default(ACTIVA)
+  
+  // Metadatos scraping
+  urlDetalle       String?
+  scrapedAt        DateTime   @default(now())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  escenarios       EscenarioSituacional[]
+  preguntas        Pregunta[]
+  simulacros       Simulacro[]
+  inscripciones    UserOpec[]
+  rankings         Ranking[]
+
+  @@index([estado, departamento])
+  @@index([entidad])
+}
+
+// ─────────────────────────────────────────────────────────
+// PREGUNTAS — 3 tipos según CNSC
+// ─────────────────────────────────────────────────────────
+
+/// Escenario de juicio situacional (≥10 líneas)
+/// Del cual se desprenden 3 preguntas FUNCIONAL_ESPECIFICA
+model EscenarioSituacional {
+  id        String     @id @default(cuid())
+  contenido String     @db.Text // Párrafo de mínimo 10 líneas
+  opecId    String
+  opec      Opec       @relation(fields: [opecId], references: [id], onDelete: Cascade)
+  preguntas Pregunta[]
+  createdAt DateTime   @default(now())
+
+  @@index([opecId])
+}
+
+model Pregunta {
+  id       String       @id @default(cuid())
+  tipo     TipoPregunta
+  texto    String       @db.Text
+
+  // Solo para FUNCIONAL_ESPECIFICA — referencia al escenario padre
+  escenarioId String?
+  escenario   EscenarioSituacional? @relation(fields: [escenarioId], references: [id], onDelete: SetNull)
+
+  opecId   String
+  opec     Opec         @relation(fields: [opecId], references: [id], onDelete: Cascade)
+
+  opciones OpcionRespuesta[]
+
+  // Categoría temática (Normatividad, Gestión Pública, etc.)
+  categoria  String
+  dificultad NivelDificultad @default(INTERMEDIO)
+
+  // Explicación/retroalimentación generada por IA (se muestra AL FINAL del simulacro)
+  explicacion String @db.Text
+
+  // Para preguntas COMPORTAMENTAL: nivel del cargo (1-5) con que fue generada
+  nivelResponsabilidad Int?
+
+  // Control de calidad
+  validada Boolean @default(false)
+  reportes Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  respuestas RespuestaUsuario[]
+
+  @@index([opecId, tipo])
+  @@index([tipo, validada])
+}
+
+model OpcionRespuesta {
+  id         String   @id @default(cuid())
+  preguntaId String
+  pregunta   Pregunta @relation(fields: [preguntaId], references: [id], onDelete: Cascade)
+
+  // FUNCIONAL_ESPECIFICA: "A", "B", "C"
+  // FUNCIONAL_TRANSVERSAL: "A", "B", "C", "D"
+  // COMPORTAMENTAL: "1", "2", "3", "4", "5"
+  letra      String
+  texto      String   @db.Text
+  esCorrecta Boolean
+
+  // Para COMPORTAMENTAL: valor Likert ponderado según nivelResponsabilidad
+  valorLikert Int?
+
+  respuestas RespuestaUsuario[]
+
+  @@index([preguntaId])
+}
+
+// ─────────────────────────────────────────────────────────
+// USUARIO
+// ─────────────────────────────────────────────────────────
+
+model UserProfile {
+  id     String @id // Clerk user ID
+  email  String @unique
+  nombre String
+
+  // Gamificación
+  xpTotal          Int      @default(0)
+  nivel            Int      @default(1) // 1=Principiante … 5=Élite
+  rachaActual      Int      @default(0) // días consecutivos
+  rachaMasLarga    Int      @default(0)
+  ultimaActividad  DateTime?
+  simulacrosMesActual Int   @default(0)
+  mesContador      String?  // "2026-03" para resetear mensual
+
+  // Estadísticas globales
+  simulacrosTotal        Int @default(0)
+  preguntasRespondidas   Int @default(0)
+  preguntasCorrectas     Int @default(0)
+
+  suscripcionId String?     @unique
+  suscripcion   Suscripcion? @relation(fields: [suscripcionId], references: [id])
+
+  inscripciones UserOpec[]
+  simulacros    Simulacro[]
+  badges        UserBadge[]
+  rankings      Ranking[]
+  ligas         UserLiga[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserOpec {
+  id          String      @id @default(cuid())
+  userId      String
+  user        UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opecId      String
+  opec        Opec        @relation(fields: [opecId], references: [id], onDelete: Cascade)
+  inscritoAt  DateTime    @default(now())
+  fechaExamen DateTime?   // copia de opec.fechaExamen para plan de estudio
+
+  @@unique([userId, opecId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────
+// SIMULACRO (sesión de examen)
+// ─────────────────────────────────────────────────────────
+
+model Simulacro {
+  id            String          @id @default(cuid())
+  userId        String
+  user          UserProfile     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opecId        String
+  opec          Opec            @relation(fields: [opecId], references: [id], onDelete: Cascade)
+
+  tipoSimulacro TipoSimulacro   @default(MIXTO)
+  estado        EstadoSimulacro @default(EN_PROGRESO)
+
+  // Resultados (se rellenan al finalizar)
+  puntajeTotal      Float?
+  puntajeFuncEsp    Float? // % correctas en FUNCIONAL_ESPECIFICA
+  puntajeFuncTrans  Float? // % correctas en FUNCIONAL_TRANSVERSAL
+  puntajeComport    Float? // Puntaje ponderado COMPORTAMENTAL
+  xpGanado          Int?
+  tiempoSegundos    Int?   // Duración total
+
+  iniciadoAt   DateTime  @default(now())
+  finalizadoAt DateTime?
+
+  respuestas RespuestaUsuario[]
+
+  @@index([userId, opecId])
+  @@index([userId, estado])
+}
+
+model RespuestaUsuario {
+  id          String           @id @default(cuid())
+  simulacroId String
+  simulacro   Simulacro        @relation(fields: [simulacroId], references: [id], onDelete: Cascade)
+  preguntaId  String
+  pregunta    Pregunta         @relation(fields: [preguntaId], references: [id])
+  opcionId    String?
+  opcion      OpcionRespuesta? @relation(fields: [opcionId], references: [id])
+  valorLikert Int?             // Solo para COMPORTAMENTAL (1-5)
+  esCorrecta  Boolean?
+  tiempoMs    Int?             // Milisegundos en responder
+
+  @@index([simulacroId])
+  @@index([preguntaId])
+}
+
+// ─────────────────────────────────────────────────────────
+// GAMIFICACIÓN
+// ─────────────────────────────────────────────────────────
+
+model Ranking {
+  id        String      @id @default(cuid())
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opecId    String
+  opec      Opec        @relation(fields: [opecId], references: [id], onDelete: Cascade)
+
+  xpSemanal Int      @default(0)
+  xpTotal   Int      @default(0)
+  posicion  Int?
+  semana    DateTime // Lunes de la semana ISO
+
+  @@unique([userId, opecId, semana])
+  @@index([opecId, semana, xpSemanal(sort: Desc)])
+}
+
+model Liga {
+  id      String     @id @default(cuid())
+  nombre  String     @unique // Bronce, Plata, Oro, Platino, Diamante
+  nivel   Int        @unique // 1-5
+  xpMin   Int
+  color   String     // HEX
+  emoji   String
+
+  usuarios UserLiga[]
+}
+
+model UserLiga {
+  id     String      @id @default(cuid())
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ligaId String
+  liga   Liga        @relation(fields: [ligaId], references: [id])
+  semana DateTime
+
+  @@unique([userId, semana])
+  @@index([ligaId, semana])
+}
+
+model Badge {
+  id          String    @id @default(cuid())
+  nombre      String    @unique
+  descripcion String
+  icono       String    // Emoji o nombre de ícono Lucide
+  tipo        TipoBadge
+  umbral      Int?      // Valor numérico para la condición (ej: 7 días de racha)
+
+  usuarios UserBadge[]
+}
+
+model UserBadge {
+  id         String      @id @default(cuid())
+  userId     String
+  user       UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId    String
+  badge      Badge       @relation(fields: [badgeId], references: [id])
+  obtenidoAt DateTime    @default(now())
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────
+// SUSCRIPCIONES
+// ─────────────────────────────────────────────────────────
+
+model Suscripcion {
+  id     String          @id @default(cuid())
+  plan   PlanSuscripcion @default(GRATUITO)
+  estado EstadoSuscripcion @default(ACTIVA)
+
+  // Límites del plan
+  simulacrosMes         Int // -1 = ilimitado
+  preguntasPorSimulacro Int
+
+  inicioAt DateTime  @default(now())
+  finAt    DateTime?
+
+  // Referencia de pago Wompi/PayU
+  referenciaPago String?
+  montoCop       Int?    // En pesos colombianos
+
+  user UserProfile?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
