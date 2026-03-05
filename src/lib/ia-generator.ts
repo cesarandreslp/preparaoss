@@ -325,7 +325,14 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
 // GENERAR TODAS LAS PREGUNTAS DE UNA OPEC
 // ─────────────────────────────────────────────────
 
-export async function generarBancoCompleto(opecId: string): Promise<void> {
+export interface ResultadoBanco {
+  total: number;
+  escenarios: number;
+  transversales: number;
+  comportamentales: number;
+}
+
+export async function generarBancoCompleto(opecId: string): Promise<ResultadoBanco> {
   console.log(`[IA] Generando banco de preguntas para OPEC: ${opecId}`);
 
   try {
@@ -341,7 +348,13 @@ export async function generarBancoCompleto(opecId: string): Promise<void> {
     await generarPreguntasComportamental(opecId, 10);
     console.log("[IA] ✅ Comportamental generada");
 
-    console.log("[IA] 🎉 Banco completo generado para OPEC:", opecId);
+    const escenarios = 2;
+    const transversales = 10;
+    const comportamentales = 10;
+    const total = escenarios * 3 + transversales + comportamentales;
+
+    console.log(`[IA] 🎉 Banco completo generado para OPEC: ${opecId} (${total} preguntas)`);
+    return { total, escenarios, transversales, comportamentales };
   } catch (error) {
     console.error("[IA] ❌ Error generando banco:", error);
     throw error;

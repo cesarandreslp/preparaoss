@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { OpecCTA } from "@/components/opec/OpecCTA";
 import Link from "next/link";
 
 export default async function OpecDetailPage({
@@ -137,38 +138,11 @@ export default async function OpecDetailPage({
       </div>
 
       {/* CTA */}
-      <div className="space-y-3 pb-4">
-        {opec._count.preguntas > 0 ? (
-          <Link
-            href={`/opecs/${id}/simulacro`}
-            className="block w-full text-center px-6 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-semibold text-white text-lg transition-colors"
-          >
-            🚀 Iniciar simulacro
-          </Link>
-        ) : (
-          <div className="w-full text-center px-6 py-4 bg-white/10 rounded-2xl text-slate-400">
-            ⏳ Generando banco de preguntas...
-          </div>
-        )}
-
-        {!inscrito && (
-          <form action={`/api/opecs/${id}/inscribirse`} method="POST">
-            <button
-              type="submit"
-              className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-medium text-white transition-colors"
-            >
-              ➕ Seguir esta OPEC (recibir notificaciones)
-            </button>
-          </form>
-        )}
-
-        <Link
-          href={`/ranking?opecId=${id}`}
-          className="block w-full text-center px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sm font-medium text-slate-300 transition-colors"
-        >
-          🏆 Ver ranking de aspirantes
-        </Link>
-      </div>
+      <OpecCTA
+        opecId={id}
+        tienePreguntas={opec._count.preguntas >= 10}
+        inscrito={inscrito}
+      />
     </div>
   );
 }
