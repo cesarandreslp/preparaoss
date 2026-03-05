@@ -1,108 +1,118 @@
 /**
  * scraper.ts
- * Scraper del portal SIMO (CNSC) — https://simo.cnsc.gov.co/#ofertaEmpleo
+ * Sincroniza OPECs desde la API REST pública de SIMO (CNSC)
  *
- * ESTRATEGIA:
- * 1. Intentar consumir la API REST/GraphQL interna del portal Angular (más estable)
- * 2. Si falla, usar fetch directo a los endpoints descubiertos vía DevTools Network tab
+ * Endpoint real descubierto: GET /empleos/ofertaPublica/?page=N&size=100
+ * No requiere autenticación. Devuelve JSON con todas las OPECs vigentes.
  *
- * NOTA: Ejecutar desde Vercel Cron Job (GET /api/cron/scraper)
- *       Una vez al día a las 6AM Colombia (UTC-5 = 11:00 UTC)
+ * NOTA: Ejecutado por Vercel Cron Job (GET /api/cron/scraper)
+ *       Diariamente a las 6 AM Colombia = 11:00 UTC
  */
 
 import { prisma } from "./prisma";
+import { EstadoOpec } from "@prisma/client";
 
 const SIMO_BASE = "https://simo.cnsc.gov.co";
-const SIMO_API = `${SIMO_BASE}/api`; // Ajustar según endpoints reales descubiertos
-
-// Headers que simula un navegador real para evitar bloqueos
-const HEADERS = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121 Safari/537.36",
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "es-CO,es;q=0.9",
-  Referer: `${SIMO_BASE}/`,
-  Origin: SIMO_BASE,
-};
+const PAGE_SIZE = 100;
+const MAX_PAGES = 40; // Techo de seguridad (3400+ OPECs ÷ 100 = ~34 páginas)
 
 // ─────────────────────────────────────────────────
-// TIPOS DE RESPUESTA DE LA API SIMO
-// (Ajustar según los endpoints reales del portal)
+// TIPOS API SIMO
 // ─────────────────────────────────────────────────
 
-interface SimoOpecRaw {
-  id: string;
-  numerConvocatoria?: string;
-  nombreCargo: string;
-  entidad: string;
-  nivelJerarquico: string;
-  grado: string;
-  numVacantes: number;
-  municipio: string;
-  departamento: string;
-  requisitosEstudio: string;
-  requisitosExp: string;
-  competencias: string[];
-  tipoPruebas: string[];
-  nivelResponsabilidad?: number;
-  fechaLimiteInscripcion?: string;
-  fechaExamen?: string;
-  urlDetalle?: string;
+interface SimoVacante {
+  municipio: { nombre: string; departamento: { nombre: string } } | null;
+  cantidad: number;
+}
+
+interface SimoOpecItem {
+  id: number;
+  fechaInscripcion: string | null;
+  empleo: {
+    denominacion: { nombre: string };
+    descripcion: string;
+    gradoNivel: { grado: string; nivelNombre: string };
+    convocatoria: {
+      nombre: string;
+      codigo: string;
+      agno: number;
+      entidad: { nombre: string };
+    };
+    funciones: Array<{ descripcion: string }>;
+    requisitosMinimos: Array<{ estudio: string; experiencia: string }>;
+    vacantes: SimoVacante[];
+  };
 }
 
 // ─────────────────────────────────────────────────
-// OBTENER LISTA DE OPECs ACTIVAS
+// HELPERS
 // ─────────────────────────────────────────────────
 
-async function fetchOpecs(pagina: number = 1, porPagina: number = 50): Promise<SimoOpecRaw[]> {
-  // IMPORTANTE: Estos endpoints son ejemplos. Debes inspeccionar el Network tab de
-  // https://simo.cnsc.gov.co/#ofertaEmpleo con Chrome DevTools (pestaña Fetch/XHR)
-  // para encontrar los endpoints reales del portal Angular.
-  //
-  // Endpoints comunes en portales Angular de entidades públicas colombianas:
-  // - /api/ofertaempleo?page=1&size=50&estado=ACTIVA
-  // - /api/convocatorias/vigentes
-  // - /opec/list?status=open
+function unique(arr: (string | undefined)[]): string[] {
+  return [...new Set(arr.filter((x): x is string => Boolean(x)))];
+}
 
-  const url = `${SIMO_API}/ofertaempleo?page=${pagina}&size=${porPagina}&estado=ACTIVA`;
+function mapNivel(n: string): number {
+  const l = n.toLowerCase();
+  if (l.includes("auxiliar") || l.includes("operativo")) return 1;
+  if (l.includes("técnico") || l.includes("tecnico") || l.includes("asistencial")) return 2;
+  if (l.includes("profesional")) return 3;
+  if (l.includes("asesor")) return 4;
+  if (l.includes("directivo") || l.includes("director") || l.includes("jefe")) return 5;
+  return 3;
+}
 
-  const res = await fetch(url, { headers: HEADERS, next: { revalidate: 0 } });
-
-  if (!res.ok) {
-    throw new Error(`[Scraper] SIMO API error: ${res.status} ${res.statusText}`);
+function mapToPrisma(item: SimoOpecItem) {
+  const e = item.empleo;
+  const req = e.requisitosMinimos[0] ?? { estudio: "", experiencia: "" };
+  const municipios = unique(e.vacantes.map((v) => v.municipio?.nombre));
+  const deptos = unique(e.vacantes.map((v) => v.municipio?.departamento?.nombre));
+  const totalVac = e.vacantes.reduce((s, v) => s + (v.cantidad || 0), 0);
+  const pruebas = ["Conocimientos específicos", "Competencias comportamentales"];
+  const nivel = e.gradoNivel.nivelNombre.toLowerCase();
+  if (nivel.includes("profesional") || nivel.includes("asesor") || nivel.includes("directivo")) {
+    pruebas.push("Análisis de competencias funcionales");
   }
 
+  return {
+    simoId: item.id.toString(),
+    numerConvocatoria: `${e.convocatoria.codigo}/${e.convocatoria.agno}`,
+    nombreCargo: e.denominacion.nombre,
+    entidad: e.convocatoria.entidad.nombre,
+    nivelJerarquico: e.gradoNivel.nivelNombre,
+    grado: e.gradoNivel.grado,
+    numVacantes: Math.max(totalVac, 1),
+    municipio: municipios.slice(0, 10).join(", ") || "Nacional",
+    departamento: deptos.slice(0, 10).join(", ") || "Nacional",
+    requisitosEstudio: req.estudio || "Ver convocatoria en SIMO CNSC",
+    requisitosExp: req.experiencia || "Ver convocatoria en SIMO CNSC",
+    competencias: e.funciones.slice(0, 8).map((f) => f.descripcion.slice(0, 300)).filter(Boolean),
+    tipoPruebas: pruebas,
+    nivelResponsabilidad: mapNivel(e.gradoNivel.nivelNombre),
+    fechaLimiteInscripcion: item.fechaInscripcion ? new Date(item.fechaInscripcion) : null,
+    estado: EstadoOpec.ACTIVA,
+    urlDetalle: `${SIMO_BASE}/#ofertaEmpleo`,
+    scrapedAt: new Date(),
+  };
+}
+
+// ─────────────────────────────────────────────────
+// FETCH PÁGINA
+// ─────────────────────────────────────────────────
+
+async function fetchPage(page: number): Promise<SimoOpecItem[]> {
+  const url = `${SIMO_BASE}/empleos/ofertaPublica/?page=${page}&size=${PAGE_SIZE}`;
+  const res = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "PreparaOss-Scraper/1.0 (preparacion-concursos-cnsc)",
+    },
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) throw new Error(`SIMO HTTP ${res.status} en página ${page}`);
   const data = await res.json();
-
-  // AJUSTAR según estructura real de la respuesta
-  return data.content ?? data.data ?? data.results ?? data ?? [];
-}
-
-// ─────────────────────────────────────────────────
-// OBTENER DETALLE DE UNA OPEC
-// ─────────────────────────────────────────────────
-
-async function fetchDetalleOpec(simoId: string): Promise<Partial<SimoOpecRaw>> {
-  const url = `${SIMO_API}/ofertaempleo/${simoId}`;
-  const res = await fetch(url, { headers: HEADERS, next: { revalidate: 0 } });
-
-  if (!res.ok) return {};
-
-  return await res.json();
-}
-
-// ─────────────────────────────────────────────────
-// MAPEAR NIVEL JERÁRQUICO → NIVEL DE RESPONSABILIDAD
-// ─────────────────────────────────────────────────
-
-function mapearNivelResponsabilidad(nivelJerarquico: string): number {
-  const nivel = nivelJerarquico.toLowerCase();
-  if (nivel.includes("auxiliar") || nivel.includes("operativo")) return 1;
-  if (nivel.includes("técnico") || nivel.includes("asistencial")) return 2;
-  if (nivel.includes("profesional")) return 3;
-  if (nivel.includes("asesor") || nivel.includes("ejecutivo")) return 4;
-  if (nivel.includes("directivo") || nivel.includes("gerente") || nivel.includes("director")) return 5;
-  return 3; // Default: Profesional
+  if (!Array.isArray(data)) return [];
+  return data as SimoOpecItem[];
 }
 
 // ─────────────────────────────────────────────────
@@ -118,87 +128,77 @@ export async function sincronizarOpecs(): Promise<{
   let actualizadas = 0;
   let errores = 0;
 
-  try {
-    console.log("[Scraper] Iniciando sincronización SIMO...");
+  console.log("[Scraper] Iniciando sincronización SIMO...");
 
-    let pagina = 1;
-    let hayMas = true;
+  let page = 0;
 
-    while (hayMas) {
-      const opecs = await fetchOpecs(pagina, 50);
+  while (page < MAX_PAGES) {
+    let items: SimoOpecItem[];
+    try {
+      items = await fetchPage(page);
+    } catch (e) {
+      console.error(`[Scraper] Error descargando página ${page}:`, e);
+      errores++;
+      if (errores >= 3) break;
+      page++;
+      continue;
+    }
 
-      if (!opecs || opecs.length === 0) {
-        hayMas = false;
-        break;
-      }
+    if (!items.length) break;
 
-      for (const raw of opecs) {
-        try {
-          // Verificar si ya existe
-          const existe = await prisma.opec.findUnique({
-            where: { simoId: raw.id },
-            select: { id: true, updatedAt: true },
+    for (const item of items) {
+      try {
+        const data = mapToPrisma(item);
+        const existing = await prisma.opec.findUnique({
+          where: { simoId: data.simoId },
+          select: { id: true },
+        });
+        if (!existing) {
+          await prisma.opec.create({ data });
+          nuevas++;
+        } else {
+          await prisma.opec.update({
+            where: { simoId: data.simoId },
+            data: {
+              nombreCargo: data.nombreCargo,
+              numVacantes: data.numVacantes,
+              municipio: data.municipio,
+              departamento: data.departamento,
+              requisitosEstudio: data.requisitosEstudio,
+              requisitosExp: data.requisitosExp,
+              competencias: data.competencias,
+              tipoPruebas: data.tipoPruebas,
+              fechaLimiteInscripcion: data.fechaLimiteInscripcion,
+              urlDetalle: data.urlDetalle,
+              scrapedAt: data.scrapedAt,
+            },
           });
-
-          const data = {
-            simoId: raw.id,
-            numerConvocatoria: raw.numerConvocatoria ?? null,
-            nombreCargo: raw.nombreCargo,
-            entidad: raw.entidad,
-            nivelJerarquico: raw.nivelJerarquico,
-            grado: raw.grado ?? "N/A",
-            numVacantes: raw.numVacantes ?? 1,
-            municipio: raw.municipio,
-            departamento: raw.departamento,
-            requisitosEstudio: raw.requisitosEstudio ?? "",
-            requisitosExp: raw.requisitosExp ?? "",
-            competencias: raw.competencias ?? [],
-            tipoPruebas: raw.tipoPruebas ?? [],
-            nivelResponsabilidad: raw.nivelResponsabilidad ?? mapearNivelResponsabilidad(raw.nivelJerarquico),
-            fechaLimiteInscripcion: raw.fechaLimiteInscripcion ? new Date(raw.fechaLimiteInscripcion) : null,
-            fechaExamen: raw.fechaExamen ? new Date(raw.fechaExamen) : null,
-            urlDetalle: raw.urlDetalle ?? `${SIMO_BASE}/#ofertaEmpleo/${raw.id}`,
-            scrapedAt: new Date(),
-            estado: "ACTIVA" as const,
-          };
-
-          if (!existe) {
-            await prisma.opec.create({ data });
-            nuevas++;
-          } else {
-            await prisma.opec.update({ where: { simoId: raw.id }, data });
-            actualizadas++;
-          }
-        } catch (e) {
-          console.error(`[Scraper] Error procesando OPEC ${raw.id}:`, e);
-          errores++;
+          actualizadas++;
         }
-      }
-
-      // Si devolvió menos de 50, no hay más páginas
-      if (opecs.length < 50) {
-        hayMas = false;
-      } else {
-        pagina++;
-        // Pausa para no saturar el servidor de la CNSC
-        await new Promise((r) => setTimeout(r, 500));
+      } catch (e) {
+        console.error(`[Scraper] Error procesando OPEC ${item.id}:`, e);
+        errores++;
       }
     }
 
-    // Marcar como VENCIDAS las OPECs con fecha límite pasada
-    await prisma.opec.updateMany({
-      where: {
-        estado: "ACTIVA",
-        fechaLimiteInscripcion: { lt: new Date() },
-      },
-      data: { estado: "VENCIDA" },
-    });
-
-    console.log(`[Scraper] ✅ Sincronización completa: ${nuevas} nuevas, ${actualizadas} actualizadas, ${errores} errores`);
-  } catch (error) {
-    console.error("[Scraper] ❌ Error en sincronización:", error);
-    throw error;
+    page++;
+    if (items.length < PAGE_SIZE) break;
+    // Pausa respetuosa entre páginas
+    await new Promise((r) => setTimeout(r, 300));
   }
+
+  // Marcar como VENCIDAS las OPECs con fecha límite pasada
+  await prisma.opec.updateMany({
+    where: {
+      estado: "ACTIVA",
+      fechaLimiteInscripcion: { lt: new Date() },
+    },
+    data: { estado: "VENCIDA" },
+  });
+
+  console.log(
+    `[Scraper] ✅ Completo: ${nuevas} nuevas, ${actualizadas} actualizadas, ${errores} errores`
+  );
 
   return { nuevas, actualizadas, errores };
 }
