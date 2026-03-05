@@ -3,15 +3,16 @@ import { getOpecssinPreguntas } from "@/lib/scraper";
 import { generarBancoCompleto } from "@/lib/ia-generator";
 
 // GET /api/cron/ia-generator
-// Vercel Cron: "0 */2 * * *" (cada 2 horas)
-// Genera preguntas para 20 OPECs por ejecución → ~240/día → ~14 días para cubrir 3386 OPECs
+// Vercel Cron: "0 12 * * *" (7AM Colombia = 12PM UTC, diario)
+// Genera preguntas para 50 OPECs por día → ~68 días para cubrir 3386 OPECs
+// Para generación masiva manual usa: POST /api/admin/generar-lote
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const BATCH = 20;
+  const BATCH = 50;
 
   try {
     const opecsSinPreguntas = await getOpecssinPreguntas();
