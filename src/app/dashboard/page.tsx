@@ -1,12 +1,15 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { ensureUserProfile } from "@/lib/ensure-profile";
 import { calcularNivel, porcentajeNivelActual } from "@/lib/gamification";
 import Link from "next/link";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
+
+  await ensureUserProfile(userId);
 
   const user = await prisma.userProfile.findUnique({
     where: { id: userId },

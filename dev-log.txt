@@ -6,3 +6,41 @@
 ✓ Starting...
  ○ (pwa) PWA support is disabled.
 ✓ Ready in 7.3s
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+○ Compiling /_error ...
+ GET / 404 in 11.6s (compile: -502806µs, proxy.ts: 11.5s, render: 516ms)
+○ Compiling /_not-found ...
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+ GET / 404 in 567ms (compile: -68730µs, proxy.ts: 550ms, render: 86ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+⨯ Error: Publishable key not valid.
+    at ignore-listed frames
+ GET / 404 in 353ms (compile: -12301µs, proxy.ts: 349ms, render: 16ms)
+  Reload env: .env
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
