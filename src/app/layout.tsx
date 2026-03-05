@@ -33,16 +33,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="es" className="dark">
-        <head>
-          <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
-          <meta name="mobile-web-app-capable" content="yes" />
-        </head>
-        <body className={`${inter.className} bg-[#0f1623] text-white antialiased`}>
+    <html lang="es" className="dark">
+      <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
+      <body className={`${inter.className} bg-[#0f1623] text-white antialiased`}>
+        <ClerkProvider>
           {children}
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

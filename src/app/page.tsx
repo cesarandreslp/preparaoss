@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { Show, SignUpButton, SignInButton } from "@clerk/nextjs";
 
-export default async function LandingPage() {
-  const { userId } = await auth();
+export default function LandingPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-gradient-to-b from-[#0f1623] to-[#1a2540]">
       {/* Hero */}
@@ -21,29 +20,26 @@ export default async function LandingPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          {!userId ? (
-            <>
-              <Link
-                href="/sign-up"
-                className="px-8 py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-colors text-white text-lg"
-              >
+          <Show when="signed-out">
+            <SignUpButton>
+              <button className="px-8 py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-colors text-white text-lg">
                 Empezar gratis
-              </Link>
-              <Link
-                href="/sign-in"
-                className="px-8 py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 transition-colors text-white text-lg"
-              >
+              </button>
+            </SignUpButton>
+            <SignInButton>
+              <button className="px-8 py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 transition-colors text-white text-lg">
                 Ingresar
-              </Link>
-            </>
-          ) : (
+              </button>
+            </SignInButton>
+          </Show>
+          <Show when="signed-in">
             <Link
               href="/dashboard"
               className="px-8 py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-colors text-white text-lg"
             >
               Ir al Dashboard →
             </Link>
-          )}
+          </Show>
         </div>
       </div>
 
