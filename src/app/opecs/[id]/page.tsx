@@ -45,10 +45,12 @@ export default async function OpecDetailPage({
       <div className="rounded-2xl p-5 space-y-3" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
         <div className="grid grid-cols-2 gap-3 text-sm">
           {[
+            { label: "Número OPEC", value: opec.simoId },
             { label: "Nivel", value: opec.nivelJerarquico },
             { label: "Grado", value: opec.grado },
             { label: "Vacantes", value: String(opec.numVacantes) },
             { label: "Municipio", value: `${opec.municipio}, ${opec.departamento}` },
+            ...(opec.numerConvocatoria ? [{ label: "Convocatoria", value: opec.numerConvocatoria }] : []),
             ...(opec.asignacionBasica ? [{ label: "Asignación básica", value: opec.asignacionBasica.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }) + "/mes" }] : []),
           ].map((item) => (
             <div key={item.label}>
