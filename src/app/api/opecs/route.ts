@@ -19,6 +19,8 @@ export async function GET(request: Request) {
     where.OR = [
       { nombreCargo: { contains: busqueda, mode: "insensitive" } },
       { entidad: { contains: busqueda, mode: "insensitive" } },
+      { simoId: { contains: busqueda, mode: "insensitive" } },
+      { numerConvocatoria: { contains: busqueda, mode: "insensitive" } },
     ];
 
   const [opecs, total] = await Promise.all([
@@ -27,6 +29,7 @@ export async function GET(request: Request) {
       select: {
         id: true,
         simoId: true,
+        numerConvocatoria: true,
         nombreCargo: true,
         entidad: true,
         nivelJerarquico: true,
