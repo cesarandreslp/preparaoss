@@ -8,7 +8,7 @@
  */
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { enviarRecordatorioRacha } from "@/lib/resend";
+import { enviarRecordatorioRacha } from "@/lib/mailer";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
       console.error(`[Cron/Recordatorios] Error enviando a ${u.email}:`, e);
       errores++;
     }
-    // Pequeña pausa para no saturar la API de Resend
+    // Pequeña pausa entre envíos
     await new Promise((r) => setTimeout(r, 200));
   }
 

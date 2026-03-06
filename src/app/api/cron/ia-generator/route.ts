@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getOpecssinPreguntas } from "@/lib/scraper";
 import { generarBancoCompleto } from "@/lib/ia-generator";
 import { prisma } from "@/lib/prisma";
-import { enviarSimulacroDisponible } from "@/lib/resend";
+import { enviarSimulacroDisponible } from "@/lib/mailer";
 
 // GET /api/cron/ia-generator
 // Vercel Cron: "0 12 * * *" (7AM Colombia = 12PM UTC, diario)

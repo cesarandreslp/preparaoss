@@ -1,9 +1,21 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+const APP_URL = process.env.APP_URL ?? "https://preparaoss.vercel.app";
 
-const FROM = "PreparaOSS <onboarding@resend.dev>";
-const APP_URL = "https://preparaoss.vercel.app";
+// Transporter reutilizable (se crea una vez por módulo)
+function getTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: Number(process.env.SMTP_PORT ?? 587) === 465, // true solo si puerto 465
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
+const FROM = process.env.EMAIL_FROM ?? `PreparaOSS <${process.env.SMTP_USER}>`;
 
 // ──────────────────────────────────────────────
 // Email: recordatorio de racha en riesgo
@@ -21,7 +33,8 @@ export async function enviarRecordatorioRacha(
 
   const emoji = racha >= 7 ? "🔥🔥" : racha >= 3 ? "🔥" : "⚡";
 
-  await resend.emails.send({
+  const transporter = getTransporter();
+  await transporter.sendMail({
     from: FROM,
     to: email,
     subject: `${emoji} Tu racha de ${racha} días está en riesgo — PreparaOSS`,
@@ -52,7 +65,8 @@ export async function enviarSimulacroDisponible(
   nombre: string,
   opec: { id: string; nombreCargo: string; entidad: string; simoId: string }
 ) {
-  await resend.emails.send({
+  const transporter = getTransporter();
+  await transporter.sendMail({
     from: FROM,
     to: email,
     subject: `📢 Nuevo simulacro disponible: ${opec.nombreCargo} — PreparaOSS`,
@@ -98,14 +112,14 @@ function baseTemplate(content: string): string {
         <tr>
           <td style="background:linear-gradient(135deg,#1B3A6B,#0F1E38);padding:24px 32px;border-bottom:1px solid #1E3D6E;">
             <p style="margin:0;font-size:20px;font-weight:800;color:#F0F4FA;letter-spacing:-0.5px;">
-              Prepara<span style="color:#4A90D9;">OSS</span>
+              PreparaOSS
             </p>
-            <p style="margin:4px 0 0;font-size:12px;color:#6B8BAD;">
+            <p style="margin:4px 0 0;font-size:12px;color:#6B8BAD;text-transform:uppercase;letter-spacing:1px;">
               Plataforma de preparación CNSC
             </p>
           </td>
         </tr>
-        <!-- Content -->
+        <!-- Body -->
         <tr>
           <td style="padding:32px;">
             ${content}
@@ -113,10 +127,9 @@ function baseTemplate(content: string): string {
         </tr>
         <!-- Footer -->
         <tr>
-          <td style="padding:16px 32px 24px;border-top:1px solid #1E3D6E;">
-            <p style="margin:0;font-size:11px;color:#3A5070;text-align:center;">
-              © 2026 PreparaOSS · 
-              <a href="${APP_URL}" style="color:#3A5070;">preparaoss.vercel.app</a>
+          <td style="padding:16px 32px;border-top:1px solid #1E3D6E;text-align:center;">
+            <p style="margin:0;font-size:11px;color:#3A5A8A;">
+              © 2026 PreparaOSS · <a href="${APP_URL}" style="color:#4A90D9;text-decoration:none;">preparaoss.vercel.app</a>
             </p>
           </td>
         </tr>
