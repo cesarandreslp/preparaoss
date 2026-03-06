@@ -12,32 +12,13 @@ interface Props {
 
 export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
   const router = useRouter();
-  const [generando, setGenerando] = useState(false);
-  const [error, setError] = useState("");
-  const [mensaje, setMensaje] = useState("");
-
-  async function generarPreguntas() {
-    setGenerando(true);
-    setError("");
-    setMensaje("");
-    try {
-      const res = await fetch(`/api/opecs/${opecId}/generar-preguntas`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setMensaje(data.mensaje);
-      router.refresh(); // Refresca el Server Component para mostrar el botón de simulacro
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Error desconocido");
-    } finally {
-      setGenerando(false);
-    }
-  }
+  const [cargando, setCargando] = useState(false);
 
   async function toggleInscripcion() {
+    setCargando(true);
     await fetch(`/api/opecs/${opecId}/inscribirse`, { method: "POST" });
     router.refresh();
+    setCargando(false);
   }
 
   return (
@@ -50,38 +31,21 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
           🚀 Iniciar simulacro
         </Link>
       ) : (
-        <div className="space-y-2">
-          <button
-            onClick={generarPreguntas}
-            disabled={generando}
-            className="btn-primary w-full px-6 py-4 text-lg rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {generando ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="animate-spin">⚙️</span>
-                Generando preguntas con IA... (30–60 seg)
-              </span>
-            ) : (
-              "🤖 Generar banco de preguntas"
-            )}
-          </button>
-          {generando && (
-            <p className="text-xs text-center" style={{ color: '#A8BFDC' }}>
-              Groq está creando escenarios situacionales, preguntas transversales y comportamentales para este cargo.
-            </p>
-          )}
-          {mensaje && (
-            <p className="text-sm text-center" style={{ color: '#27AE60' }}>✅ {mensaje}</p>
-          )}
-          {error && (
-            <p className="text-sm text-center" style={{ color: '#E74C3C' }}>❌ {error}</p>
-          )}
+        <div
+          className="w-full px-6 py-4 rounded-2xl text-center"
+          style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', color: '#F5A623' }}
+        >
+          <p className="font-medium">⏳ Banco de preguntas en preparación</p>
+          <p className="text-xs mt-1" style={{ color: '#A8BFDC' }}>
+            El simulacro estará disponible pronto. ¡Sigue esta OPEC para estar al tanto!
+          </p>
         </div>
       )}
 
       <button
         onClick={toggleInscripcion}
-        className="w-full px-6 py-3 rounded-2xl text-sm font-medium transition-all"
+        disabled={cargando}
+        className="w-full px-6 py-3 rounded-2xl text-sm font-medium transition-all disabled:opacity-60"
         style={inscrito
           ? { background: 'rgba(39,174,96,0.15)', color: '#27AE60', border: '1px solid rgba(39,174,96,0.35)' }
           : { background: 'rgba(74,144,217,0.15)', color: '#4A90D9', border: '1px solid rgba(74,144,217,0.35)' }}
@@ -98,4 +62,4 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
       </Link>
     </div>
   );
-}
+}}
