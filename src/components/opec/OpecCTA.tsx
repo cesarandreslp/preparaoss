@@ -62,4 +62,4 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
       </Link>
     </div>
   );
-}}
+}
