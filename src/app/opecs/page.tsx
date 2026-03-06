@@ -84,9 +84,11 @@ export default function OpecsPage() {
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-mono px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,166,35,0.15)', color: '#F5A623', border: '1px solid rgba(245,166,35,0.25)' }}>
-                      #{opec.numerConvocatoria ?? opec.simoId}
-                    </span>
+                    {opec.numerConvocatoria && (
+                      <span className="text-xs font-mono px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,166,35,0.15)', color: '#F5A623', border: '1px solid rgba(245,166,35,0.25)' }}>
+                        Conv. {opec.numerConvocatoria}
+                      </span>
+                    )}
                   </div>
                   <p className="font-semibold truncate" style={{ color: '#F0F4FA' }}>{opec.nombreCargo}</p>
                   <p className="text-sm truncate" style={{ color: '#A8BFDC' }}>{opec.entidad}</p>
