@@ -388,3 +388,14 @@ model Suscripcion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ─────────────────────────────────────────────────────────
+// CONFIGURACIÓN DE LA APLICACIÓN
+// ─────────────────────────────────────────────────────────
+
+/// Pares clave-valor para configuración persit en DB (ej. SMTP)
+model AppConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

@@ -1,21 +1,36 @@
 import nodemailer from "nodemailer";
+import { prisma } from "@/lib/prisma";
 
 const APP_URL = process.env.APP_URL ?? "https://preparaoss.vercel.app";
 
-// Transporter reutilizable (se crea una vez por módulo)
-function getTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT ?? 587),
-    secure: Number(process.env.SMTP_PORT ?? 587) === 465, // true solo si puerto 465
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+// ──────────────────────────────────────────────
+// Carga configuración SMTP desde DB, con fallback a env vars
+// ──────────────────────────────────────────────
+async function getSmtpConfig() {
+  const rows = await prisma.appConfig.findMany({
+    where: { key: { in: ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "EMAIL_FROM"] } },
   });
+
+  const cfg: Record<string, string> = {};
+  for (const r of rows) cfg[r.key] = r.value;
+
+  const host = cfg["SMTP_HOST"] || process.env.SMTP_HOST || "";
+  const port = Number(cfg["SMTP_PORT"] || process.env.SMTP_PORT || 587);
+  const user = cfg["SMTP_USER"] || process.env.SMTP_USER || "";
+  const pass = cfg["SMTP_PASS"] || process.env.SMTP_PASS || "";
+  const from = cfg["EMAIL_FROM"] || process.env.EMAIL_FROM || `PreparaOSS <${user}>`;
+
+  return { host, port, user, pass, from };
 }
 
-const FROM = process.env.EMAIL_FROM ?? `PreparaOSS <${process.env.SMTP_USER}>`;
+function buildTransporter(host: string, port: number, user: string, pass: string) {
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
+}
 
 // ──────────────────────────────────────────────
 // Email: recordatorio de racha en riesgo
@@ -26,6 +41,9 @@ export async function enviarRecordatorioRacha(
   nombre: string,
   racha: number
 ) {
+  const { host, port, user, pass, from } = await getSmtpConfig();
+  const transporter = buildTransporter(host, port, user, pass);
+
   const mensaje =
     racha === 1
       ? "Tienes <strong>1 día de racha</strong> activa. ¡No la pierdas!"
@@ -33,9 +51,8 @@ export async function enviarRecordatorioRacha(
 
   const emoji = racha >= 7 ? "🔥🔥" : racha >= 3 ? "🔥" : "⚡";
 
-  const transporter = getTransporter();
   await transporter.sendMail({
-    from: FROM,
+    from,
     to: email,
     subject: `${emoji} Tu racha de ${racha} días está en riesgo — PreparaOSS`,
     html: baseTemplate(`
@@ -65,9 +82,11 @@ export async function enviarSimulacroDisponible(
   nombre: string,
   opec: { id: string; nombreCargo: string; entidad: string; simoId: string }
 ) {
-  const transporter = getTransporter();
+  const { host, port, user, pass, from } = await getSmtpConfig();
+  const transporter = buildTransporter(host, port, user, pass);
+
   await transporter.sendMail({
-    from: FROM,
+    from,
     to: email,
     subject: `📢 Nuevo simulacro disponible: ${opec.nombreCargo} — PreparaOSS`,
     html: baseTemplate(`
@@ -93,6 +112,38 @@ export async function enviarSimulacroDisponible(
          style="display:inline-block;background:linear-gradient(135deg,#1B3A6B,#2563EB);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:700;font-size:15px;">
         🎯 Iniciar simulacro
       </a>
+    `),
+  });
+}
+
+// ──────────────────────────────────────────────
+// Email: prueba de conectividad (para el admin)
+// ──────────────────────────────────────────────
+export async function enviarEmailPrueba() {
+  const { host, port, user, pass, from } = await getSmtpConfig();
+
+  if (!host || !user || !pass) {
+    throw new Error("Configuración SMTP incompleta. Guarda SMTP_HOST, SMTP_USER y SMTP_PASS en la configuración.");
+  }
+
+  const transporter = buildTransporter(host, port, user, pass);
+  await transporter.verify();
+
+  await transporter.sendMail({
+    from,
+    to: user,
+    subject: "✅ Prueba de email — PreparaOSS",
+    html: baseTemplate(`
+      <h2 style="margin:0 0 8px;font-size:22px;color:#4ADE80;">
+        ✅ ¡Configuración correcta!
+      </h2>
+      <p style="margin:0 0 16px;font-size:15px;color:#A8BFDC;">
+        El servidor SMTP está correctamente configurado para PreparaOSS.
+      </p>
+      <p style="margin:0;font-size:13px;color:#6B8BAD;">
+        Servidor: <strong style="color:#F0F4FA;">${host}:${port}</strong><br/>
+        Usuario: <strong style="color:#F0F4FA;">${user}</strong>
+      </p>
     `),
   });
 }

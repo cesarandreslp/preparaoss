@@ -93,6 +93,13 @@ export default function AdminPage() {
             <p className="text-gray-500 text-xs">Planes y usuarios</p>
           </div>
         </a>
+        <a href="/admin/configuracion" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
+          <span className="text-2xl">✉️</span>
+          <div>
+            <p className="font-semibold">Email SMTP</p>
+            <p className="text-gray-500 text-xs">Configuración de correo</p>
+          </div>
+        </a>
         <a href="/dashboard" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
           <span className="text-2xl">📊</span>
           <div>
