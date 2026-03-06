@@ -30,6 +30,7 @@ export async function GET(request: Request) {
         id: true,
         simoId: true,
         numerConvocatoria: true,
+        asignacionBasica: true,
         nombreCargo: true,
         entidad: true,
         nivelJerarquico: true,

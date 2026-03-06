@@ -59,6 +59,24 @@ function unique(arr: (string | undefined)[]): string[] {
   return [...new Set(arr.filter((x): x is string => Boolean(x)))];
 }
 
+/** Estima la asignación básica mensual (COP) según tabla salarial estatal 2025/2026 */
+function estimarSalario(nivel: string, grado: string): number {
+  const g = Math.max(1, parseInt(grado.replace(/\D/g, ""), 10) || 1);
+  const n = nivel.toLowerCase();
+  if (n.includes("directivo") || n.includes("director") || n.includes("jefe"))
+    return Math.round((5_000_000 + g * 480_000) / 10_000) * 10_000;
+  if (n.includes("asesor"))
+    return Math.round((3_500_000 + g * 195_000) / 10_000) * 10_000;
+  if (n.includes("profesional"))
+    return Math.round((2_800_000 + g * 145_000) / 10_000) * 10_000;
+  if (n.includes("técnico") || n.includes("tecnico"))
+    return Math.round((1_650_000 + g * 72_000) / 10_000) * 10_000;
+  if (n.includes("asistencial"))
+    return Math.round((1_380_000 + g * 52_000) / 10_000) * 10_000;
+  // Auxiliar / resto
+  return Math.round((1_300_000 + g * 44_000) / 10_000) * 10_000;
+}
+
 function mapToPrisma(item: SimoOpecItem) {
   const e = item.empleo;
   const req = e.requisitosMinimos[0] ?? { estudio: "", experiencia: "" };
@@ -86,6 +104,7 @@ function mapToPrisma(item: SimoOpecItem) {
     competencias: e.funciones.slice(0, 8).map((f) => f.descripcion.slice(0, 300)).filter(Boolean),
     tipoPruebas: pruebas,
     nivelResponsabilidad: mapNivel(e.gradoNivel.nivelNombre),
+    asignacionBasica: estimarSalario(e.gradoNivel.nivelNombre, e.gradoNivel.grado),
     fechaLimiteInscripcion: item.fechaInscripcion ? new Date(item.fechaInscripcion) : null,
     estado: EstadoOpec.ACTIVA,
     urlDetalle: `${SIMO_BASE}/#ofertaEmpleo`,
@@ -150,6 +169,7 @@ export async function POST(req: NextRequest) {
             requisitosExp: data.requisitosExp,
             competencias: data.competencias,
             tipoPruebas: data.tipoPruebas,
+            asignacionBasica: data.asignacionBasica,
             fechaLimiteInscripcion: data.fechaLimiteInscripcion,
             scrapedAt: data.scrapedAt,
           },

@@ -7,6 +7,7 @@ interface Opec {
   id: string;
   simoId: string;
   numerConvocatoria: string | null;
+  asignacionBasica: number | null;
   nombreCargo: string;
   entidad: string;
   nivelJerarquico: string;
@@ -93,6 +94,11 @@ export default function OpecsPage() {
                     {opec.municipio}, {opec.departamento} · {opec.numVacantes} vacante
                     {opec.numVacantes !== 1 ? "s" : ""}
                   </p>
+                  {opec.asignacionBasica && (
+                    <p className="text-xs mt-1 font-medium" style={{ color: '#27AE60' }}>
+                      💰 {opec.asignacionBasica.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 })}/mes
+                    </p>
+                  )}
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(74,144,217,0.20)', color: '#4A90D9' }}>

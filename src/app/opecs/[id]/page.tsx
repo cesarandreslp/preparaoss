@@ -49,6 +49,7 @@ export default async function OpecDetailPage({
             { label: "Grado", value: opec.grado },
             { label: "Vacantes", value: String(opec.numVacantes) },
             { label: "Municipio", value: `${opec.municipio}, ${opec.departamento}` },
+            ...(opec.asignacionBasica ? [{ label: "Asignación básica", value: opec.asignacionBasica.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }) + "/mes" }] : []),
           ].map((item) => (
             <div key={item.label}>
               <p className="text-xs uppercase tracking-wide" style={{ color: '#6B8BAD' }}>{item.label}</p>
