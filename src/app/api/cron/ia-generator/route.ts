@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getOpecssinPreguntas } from "@/lib/scraper";
 import { generarBancoCompleto } from "@/lib/ia-generator";
+import { prisma } from "@/lib/prisma";
+import { enviarSimulacroDisponible } from "@/lib/resend";
 
 // GET /api/cron/ia-generator
 // Vercel Cron: "0 12 * * *" (7AM Colombia = 12PM UTC, diario)
@@ -30,6 +32,23 @@ export async function GET(request: Request) {
       try {
         await generarBancoCompleto(opecId);
         generadas.push(opecId);
+
+        // Notificar a los usuarios que siguen esta OPEC
+        try {
+          const opec = await prisma.opec.findUnique({
+            where: { id: opecId },
+            select: {
+              id: true, simoId: true, nombreCargo: true, entidad: true,
+              inscripciones: { select: { user: { select: { email: true, nombre: true } } } },
+            },
+          });
+          if (opec && opec.inscripciones.length > 0) {
+            for (const ins of opec.inscripciones) {
+              await enviarSimulacroDisponible(ins.user.email, ins.user.nombre, opec).catch(() => {});
+              await new Promise((r) => setTimeout(r, 150));
+            }
+          }
+        } catch { /* no bloquear si falla el email */ }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error(`[Cron/IA] Error OPEC ${opecId}:`, msg);
