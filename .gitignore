@@ -50,3 +50,5 @@ next-env.d.ts
 # scripts output & screenshots
 /.ts-scripts-out/
 scripts/*.png
+
+.vercel
