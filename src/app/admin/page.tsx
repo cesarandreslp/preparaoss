@@ -82,7 +82,25 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-8">
       <h1 className="text-3xl font-bold mb-2">🛠️ Panel Admin</h1>
-      <p className="text-gray-400 mb-8">Generación masiva de bancos de preguntas IA</p>
+      <p className="text-gray-400 mb-6">Generación masiva de bancos de preguntas IA</p>
+
+      {/* Nav cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+        <a href="/admin/membresias" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
+          <span className="text-2xl">💎</span>
+          <div>
+            <p className="font-semibold">Membresías</p>
+            <p className="text-gray-500 text-xs">Planes y usuarios</p>
+          </div>
+        </a>
+        <a href="/dashboard" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
+          <span className="text-2xl">📊</span>
+          <div>
+            <p className="font-semibold">Dashboard</p>
+            <p className="text-gray-500 text-xs">Vista de usuario</p>
+          </div>
+        </a>
+      </div>
 
       {/* Stats */}
       <div className="bg-gray-900 rounded-xl p-6 mb-6 flex gap-8">

@@ -351,6 +351,21 @@ model UserBadge {
 // SUSCRIPCIONES
 // ─────────────────────────────────────────────────────────
 
+/// Configuración editable de cada plan (guardada en DB, admin la puede modificar)
+model PlanConfig {
+  plan                  PlanSuscripcion @id
+  nombre                String          // "Gratuito", "Básico", "Pro", "Premium"
+  descripcion           String
+  precioMensualCOP      Int             // 0 = gratis
+  simulacrosMes         Int             // -1 = ilimitado
+  preguntasPorSimulacro Int
+  features              String[]        // Lista de beneficios visibles al usuario
+  color                 String          // HEX: "#16a34a"
+  emoji                 String          // "🆓" "⚡" "🚀" "💎"
+  activo                Boolean         @default(true)
+  updatedAt             DateTime        @updatedAt
+}
+
 model Suscripcion {
   id     String          @id @default(cuid())
   plan   PlanSuscripcion @default(GRATUITO)
