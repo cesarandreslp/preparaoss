@@ -40,27 +40,27 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
   const retroMap = new Map(r.retroalimentacion.map((x) => [x.preguntaId, x]));
 
   const colorPuntaje = (p: number) => {
-    if (p >= 80) return "text-green-400";
-    if (p >= 60) return "text-yellow-400";
-    return "text-red-400";
+    if (p >= 80) return { color: '#27AE60' };
+    if (p >= 60) return { color: '#F5A623' };
+    return { color: '#E74C3C' };
   };
 
   return (
     <div className="space-y-6 pb-8">
       {/* Puntaje total */}
-      <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-2xl p-6 text-center">
-        <p className="text-slate-400 text-sm mb-1">Puntaje total</p>
-        <p className={`text-6xl font-bold mb-2 ${colorPuntaje(r.puntajeTotal)}`}>
+      <div className="rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg,rgba(27,58,107,0.50),rgba(37,99,235,0.25))', border: '1px solid #2A4A7F' }}>
+        <p className="text-sm mb-1" style={{ color: '#A8BFDC' }}>Puntaje total</p>
+        <p className="text-6xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)', ...colorPuntaje(r.puntajeTotal) }}>
           {r.puntajeTotal}%
         </p>
-        <p className="text-indigo-400 font-medium">+{r.xpGanado} XP ganados 🔥</p>
+        <p className="font-medium" style={{ color: '#F5A623' }}>+{r.xpGanado} XP ganados 🔥</p>
 
         {r.badgesNuevos.length > 0 && (
-          <div className="mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
-            <p className="text-yellow-400 text-sm font-semibold mb-1">¡Nuevos logros!</p>
+          <div className="mt-4 rounded-xl p-3" style={{ background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.35)' }}>
+            <p className="text-sm font-semibold mb-1" style={{ color: '#F5A623' }}>¡Nuevos logros!</p>
             <div className="flex flex-wrap gap-2 justify-center">
               {r.badgesNuevos.map((b) => (
-                <span key={b} className="bg-yellow-500/20 text-yellow-300 text-xs px-3 py-1 rounded-full">
+                <span key={b} className="text-xs px-3 py-1 rounded-full" style={{ background: 'rgba(245,166,35,0.20)', color: '#F5A623' }}>
                   🏅 {b}
                 </span>
               ))}
@@ -78,12 +78,13 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
         ].map((item) => (
           <div
             key={item.label}
-            className="bg-white/5 border border-white/10 rounded-xl p-3 text-center"
+            className="rounded-xl p-3 text-center"
+            style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}
           >
-            <p className={`text-2xl font-bold ${item.value !== null ? colorPuntaje(item.value) : "text-slate-500"}`}>
+            <p className="text-2xl font-bold" style={item.value !== null ? colorPuntaje(item.value) : { color: '#6B8BAD' }}>
               {item.value !== null ? `${item.value}%` : "N/A"}
             </p>
-            <p className="text-slate-400 text-xs mt-1">{item.label}</p>
+            <p className="text-xs mt-1" style={{ color: '#A8BFDC' }}>{item.label}</p>
           </div>
         ))}
       </div>
@@ -93,7 +94,7 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
           Justifica cada respuesta con la explicación de la IA
       ───────────────────────────────────────────────────── */}
       <div>
-        <h2 className="text-white font-bold text-lg mb-4">📋 Retroalimentación</h2>
+        <h2 className="font-bold text-lg mb-4" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>📋 Retroalimentación</h2>
 
         <div className="space-y-4">
           {todasPreguntas.map((pregunta, i) => {
@@ -110,23 +111,22 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
             return (
               <div
                 key={pregunta.id}
-                className={`rounded-2xl border p-5 ${
-                  retro.esCorrecta
-                    ? "bg-green-600/10 border-green-500/30"
-                    : "bg-red-600/10 border-red-500/30"
-                }`}
+                className="rounded-2xl border p-5"
+                style={retro.esCorrecta
+                  ? { background: 'rgba(39,174,96,0.10)', borderColor: 'rgba(39,174,96,0.35)' }
+                  : { background: 'rgba(231,76,60,0.10)', borderColor: 'rgba(231,76,60,0.35)' }}
               >
                 {/* Número + resultado */}
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-lg ${retro.esCorrecta ? "text-green-400" : "text-red-400"}`}>
+                  <span className="text-lg" style={{ color: retro.esCorrecta ? '#27AE60' : '#E74C3C' }}>
                     {retro.esCorrecta ? "✅" : "❌"}
                   </span>
-                  <span className="text-xs text-slate-400">Pregunta {i + 1}</span>
-                  <span className="text-xs text-slate-500 ml-auto">{pregunta.categoria}</span>
+                  <span className="text-xs" style={{ color: '#A8BFDC' }}>Pregunta {i + 1}</span>
+                  <span className="text-xs ml-auto" style={{ color: '#6B8BAD' }}>{pregunta.categoria}</span>
                 </div>
 
                 {/* Texto de la pregunta */}
-                <p className="text-white text-sm font-medium mb-3 leading-relaxed">
+                <p className="text-sm font-medium mb-3 leading-relaxed" style={{ color: '#F0F4FA' }}>
                   {pregunta.texto}
                 </p>
 
@@ -138,13 +138,12 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
                     return (
                       <div
                         key={opcion.id}
-                        className={`flex items-start gap-2 px-3 py-2 rounded-lg text-sm ${
-                          esCorrecta
-                            ? "bg-green-500/20 text-green-200"
-                            : esSeleccionada
-                            ? "bg-red-500/20 text-red-200"
-                            : "text-slate-400"
-                        }`}
+                        className="flex items-start gap-2 px-3 py-2 rounded-lg text-sm"
+                        style={esCorrecta
+                          ? { background: 'rgba(39,174,96,0.20)', color: '#6ee7a0' }
+                          : esSeleccionada
+                          ? { background: 'rgba(231,76,60,0.20)', color: '#fca5a5' }
+                          : { color: '#A8BFDC' }}
                       >
                         <span className="shrink-0 mt-0.5">
                           {esCorrecta ? "✓" : esSeleccionada ? "✗" : "·"}
@@ -158,11 +157,11 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
                 </div>
 
                 {/* Explicación de la IA */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <p className="text-xs text-indigo-400 font-semibold mb-1 uppercase tracking-wide">
+                <div className="rounded-xl p-4" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
+                  <p className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: '#4A90D9' }}>
                     Explicación
                   </p>
-                  <p className="text-slate-300 text-sm leading-relaxed">{retro.explicacion}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: '#A8BFDC' }}>{retro.explicacion}</p>
                 </div>
               </div>
             );
@@ -173,7 +172,7 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
       {/* Botón volver */}
       <button
         onClick={onVolver}
-        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-white text-lg transition-colors"
+        className="btn-primary w-full py-4 text-lg rounded-2xl"
       >
         Volver a la OPEC
       </button>

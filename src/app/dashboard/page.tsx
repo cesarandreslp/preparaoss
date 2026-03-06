@@ -46,52 +46,51 @@ export default async function DashboardPage() {
       {/* Saludo + racha */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-slate-400 text-sm">Buenos días,</p>
-          <h1 className="text-xl font-bold text-white">{user.nombre}</h1>
+          <p className="text-sm" style={{ color: '#A8BFDC' }}>Buenos días,</p>
+          <h1 className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>{user.nombre}</h1>
         </div>
-        <div className="flex items-center gap-2 bg-orange-500/20 text-orange-400 px-3 py-2 rounded-xl">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(245,166,35,0.15)', color: '#F5A623', border: '1px solid rgba(245,166,35,0.30)' }}>
           <span className="text-lg">🔥</span>
-          <span className="font-bold">{user.rachaActual}</span>
+          <span className="font-bold" style={{ fontFamily: 'var(--font-display)' }}>{user.rachaActual}</span>
         </div>
       </div>
 
       {/* Tarjeta de nivel / XP */}
-      <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-2xl p-5">
+      <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg,rgba(27,58,107,0.50),rgba(37,99,235,0.25))', border: '1px solid #2A4A7F' }}>
         <div className="flex justify-between items-center mb-3">
           <div>
-            <p className="text-xs text-slate-400 uppercase tracking-wider">Nivel {nivelInfo.nivel}</p>
-            <p className="font-bold text-white text-lg">{nivelInfo.nombre}</p>
+            <p className="text-xs uppercase tracking-wider" style={{ color: '#A8BFDC' }}>Nivel {nivelInfo.nivel}</p>
+            <p className="font-bold text-lg" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>{nivelInfo.nombre}</p>
           </div>
           <div className="text-right">
-            <p className="text-indigo-400 font-bold text-lg">{user.xpTotal.toLocaleString()} XP</p>
-            <p className="text-xs text-slate-400">{user.simulacrosTotal} simulacros</p>
+            <p className="font-bold text-lg" style={{ color: '#F5A623', fontFamily: 'var(--font-display)' }}>{user.xpTotal.toLocaleString()} XP</p>
+            <p className="text-xs" style={{ color: '#A8BFDC' }}>{user.simulacrosTotal} simulacros</p>
           </div>
         </div>
         {/* Barra de progreso */}
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all"
-            style={{ width: `${progreso}%` }}
+            className="h-full rounded-full transition-all" style={{ background: 'linear-gradient(90deg,#2563EB,#4A90D9)', width: `${progreso}%` }}
           />
         </div>
-        <p className="text-xs text-slate-500 mt-1">{progreso}% al siguiente nivel</p>
+        <p className="text-xs mt-1" style={{ color: '#6B8BAD' }}>{progreso}% al siguiente nivel</p>
       </div>
 
       {/* Mis OPECs */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <h2 className="font-semibold text-white">Mis OPECs</h2>
-          <Link href="/opecs" className="text-indigo-400 text-sm">
+          <h2 className="font-semibold" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>Mis OPECs</h2>
+          <Link href="/opecs" className="text-sm font-medium" style={{ color: '#4A90D9' }}>
             Ver todas →
           </Link>
         </div>
 
         {user.inscripciones.length === 0 ? (
-          <div className="bg-white/5 rounded-2xl p-8 text-center border border-white/10">
-            <p className="text-slate-400 mb-4">Aún no te has inscrito a ninguna OPEC</p>
+          <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
+            <p className="mb-4" style={{ color: '#A8BFDC' }}>Aún no te has inscrito a ninguna OPEC</p>
             <Link
               href="/opecs"
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-sm font-medium transition-colors"
+              className="btn-primary text-sm px-5 py-2"
             >
               Buscar OPECs disponibles
             </Link>
@@ -102,12 +101,13 @@ export default async function DashboardPage() {
               <Link
                 key={opec.id}
                 href={`/opecs/${opec.id}`}
-                className="block bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-colors"
+                className="block rounded-2xl p-4 transition-all hover:brightness-110"
+                style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}
               >
-                <p className="font-medium text-white">{opec.nombreCargo}</p>
-                <p className="text-slate-400 text-sm">{opec.entidad}</p>
+                <p className="font-medium" style={{ color: '#F0F4FA' }}>{opec.nombreCargo}</p>
+                <p className="text-sm" style={{ color: '#A8BFDC' }}>{opec.entidad}</p>
                 {opec.fechaExamen && (
-                  <p className="text-xs text-indigo-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#4A90D9' }}>
                     📅 Examen:{" "}
                     {new Date(opec.fechaExamen).toLocaleDateString("es-CO")}
                   </p>
@@ -127,10 +127,11 @@ export default async function DashboardPage() {
           <Link
             key={a.href}
             href={a.href}
-            className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 text-center transition-colors"
+            className="rounded-2xl p-4 text-center transition-all hover:brightness-110"
+            style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}
           >
             <div className="text-2xl mb-1">{a.icon}</div>
-            <p className="text-sm font-medium text-white">{a.label}</p>
+            <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>{a.label}</p>
           </Link>
         ))}
       </div>

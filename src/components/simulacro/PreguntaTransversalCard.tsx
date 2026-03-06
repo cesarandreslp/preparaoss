@@ -11,15 +11,15 @@ interface Props {
 
 export function PreguntaTransversalCard({ numero, pregunta, respuesta, onRespuesta }: Props) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+    <div className="rounded-2xl p-5" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
       <div className="flex items-center gap-2 mb-3">
-        <span className="bg-white/10 text-slate-300 text-xs font-bold px-2 py-0.5 rounded-full">
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(74,144,217,0.20)', color: '#4A90D9', fontFamily: 'var(--font-display)' }}>
           #{numero}
         </span>
-        <span className="text-xs text-slate-500">{pregunta.categoria}</span>
+        <span className="text-xs" style={{ color: '#6B8BAD' }}>{pregunta.categoria}</span>
       </div>
 
-      <p className="text-white font-medium mb-4 leading-relaxed">{pregunta.texto}</p>
+      <p className="font-medium mb-4 leading-relaxed" style={{ color: '#F0F4FA' }}>{pregunta.texto}</p>
 
       {/* 4 opciones (A, B, C, D) */}
       <div className="space-y-2">
@@ -29,13 +29,12 @@ export function PreguntaTransversalCard({ numero, pregunta, respuesta, onRespues
             <button
               key={opcion.id}
               onClick={() => onRespuesta({ preguntaId: pregunta.id, opcionId: opcion.id })}
-              className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm ${
-                seleccionada
-                  ? "bg-indigo-600/30 border-indigo-500 text-white"
-                  : "bg-white/5 border-white/10 text-slate-300 hover:border-white/30"
-              }`}
+              className="w-full text-left px-4 py-3 rounded-xl border transition-all text-sm"
+              style={seleccionada
+                ? { background: 'rgba(37,99,235,0.30)', borderColor: '#4A90D9', color: '#F0F4FA' }
+                : { background: 'rgba(30,61,110,0.30)', borderColor: '#2A4A7F', color: '#A8BFDC' }}
             >
-              <span className="font-bold text-indigo-400 mr-2">{opcion.letra}.</span>
+              <span className="font-bold mr-2" style={{ color: '#4A90D9' }}>{opcion.letra}.</span>
               {opcion.texto}
             </button>
           );

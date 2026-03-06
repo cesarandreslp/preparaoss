@@ -34,7 +34,7 @@ function RankingContent() {
 
   if (!opecId) {
     return (
-      <div className="text-center py-16 text-slate-400">
+      <div className="text-center py-16" style={{ color: '#A8BFDC' }}>
         <p className="text-4xl mb-4">🏆</p>
         <p>Selecciona una OPEC para ver su ranking</p>
       </div>
@@ -44,18 +44,18 @@ function RankingContent() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-white">Ranking semanal</h1>
-        {semana && <p className="text-slate-400 text-sm">Semana del {semana}</p>}
+        <h1 className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>Ranking semanal</h1>
+        {semana && <p className="text-sm" style={{ color: '#A8BFDC' }}>Semana del {semana}</p>}
       </div>
 
       {cargando ? (
         <div className="space-y-3">
           {[...Array(10)].map((_, i) => (
-            <div key={i} className="h-16 bg-white/5 rounded-2xl animate-pulse" />
+            <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(30,61,110,0.40)' }} />
           ))}
         </div>
       ) : ranking.length === 0 ? (
-        <div className="text-center py-16 text-slate-400">
+        <div className="text-center py-16" style={{ color: '#A8BFDC' }}>
           Aún no hay participantes en esta OPEC
         </div>
       ) : (
@@ -69,27 +69,26 @@ function RankingContent() {
             return (
               <div
                 key={entry.userId}
-                className={`flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all ${
-                  entry.esTuyo
-                    ? "bg-indigo-600/20 border-indigo-500/50"
-                    : "bg-white/5 border-white/10"
-                }`}
+                className="flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all"
+              style={entry.esTuyo
+                ? { background: 'rgba(37,99,235,0.18)', borderColor: 'rgba(74,144,217,0.50)' }
+                : { background: 'rgba(30,61,110,0.30)', borderColor: '#2A4A7F' }}
               >
-                <div className="w-8 text-center font-bold text-slate-400 text-sm">
+                <div className="w-8 text-center font-bold text-sm" style={{ color: '#A8BFDC' }}>
                   {medallaIcon ?? `#${entry.posicion}`}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`font-semibold truncate ${entry.esTuyo ? "text-indigo-300" : "text-white"}`}>
+                  <p className="font-semibold truncate" style={{ color: entry.esTuyo ? '#4A90D9' : '#F0F4FA' }}>
                     {entry.nombre}
-                    {entry.esTuyo && <span className="text-xs ml-2 text-indigo-400">(tú)</span>}
+                    {entry.esTuyo && <span className="text-xs ml-2" style={{ color: '#4A90D9' }}>(tú)</span>}
                   </p>
-                  <p className="text-slate-500 text-xs">Nivel {entry.nivel}</p>
+                  <p className="text-xs" style={{ color: '#6B8BAD' }}>Nivel {entry.nivel}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-indigo-400 font-bold text-sm">
+                  <p className="font-bold text-sm" style={{ color: '#F5A623', fontFamily: 'var(--font-display)' }}>
                     {entry.xpSemanal.toLocaleString()} XP
                   </p>
-                  <p className="text-slate-500 text-xs">total: {entry.xpTotal.toLocaleString()}</p>
+                  <p className="text-xs" style={{ color: '#6B8BAD' }}>total: {entry.xpTotal.toLocaleString()}</p>
                 </div>
               </div>
             );

@@ -1,26 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Sora, DM_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "PreparaOss — Concursos de Méritos CNSC",
+  title: "PreparaOSS — Concursos de Méritos CNSC",
   description:
     "Prepárate para los concursos de méritos de la CNSC con simulacros generados por IA, gamificación estilo Duolingo y competencias entre aspirantes.",
-  applicationName: "PreparaOss",
+  applicationName: "PreparaOSS",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "PreparaOss",
+    title: "PreparaOSS",
   },
   formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6366f1",
+  themeColor: "#1B3A6B",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -33,12 +45,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="dark">
+    <html lang="es" className={`${sora.variable} ${dmSans.variable}`}>
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${inter.className} bg-[#0f1623] text-white antialiased`}>
+      <body className="antialiased">
         <ClerkProvider>
           {children}
         </ClerkProvider>

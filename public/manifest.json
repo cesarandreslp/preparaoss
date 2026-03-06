@@ -1,11 +1,11 @@
 {
-  "name": "PreparaOss",
-  "short_name": "PreparaOss",
+  "name": "PreparaOSS",
+  "short_name": "PreparaOSS",
   "description": "Prepárate para los concursos de méritos de la CNSC con simulacros de IA y gamificación",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#0f1623",
-  "theme_color": "#6366f1",
+  "background_color": "#0D1F3C",
+  "theme_color": "#1B3A6B",
   "orientation": "portrait",
   "icons": [
     {

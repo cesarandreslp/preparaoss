@@ -3,40 +3,51 @@ import { Show, SignUpButton, SignInButton } from "@clerk/nextjs";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-gradient-to-b from-[#0f1623] to-[#1a2540]">
+    <main
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
+      style={{ background: "linear-gradient(180deg, #0D1F3C 0%, #1B3A6B 60%, #1a2d4e 100%)" }}
+    >
       {/* Hero */}
       <div className="text-center max-w-2xl mx-auto">
         <div className="text-6xl mb-4">🏛️</div>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          PreparaOss
+        <h1
+          className="text-4xl md:text-5xl font-extrabold mb-4"
+          style={{
+            fontFamily: "var(--font-display)",
+            background: "linear-gradient(135deg, #4A90D9, #F5A623)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          PreparaOSS
         </h1>
-        <p className="text-lg md:text-xl text-slate-300 mb-2">
+        <p className="text-lg md:text-xl mb-2" style={{ color: "#A8BFDC" }}>
           Prepárate para los concursos de méritos de la{" "}
-          <strong className="text-white">CNSC</strong> con simulacros
+          <strong style={{ color: "#F0F4FA" }}>CNSC</strong> con simulacros
           generados por inteligencia artificial.
         </p>
-        <p className="text-slate-400 mb-8">
+        <p className="mb-8 text-sm" style={{ color: "#6B8BAD" }}>
           Gamificación · Rankings · Competencias entre aspirantes · 3 tipos de prueba
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Show when="signed-out">
             <SignUpButton>
-              <button className="px-8 py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-colors text-white text-lg">
+              <button className="btn-primary text-lg px-8 py-3">
                 Empezar gratis
               </button>
             </SignUpButton>
             <SignInButton>
-              <button className="px-8 py-3 rounded-xl font-semibold bg-white/10 hover:bg-white/20 transition-colors text-white text-lg">
+              <button
+                className="btn-secondary text-lg px-8 py-3"
+                style={{ borderRadius: "9999px" }}
+              >
                 Ingresar
               </button>
             </SignInButton>
           </Show>
           <Show when="signed-in">
-            <Link
-              href="/dashboard"
-              className="px-8 py-3 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 transition-colors text-white text-lg"
-            >
+            <Link href="/dashboard" className="btn-primary text-lg px-8 py-3">
               Ir al Dashboard →
             </Link>
           </Show>
@@ -64,18 +75,26 @@ export default function LandingPage() {
         ].map((f) => (
           <div
             key={f.title}
-            className="bg-white/5 rounded-2xl p-6 border border-white/10"
+            className="card"
+            style={{
+              background: "rgba(30, 61, 110, 0.50)",
+              borderColor: "#2A4A7F",
+            }}
           >
             <div className="text-3xl mb-3">{f.icon}</div>
-            <h3 className="font-semibold text-white mb-2">{f.title}</h3>
-            <p className="text-slate-400 text-sm">{f.desc}</p>
+            <h3 className="font-semibold mb-2" style={{ fontFamily: "var(--font-display)", color: "#F0F4FA" }}>
+              {f.title}
+            </h3>
+            <p className="text-sm" style={{ color: "#A8BFDC" }}>
+              {f.desc}
+            </p>
           </div>
         ))}
       </div>
 
       {/* Pricing pills */}
       <div className="mt-16 text-center">
-        <p className="text-slate-400 mb-4 text-sm">Inversión mínima para empezar</p>
+        <p className="mb-4 text-sm" style={{ color: "#6B8BAD" }}>Inversión mínima para empezar</p>
         <div className="flex flex-wrap gap-3 justify-center">
           {[
             { label: "Gratuito", tag: "$0", highlight: false },
@@ -85,11 +104,21 @@ export default function LandingPage() {
           ].map((p) => (
             <span
               key={p.label}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
+              className="px-4 py-2 rounded-full text-sm font-medium"
+              style={
                 p.highlight
-                  ? "bg-indigo-600 text-white"
-                  : "bg-white/10 text-slate-300"
-              }`}
+                  ? {
+                      background: "linear-gradient(135deg,#F5A623,#C9962B)",
+                      color: "#0D1F3C",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 600,
+                    }
+                  : {
+                      background: "rgba(74,144,217,0.12)",
+                      color: "#A8BFDC",
+                      border: "1px solid #2A4A7F",
+                    }
+              }
             >
               {p.label} — {p.tag}
             </span>

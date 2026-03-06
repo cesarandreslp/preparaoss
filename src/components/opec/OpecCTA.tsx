@@ -45,7 +45,7 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
       {tienePreguntas ? (
         <Link
           href={`/opecs/${opecId}/simulacro`}
-          className="block w-full text-center px-6 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-semibold text-white text-lg transition-colors"
+          className="btn-primary block w-full text-center px-6 py-4 text-lg rounded-2xl"
         >
           🚀 Iniciar simulacro
         </Link>
@@ -54,7 +54,7 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
           <button
             onClick={generarPreguntas}
             disabled={generando}
-            className="w-full px-6 py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed rounded-2xl font-semibold text-white text-lg transition-colors"
+            className="btn-primary w-full px-6 py-4 text-lg rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {generando ? (
               <span className="flex items-center justify-center gap-2">
@@ -66,33 +66,33 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
             )}
           </button>
           {generando && (
-            <p className="text-xs text-slate-400 text-center">
+            <p className="text-xs text-center" style={{ color: '#A8BFDC' }}>
               Groq está creando escenarios situacionales, preguntas transversales y comportamentales para este cargo.
             </p>
           )}
           {mensaje && (
-            <p className="text-green-400 text-sm text-center">✅ {mensaje}</p>
+            <p className="text-sm text-center" style={{ color: '#27AE60' }}>✅ {mensaje}</p>
           )}
           {error && (
-            <p className="text-red-400 text-sm text-center">❌ {error}</p>
+            <p className="text-sm text-center" style={{ color: '#E74C3C' }}>❌ {error}</p>
           )}
         </div>
       )}
 
       <button
         onClick={toggleInscripcion}
-        className={`w-full px-6 py-3 rounded-2xl text-sm font-medium transition-colors ${
-          inscrito
-            ? "bg-green-600/20 text-green-400 hover:bg-red-600/20 hover:text-red-400"
-            : "bg-white/10 hover:bg-white/20 text-white"
-        }`}
+        className="w-full px-6 py-3 rounded-2xl text-sm font-medium transition-all"
+        style={inscrito
+          ? { background: 'rgba(39,174,96,0.15)', color: '#27AE60', border: '1px solid rgba(39,174,96,0.35)' }
+          : { background: 'rgba(74,144,217,0.15)', color: '#4A90D9', border: '1px solid rgba(74,144,217,0.35)' }}
       >
         {inscrito ? "✅ Siguiendo esta OPEC (click para dejar de seguir)" : "➕ Seguir esta OPEC"}
       </button>
 
       <Link
         href={`/ranking?opecId=${opecId}`}
-        className="block w-full text-center px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sm font-medium text-slate-300 transition-colors"
+        className="block w-full text-center px-6 py-3 rounded-2xl text-sm font-medium transition-all"
+        style={{ background: 'rgba(30,61,110,0.40)', color: '#A8BFDC', border: '1px solid #2A4A7F' }}
       >
         🏆 Ver ranking de aspirantes
       </Link>

@@ -11,17 +11,16 @@ interface Props {
 
 export function EscenarioCard({ numero, escenario, respuestas, onRespuesta }: Props) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
       {/* Escenario */}
-      <div className="bg-indigo-600/10 border-b border-white/10 p-5">
+      <div className="p-5" style={{ background: 'rgba(37,99,235,0.12)', borderBottom: '1px solid #2A4A7F' }}>
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1B3A6B,#2563EB)', color: '#F0F4FA', fontFamily: 'var(--font-display)' }}>
             CASO {numero}
           </span>
-          <span className="text-xs text-slate-400">Juicio situacional</span>
+          <span className="text-xs" style={{ color: '#A8BFDC' }}>Juicio situacional</span>
         </div>
-        {/* Párrafo del escenario — mínimo 10 líneas */}
-        <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+        <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#A8BFDC' }}>
           {escenario.contenido}
         </p>
       </div>
@@ -57,8 +56,8 @@ function SubPregunta({
 }) {
   return (
     <div className="p-5 space-y-3">
-      <p className="text-white font-medium text-sm">
-        <span className="text-indigo-400 font-bold mr-1">{letra})</span>
+      <p className="font-medium text-sm" style={{ color: '#F0F4FA' }}>
+        <span className="font-bold mr-1" style={{ color: '#4A90D9' }}>{letra})</span>
         {pregunta.texto}
       </p>
 
@@ -70,13 +69,12 @@ function SubPregunta({
             <button
               key={opcion.id}
               onClick={() => onSeleccionar(opcion.id)}
-              className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all border ${
-                marcada
-                  ? "bg-indigo-600/40 border-indigo-400 text-white"
-                  : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20"
-              }`}
+            className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all border"
+              style={marcada
+                ? { background: 'rgba(37,99,235,0.35)', borderColor: '#4A90D9', color: '#F0F4FA' }
+                : { background: 'rgba(30,61,110,0.30)', borderColor: '#2A4A7F', color: '#A8BFDC' }}
             >
-              <span className="font-bold mr-2 text-indigo-400">{opcion.letra}.</span>
+              <span className="font-bold mr-2" style={{ color: '#4A90D9' }}>{opcion.letra}.</span>
               {opcion.texto}
             </button>
           );

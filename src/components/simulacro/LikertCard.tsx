@@ -9,35 +9,34 @@ interface Props {
   onRespuesta: (r: RespuestaInput) => void;
 }
 
-const LIKERT_COLORES = [
-  "border-red-500/50 bg-red-500/10 text-red-300",
-  "border-orange-500/50 bg-orange-500/10 text-orange-300",
-  "border-yellow-500/50 bg-yellow-500/10 text-yellow-300",
-  "border-blue-500/50 bg-blue-500/10 text-blue-300",
-  "border-green-500/50 bg-green-500/10 text-green-300",
+const LIKERT_STYLES = [
+  { borderColor: 'rgba(231,76,60,0.50)', background: 'rgba(231,76,60,0.10)', color: '#f87171' },
+  { borderColor: 'rgba(243,156,18,0.50)', background: 'rgba(243,156,18,0.10)', color: '#fbbf24' },
+  { borderColor: 'rgba(245,166,35,0.50)', background: 'rgba(245,166,35,0.10)', color: '#F5A623' },
+  { borderColor: 'rgba(74,144,217,0.50)', background: 'rgba(74,144,217,0.10)', color: '#4A90D9' },
+  { borderColor: 'rgba(39,174,96,0.50)',  background: 'rgba(39,174,96,0.10)',  color: '#27AE60' },
 ];
-
-const LIKERT_COLORES_ACTIVOS = [
-  "border-red-500 bg-red-500/30 text-white",
-  "border-orange-500 bg-orange-500/30 text-white",
-  "border-yellow-500 bg-yellow-500/30 text-white",
-  "border-blue-500 bg-blue-500/30 text-white",
-  "border-green-500 bg-green-500/30 text-white",
+const LIKERT_STYLES_ACTIVOS = [
+  { borderColor: '#E74C3C', background: 'rgba(231,76,60,0.30)', color: '#F0F4FA' },
+  { borderColor: '#F39C12', background: 'rgba(243,156,18,0.30)', color: '#F0F4FA' },
+  { borderColor: '#F5A623', background: 'rgba(245,166,35,0.30)', color: '#F0F4FA' },
+  { borderColor: '#4A90D9', background: 'rgba(74,144,217,0.30)', color: '#F0F4FA' },
+  { borderColor: '#27AE60', background: 'rgba(39,174,96,0.30)',  color: '#F0F4FA' },
 ];
 
 export function LikertCard({ numero, pregunta, respuesta, onRespuesta }: Props) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+    <div className="rounded-2xl p-5" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
       <div className="flex items-center gap-2 mb-3">
-        <span className="bg-purple-600/30 text-purple-300 text-xs font-bold px-2 py-0.5 rounded-full">
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(74,144,217,0.20)', color: '#4A90D9', fontFamily: 'var(--font-display)' }}>
           #{numero} COMPORTAMENTAL
         </span>
-        <span className="text-xs text-slate-500">{pregunta.categoria}</span>
+        <span className="text-xs" style={{ color: '#6B8BAD' }}>{pregunta.categoria}</span>
       </div>
 
-      <p className="text-white font-medium mb-5 leading-relaxed">{pregunta.texto}</p>
+      <p className="font-medium mb-5 leading-relaxed" style={{ color: '#F0F4FA' }}>{pregunta.texto}</p>
 
-      <p className="text-xs text-slate-400 mb-3">
+      <p className="text-xs mb-3" style={{ color: '#A8BFDC' }}>
         ¿Con qué frecuencia harías esto?
       </p>
 
@@ -45,8 +44,8 @@ export function LikertCard({ numero, pregunta, respuesta, onRespuesta }: Props) 
       <div className="space-y-2">
         {pregunta.opciones.map((opcion, i) => {
           const seleccionada = respuesta?.opcionId === opcion.id;
-          const colorBase = LIKERT_COLORES[i % 5];
-          const colorActivo = LIKERT_COLORES_ACTIVOS[i % 5];
+          const estilo = LIKERT_STYLES[i % 5];
+          const estiloActivo = LIKERT_STYLES_ACTIVOS[i % 5];
           return (
             <button
               key={opcion.id}
@@ -57,9 +56,8 @@ export function LikertCard({ numero, pregunta, respuesta, onRespuesta }: Props) 
                   valorLikert: opcion.valorLikert ?? i + 1,
                 })
               }
-              className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm flex items-center gap-3 ${
-                seleccionada ? colorActivo : `${colorBase} hover:opacity-80`
-              }`}
+              className="w-full text-left px-4 py-3 rounded-xl border transition-all text-sm flex items-center gap-3"
+              style={seleccionada ? estiloActivo : estilo}
             >
               <span className="font-bold text-lg w-6 text-center shrink-0">
                 {opcion.letra}
@@ -70,7 +68,7 @@ export function LikertCard({ numero, pregunta, respuesta, onRespuesta }: Props) 
         })}
       </div>
 
-      <div className="flex justify-between text-xs text-slate-500 mt-2 px-1">
+      <div className="flex justify-between text-xs px-1 mt-2" style={{ color: '#6B8BAD' }}>
         <span>1 = Nunca</span>
         <span>5 = Siempre</span>
       </div>
