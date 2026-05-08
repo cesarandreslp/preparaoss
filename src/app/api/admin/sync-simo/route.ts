@@ -1,108 +1,19 @@
 /**
  * POST /api/admin/sync-simo
  * Sincroniza OPECs desde la API pública de SIMO-CNSC hacia la DB.
- * Solo accesible por usuarios autenticados (se puede reforzar con check de rol).
  *
  * Query params:
  *   ?maxPages=5   → limitar páginas (para pruebas)
  *   ?reset=true   → borrar OPECs antes de importar
+ *
+ * Delega la lógica de scraping a `lib/scraper.ts` (única fuente de verdad).
  */
 
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { EstadoOpec } from "@prisma/client";
+import { fetchPage, mapToPrisma, SIMO_PAGE_SIZE } from "@/lib/scraper";
 
-const SIMO_BASE = "https://simo.cnsc.gov.co";
-const PAGE_SIZE = 100;
-
-// ──────────────────────────────────────────────
-// TIPOS SIMO
-// ──────────────────────────────────────────────
-interface SimoVacante {
-  municipio: { nombre: string; departamento: { nombre: string } } | null;
-  cantidad: number;
-}
-interface SimoEmpleo {
-  createdDate?: string;
-  id: number;
-  asignacionSalarial?: number;
-  codigoEmpleo?: string;
-  denominacion: { nombre: string };
-  descripcion: string;
-  concursoAscenso?: boolean;
-  gradoNivel: { grado: string; nivelNombre: string };
-  convocatoria: {
-    nombre: string;
-    codigo: string;
-    agno: number;
-    entidad: { nombre: string };
-  };
-  funciones: Array<{ descripcion: string }>;
-  requisitosMinimos: Array<{ estudio: string; experiencia: string }>;
-  vacantes: SimoVacante[];
-}
-interface SimoOpecItem {
-  id: number;
-  fechaInscripcion: string | null;
-  empleo: SimoEmpleo;
-}
-
-// ──────────────────────────────────────────────
-// HELPERS
-// ──────────────────────────────────────────────
-function mapNivel(n: string): number {
-  const l = n.toLowerCase();
-  if (l.includes("auxiliar") || l.includes("operativo")) return 1;
-  if (l.includes("técnico") || l.includes("tecnico") || l.includes("asistencial")) return 2;
-  if (l.includes("profesional")) return 3;
-  if (l.includes("asesor")) return 4;
-  if (l.includes("directivo") || l.includes("director") || l.includes("jefe")) return 5;
-  return 3;
-}
-
-function unique(arr: (string | undefined)[]): string[] {
-  return [...new Set(arr.filter((x): x is string => Boolean(x)))];
-}
-
-function mapToPrisma(item: SimoOpecItem) {
-  const e = item.empleo;
-  const req = e.requisitosMinimos[0] ?? { estudio: "", experiencia: "" };
-  const municipios = unique(e.vacantes.map((v) => v.municipio?.nombre));
-  const deptos = unique(e.vacantes.map((v) => v.municipio?.departamento?.nombre));
-  const totalVac = e.vacantes.reduce((s, v) => s + (v.cantidad || 0), 0);
-  const pruebas = ["Conocimientos específicos", "Competencias comportamentales"];
-  const nivel = e.gradoNivel.nivelNombre.toLowerCase();
-  if (nivel.includes("profesional") || nivel.includes("asesor") || nivel.includes("directivo")) {
-    pruebas.push("Análisis de competencias funcionales");
-  }
-
-  return {
-    simoId: item.id.toString(),
-    numerConvocatoria: `${e.convocatoria.codigo}/${e.convocatoria.agno}`,
-    nombreCargo: e.denominacion.nombre,
-    entidad: e.convocatoria.entidad.nombre,
-    nivelJerarquico: e.gradoNivel.nivelNombre,
-    grado: e.gradoNivel.grado,
-    numVacantes: Math.max(totalVac, 1),
-    municipio: municipios.slice(0, 10).join(", ") || "Nacional",
-    departamento: deptos.slice(0, 10).join(", ") || "Nacional",
-    requisitosEstudio: req.estudio || "Ver convocatoria en SIMO CNSC",
-    requisitosExp: req.experiencia || "Ver convocatoria en SIMO CNSC",
-    competencias: e.funciones.slice(0, 8).map((f) => f.descripcion.slice(0, 300)).filter(Boolean),
-    tipoPruebas: pruebas,
-    nivelResponsabilidad: mapNivel(e.gradoNivel.nivelNombre),
-    asignacionBasica: e.asignacionSalarial ?? null,
-    fechaLimiteInscripcion: item.fechaInscripcion ? new Date(item.fechaInscripcion) : null,
-    estado: EstadoOpec.ACTIVA,
-    urlDetalle: `${SIMO_BASE}/#ofertaEmpleo`,
-    scrapedAt: new Date(),
-  };
-}
-
-// ──────────────────────────────────────────────
-// HANDLER
-// ──────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) {
@@ -119,20 +30,12 @@ export async function POST(req: NextRequest) {
 
   let page = 0;
   let imported = 0;
-  let updated = 0;
   let errors = 0;
 
   while (page < maxPages) {
-    const url = `${SIMO_BASE}/empleos/ofertaPublica/?page=${page}&size=${PAGE_SIZE}`;
-    let items: SimoOpecItem[];
-
+    let items;
     try {
-      const res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        next: { revalidate: 0 },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      items = (await res.json()) as SimoOpecItem[];
+      items = await fetchPage(page);
     } catch {
       errors++;
       if (errors >= 3) break;
@@ -169,7 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     page++;
-    if (items.length < PAGE_SIZE) break;
+    if (items.length < SIMO_PAGE_SIZE) break;
   }
 
   const total = await prisma.opec.count();

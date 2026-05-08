@@ -25,12 +25,13 @@ interface SimoVacante {
   cantidad: number;
 }
 
-interface SimoOpecItem {
+export interface SimoOpecItem {
   id: number;
   fechaInscripcion: string | null;
   empleo: {
     denominacion: { nombre: string };
     descripcion: string;
+    asignacionSalarial?: number;
     gradoNivel: { grado: string; nivelNombre: string };
     convocatoria: {
       nombre: string;
@@ -43,6 +44,9 @@ interface SimoOpecItem {
     vacantes: SimoVacante[];
   };
 }
+
+export const SIMO_API_BASE = SIMO_BASE;
+export const SIMO_PAGE_SIZE = PAGE_SIZE;
 
 // ─────────────────────────────────────────────────
 // HELPERS
@@ -62,7 +66,7 @@ function mapNivel(n: string): number {
   return 3;
 }
 
-function mapToPrisma(item: SimoOpecItem) {
+export function mapToPrisma(item: SimoOpecItem) {
   const e = item.empleo;
   const req = e.requisitosMinimos[0] ?? { estudio: "", experiencia: "" };
   const municipios = unique(e.vacantes.map((v) => v.municipio?.nombre));
@@ -89,6 +93,7 @@ function mapToPrisma(item: SimoOpecItem) {
     competencias: e.funciones.slice(0, 8).map((f) => f.descripcion.slice(0, 300)).filter(Boolean),
     tipoPruebas: pruebas,
     nivelResponsabilidad: mapNivel(e.gradoNivel.nivelNombre),
+    asignacionBasica: e.asignacionSalarial ?? null,
     fechaLimiteInscripcion: item.fechaInscripcion ? new Date(item.fechaInscripcion) : null,
     estado: EstadoOpec.ACTIVA,
     urlDetalle: `${SIMO_BASE}/#ofertaEmpleo`,
@@ -96,11 +101,33 @@ function mapToPrisma(item: SimoOpecItem) {
   };
 }
 
+/** Campos que se actualizan en cada scrape (excluye id/simoId/createdAt). */
+function camposActualizables(data: ReturnType<typeof mapToPrisma>) {
+  return {
+    nombreCargo: data.nombreCargo,
+    entidad: data.entidad,
+    nivelJerarquico: data.nivelJerarquico,
+    grado: data.grado,
+    numVacantes: data.numVacantes,
+    municipio: data.municipio,
+    departamento: data.departamento,
+    requisitosEstudio: data.requisitosEstudio,
+    requisitosExp: data.requisitosExp,
+    competencias: data.competencias,
+    tipoPruebas: data.tipoPruebas,
+    nivelResponsabilidad: data.nivelResponsabilidad,
+    asignacionBasica: data.asignacionBasica,
+    fechaLimiteInscripcion: data.fechaLimiteInscripcion,
+    urlDetalle: data.urlDetalle,
+    scrapedAt: data.scrapedAt,
+  };
+}
+
 // ─────────────────────────────────────────────────
 // FETCH PÁGINA
 // ─────────────────────────────────────────────────
 
-async function fetchPage(page: number): Promise<SimoOpecItem[]> {
+export async function fetchPage(page: number): Promise<SimoOpecItem[]> {
   const url = `${SIMO_BASE}/empleos/ofertaPublica/?page=${page}&size=${PAGE_SIZE}`;
   const res = await fetch(url, {
     headers: {
@@ -149,30 +176,16 @@ export async function sincronizarOpecs(): Promise<{
     for (const item of items) {
       try {
         const data = mapToPrisma(item);
-        const existing = await prisma.opec.findUnique({
+        const result = await prisma.opec.upsert({
           where: { simoId: data.simoId },
-          select: { id: true },
+          create: data,
+          update: camposActualizables(data),
+          select: { id: true, createdAt: true, updatedAt: true },
         });
-        if (!existing) {
-          await prisma.opec.create({ data });
+        // upsert no distingue create/update; usamos timestamps para inferir
+        if (result.createdAt.getTime() === result.updatedAt.getTime()) {
           nuevas++;
         } else {
-          await prisma.opec.update({
-            where: { simoId: data.simoId },
-            data: {
-              nombreCargo: data.nombreCargo,
-              numVacantes: data.numVacantes,
-              municipio: data.municipio,
-              departamento: data.departamento,
-              requisitosEstudio: data.requisitosEstudio,
-              requisitosExp: data.requisitosExp,
-              competencias: data.competencias,
-              tipoPruebas: data.tipoPruebas,
-              fechaLimiteInscripcion: data.fechaLimiteInscripcion,
-              urlDetalle: data.urlDetalle,
-              scrapedAt: data.scrapedAt,
-            },
-          });
           actualizadas++;
         }
       } catch (e) {
