@@ -13,6 +13,57 @@ import { prisma } from "./prisma";
 import { z } from "zod";
 
 // ─────────────────────────────────────────────────
+// CONTEXTO DOCUMENTAL — alimenta los prompts con el
+// texto parseado de los manuales/guías oficiales
+// que el admin haya subido para la OPEC.
+// ─────────────────────────────────────────────────
+
+// Presupuesto total de caracteres del contexto inyectado.
+// Llama 3.3 70B tiene 128K de contexto. Reservamos ~10K tokens (~40K chars)
+// para contexto documental, dejando holgura para prompt + respuesta JSON.
+const MAX_CONTEXT_CHARS = 40_000;
+
+// Prioridad por tipo: el manual de funciones es más relevante que un anexo genérico.
+const TYPE_PRIORITY: Record<string, number> = {
+  MANUAL_FUNCIONES: 1,
+  EJES_TEMATICOS: 2,
+  GUIA_ORIENTACION: 3,
+  DOCUMENTO_ENTIDAD: 4,
+  OTHER: 5,
+};
+
+async function obtenerContextoDocumentos(opecId: string): Promise<string> {
+  const docs = await prisma.document.findMany({
+    where: { opecId, isParsed: true, parsedContent: { not: null } },
+    select: { type: true, fileName: true, parsedContent: true },
+  });
+
+  if (docs.length === 0) return "";
+
+  const ordenados = [...docs].sort(
+    (a, b) => (TYPE_PRIORITY[a.type] ?? 99) - (TYPE_PRIORITY[b.type] ?? 99)
+  );
+
+  const partes: string[] = [];
+  let usados = 0;
+
+  for (const d of ordenados) {
+    const restante = MAX_CONTEXT_CHARS - usados;
+    if (restante <= 200) break; // sin espacio útil para otro doc
+    const recorte = (d.parsedContent ?? "").slice(0, restante - 100);
+    partes.push(`### ${d.type} — ${d.fileName}\n${recorte}`);
+    usados += recorte.length + 100;
+  }
+
+  return partes.join("\n\n");
+}
+
+function bloqueContexto(contexto: string): string {
+  if (!contexto) return "";
+  return `\n\nCONTEXTO DOCUMENTAL OFICIAL DEL CARGO (úsalo como fuente PRIMARIA — las preguntas deben evaluar conocimiento concreto de este material):\n"""\n${contexto}\n"""\n`;
+}
+
+// ─────────────────────────────────────────────────
 // SCHEMAS ZOD de validación
 // ─────────────────────────────────────────────────
 
@@ -80,11 +131,13 @@ export async function generarPreguntasFuncionalEspecifica(
     },
   });
 
+  const contexto = await obtenerContextoDocumentos(opecId);
+
   for (let i = 0; i < cantidad; i++) {
     const prompt = `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
 
 Genera UN escenario de juicio situacional para el cargo: "${opec.nombreCargo}" en "${opec.entidad}" (nivel: ${opec.nivelJerarquico}).
-Competencias evaluadas: ${opec.competencias.join(", ")}.
+Competencias evaluadas: ${opec.competencias.join(", ")}.${bloqueContexto(contexto)}
 
 REGLAS ESTRICTAS para el escenario:
 - El escenario (párrafo situacional) debe tener MÍNIMO 10 líneas de texto, describiendo una situación laboral compleja y realista.
@@ -171,10 +224,12 @@ export async function generarPreguntasFuncionalTransversal(
     },
   });
 
+  const contexto = await obtenerContextoDocumentos(opecId);
+
   const prompt = `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
 
 Genera EXACTAMENTE ${cantidad} preguntas de competencias funcionales transversales para el cargo: "${opec.nombreCargo}" en "${opec.entidad}".
-Competencias: ${opec.competencias.join(", ")}.
+Competencias: ${opec.competencias.join(", ")}.${bloqueContexto(contexto)}
 
 REGLAS:
 - Cada pregunta tiene EXACTAMENTE 4 opciones (A, B, C, D).
@@ -258,10 +313,12 @@ export async function generarPreguntasComportamental(
     "Directivo (nivel 5): liderazgo estratégico, toma de decisiones de alto impacto, gestión de equipos",
   ][opec.nivelResponsabilidad];
 
+  const contexto = await obtenerContextoDocumentos(opecId);
+
   const prompt = `Eres un experto en evaluación de competencias comportamentales para el Estado colombiano (CNSC).
 
 Genera EXACTAMENTE ${cantidad} preguntas de comportamiento laboral en escala Likert para el cargo: "${opec.nombreCargo}".
-Nivel de responsabilidad: ${descripcionNivel}
+Nivel de responsabilidad: ${descripcionNivel}${bloqueContexto(contexto)}
 
 REGLAS:
 - Cada pregunta describe una SITUACIÓN LABORAL concreta.

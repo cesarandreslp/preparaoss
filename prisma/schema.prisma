@@ -66,6 +66,14 @@ enum EstadoOpec {
   VENCIDA
 }
 
+enum DocumentType {
+  MANUAL_FUNCIONES
+  GUIA_ORIENTACION
+  EJES_TEMATICOS
+  DOCUMENTO_ENTIDAD
+  OTHER
+}
+
 // ─────────────────────────────────────────────────────────
 // OPEC — Oferta Pública de Empleo de Carrera
 // ─────────────────────────────────────────────────────────
@@ -107,6 +115,7 @@ model Opec {
   simulacros       Simulacro[]
   inscripciones    UserOpec[]
   rankings         Ranking[]
+  documentos       Document[]
 
   @@index([estado, departamento])
   @@index([entidad])
@@ -398,4 +407,26 @@ model AppConfig {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────
+// DOCUMENTOS — Manuales y guías oficiales por OPEC (input para IA)
+// ─────────────────────────────────────────────────────────
+
+model Document {
+  id            String       @id @default(cuid())
+  opecId        String
+  opec          Opec         @relation(fields: [opecId], references: [id], onDelete: Cascade)
+
+  type          DocumentType
+  fileName      String
+  fileSize      Int          // bytes
+  parsedContent String?      @db.Text
+  isParsed      Boolean      @default(false)
+  parseError    String?
+  ocrUsed       Boolean      @default(false)
+
+  uploadedAt    DateTime     @default(now())
+
+  @@index([opecId])
 }
