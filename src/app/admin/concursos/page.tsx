@@ -104,6 +104,24 @@ export default function AdminConcursosPage() {
           </div>
         </div>
 
+        {/* Aviso de tamaño de imagen */}
+        <div
+          className="mt-6 mb-2 rounded-xl px-4 py-3 flex items-start gap-3 text-sm"
+          style={{
+            background: "rgba(245, 166, 35, 0.10)",
+            border: "1px solid rgba(245, 166, 35, 0.35)",
+            color: "#FBBF24",
+          }}
+        >
+          <span className="text-lg leading-none">💡</span>
+          <p>
+            <strong className="text-white">Al subir una imagen custom:</strong> usa una
+            imagen de <strong className="text-white">1200×630 px (ratio 1.91:1)</strong>
+            {" "}para que calce perfecto con la grid del slider y la página de listado.
+            Si la dejas vacía, se usa la auto-generada con next/og.
+          </p>
+        </div>
+
         {loading ? (
           <div className="space-y-3 mt-8">
             {[...Array(5)].map((_, i) => (
