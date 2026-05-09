@@ -727,11 +727,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Tricolor accent antes del footer */}
-      <div className="flag-stripe flag-stripe-thin" aria-hidden="true" />
-
       {/* ─── FOOTER ─── */}
-      <footer style={{ borderColor: "var(--border-subtle)" }}>
+      <footer className="relative" style={{ borderColor: "var(--border-subtle)" }}>
+        {/* Tricolor sello en el borde superior del footer */}
+        <div className="flag-stripe absolute top-0 inset-x-0" aria-hidden="true" />
         <div className="container-app py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
