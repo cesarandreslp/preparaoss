@@ -27,9 +27,10 @@ export default function LandingPage() {
       <nav
         className="fixed top-0 inset-x-0 z-50 transition-all"
         style={{
-          background: scrolled ? "rgba(250, 247, 242, 0.78)" : "transparent",
-          backdropFilter: scrolled ? "blur(16px)" : "none",
-          borderBottom: scrolled ? "1px solid var(--border-subtle)" : "1px solid transparent",
+          background: scrolled ? "rgba(135, 206, 235, 0.65)" : "rgba(135, 206, 235, 0.35)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          borderBottom: scrolled ? "1px solid rgba(0, 56, 147, 0.15)" : "1px solid transparent",
         }}
       >
         <div className="container-app flex items-center justify-between py-4">
@@ -707,7 +708,13 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="relative" style={{ borderColor: "var(--border-subtle)" }}>
+      <footer
+        className="relative"
+        style={{
+          background: "rgba(206, 17, 38, 0.10)",
+          borderColor: "var(--border-subtle)",
+        }}
+      >
         {/* Tricolor sello en el borde superior del footer */}
         <div className="flag-stripe absolute top-0 inset-x-0" aria-hidden="true" />
         <div className="container-app py-16 grid grid-cols-2 md:grid-cols-4 gap-10">

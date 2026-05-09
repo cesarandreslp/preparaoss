@@ -30,8 +30,8 @@ export function TopBar() {
     <header
       className="sticky top-0 z-40 backdrop-blur-xl border-b"
       style={{
-        background: "rgba(250, 247, 242, 0.78)",
-        borderColor: "var(--border-subtle)",
+        background: "rgba(135, 206, 235, 0.65)",
+        borderColor: "rgba(0, 56, 147, 0.15)",
       }}
     >
       <div className="container-app max-w-3xl flex items-center justify-between py-4">
