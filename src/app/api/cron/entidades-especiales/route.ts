@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scrapeEntidadEspecial } from "@/lib/entidades-especiales-scraper";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 // GET /api/cron/entidades-especiales
 // Vercel Cron: diario, recorre todas las entidades activas y las scrapea.

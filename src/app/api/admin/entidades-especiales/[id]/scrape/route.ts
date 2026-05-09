@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { scrapeEntidadEspecial } from "@/lib/entidades-especiales-scraper";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 export async function POST(
   _req: Request,
