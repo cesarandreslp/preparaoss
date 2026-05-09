@@ -45,6 +45,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             <a href="#como-funciona" className="btn-ghost">Cómo funciona</a>
             <a href="#opecs" className="btn-ghost">OPECs</a>
+            <Link href="/biblioteca" className="btn-ghost">Biblioteca</Link>
             <a href="#planes" className="btn-ghost">Planes</a>
             <a href="#faq" className="btn-ghost">FAQ</a>
           </div>

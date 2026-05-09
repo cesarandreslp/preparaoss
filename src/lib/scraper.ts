@@ -220,14 +220,14 @@ export async function sincronizarOpecs(): Promise<{
 // OBTENER OPECs NUEVAS QUE AÚN NO TIENEN PREGUNTAS
 // ─────────────────────────────────────────────────
 
-export async function getOpecssinPreguntas(): Promise<string[]> {
+export async function getOpecssinPreguntas(limit = 50): Promise<string[]> {
   const opecs = await prisma.opec.findMany({
     where: {
       estado: "ACTIVA",
       preguntas: { none: {} },
     },
     select: { id: true },
-    take: 10, // Procesar de a 10 para no superar timeout de Vercel
+    take: limit,
   });
 
   return opecs.map((o) => o.id);

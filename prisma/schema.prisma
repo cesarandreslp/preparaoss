@@ -459,3 +459,38 @@ model ConcursoEnDesarrollo {
 
   @@index([visible, orden])
 }
+
+// ─────────────────────────────────────────────────────────
+// BIBLIOTECA — Recursos transversales (leyes, decretos, manuales)
+// que aplican a cualquier funcionario público colombiano.
+// Admin sube/asigna el PDF; los usuarios pueden descargarlo/leerlo.
+// ─────────────────────────────────────────────────────────
+
+enum BloqueBiblioteca {
+  REGIMEN_SERVIDOR_PUBLICO
+  DISCIPLINARIO
+  INFORMACION_ARCHIVO_TRANSPARENCIA
+  GESTION_CONTROL
+  CONTRATACION_PRESUPUESTO_TALENTO
+  ETICA_SERVICIO
+}
+
+model RecursoBiblioteca {
+  id          String           @id @default(cuid())
+  bloque      BloqueBiblioteca
+  titulo      String           // "Carrera Administrativa"
+  numeroNorma String?          // "Ley 909 de 2004"
+  descripcion String?          @db.Text
+  /// URL del PDF (puede ser externa o Vercel Blob después de upload)
+  pdfUrl      String?
+  /// Nombre del archivo (cuando se sube via Blob)
+  pdfFileName String?
+  /// Tamaño en bytes del PDF subido
+  pdfSize     Int?
+  vigente     Boolean          @default(true)
+  orden       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([bloque, vigente, orden])
+}

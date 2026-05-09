@@ -4,9 +4,12 @@ import { generarBancoCompleto } from "@/lib/ia-generator";
 import { prisma } from "@/lib/prisma";
 import { enviarSimulacroDisponible } from "@/lib/mailer";
 
+// Permitir hasta 5 minutos por ejecución (Vercel Pro). En Hobby cap a 60s.
+export const maxDuration = 300;
+
 // GET /api/cron/ia-generator
-// Vercel Cron: "0 12 * * *" (7AM Colombia = 12PM UTC, diario)
-// Genera preguntas para 50 OPECs por día → ~68 días para cubrir 3386 OPECs
+// Vercel Cron: 4 veces/día (00, 06, 12, 18 UTC). 50 OPECs por ejecución
+// → 200 OPECs/día → ~14 días para cubrir las 2.678 pendientes.
 // Para generación masiva manual usa: POST /api/admin/generar-lote
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -17,7 +20,7 @@ export async function GET(request: Request) {
   const BATCH = 50;
 
   try {
-    const opecsSinPreguntas = await getOpecssinPreguntas();
+    const opecsSinPreguntas = await getOpecssinPreguntas(BATCH);
     const pendientes = opecsSinPreguntas.length;
 
     if (pendientes === 0) {
