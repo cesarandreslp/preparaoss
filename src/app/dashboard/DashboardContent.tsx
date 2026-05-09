@@ -16,7 +16,10 @@ export async function DashboardContent() {
       xpTotal: true,
       nivel: true,
       rachaActual: true,
+      rachaMasLarga: true,
       simulacrosTotal: true,
+      preguntasCorrectas: true,
+      preguntasRespondidas: true,
       inscripciones: {
         take: 5,
         orderBy: { inscritoAt: "desc" },
@@ -27,6 +30,7 @@ export async function DashboardContent() {
               nombreCargo: true,
               entidad: true,
               fechaExamen: true,
+              fechaLimiteInscripcion: true,
             },
           },
         },
@@ -38,66 +42,140 @@ export async function DashboardContent() {
 
   const nivelInfo = calcularNivel(user.xpTotal);
   const progreso = porcentajeNivelActual(user.xpTotal);
+  const precision =
+    user.preguntasRespondidas > 0
+      ? Math.round((user.preguntasCorrectas / user.preguntasRespondidas) * 100)
+      : 0;
+
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Buenos días" : hour < 19 ? "Buenas tardes" : "Buenas noches";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Saludo + racha */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-sm" style={{ color: "#A8BFDC" }}>Buenos días,</p>
-          <h1 className="text-xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F0F4FA" }}>
-            {user.nombre}
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+            {greeting},
+          </p>
+          <h1
+            className="text-3xl font-extrabold mt-1"
+            style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}
+          >
+            {user.nombre.split(" ")[0]} 👋
           </h1>
         </div>
         <div
-          className="flex items-center gap-2 px-3 py-2 rounded-xl"
-          style={{ background: "rgba(245,166,35,0.15)", color: "#F5A623", border: "1px solid rgba(245,166,35,0.30)" }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full"
+          style={{
+            background: "rgba(245,166,35,0.10)",
+            border: "1px solid rgba(245,166,35,0.30)",
+          }}
         >
-          <span className="text-lg">🔥</span>
-          <span className="font-bold" style={{ fontFamily: "var(--font-display)" }}>{user.rachaActual}</span>
+          <span className="text-xl">🔥</span>
+          <div>
+            <p
+              className="font-bold leading-none"
+              style={{ color: "var(--gold-300)", fontFamily: "var(--font-display)" }}
+            >
+              {user.rachaActual}
+            </p>
+            <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+              días seguidos
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Tarjeta de nivel / XP */}
-      <div
-        className="rounded-2xl p-5"
-        style={{ background: "linear-gradient(135deg,rgba(27,58,107,0.50),rgba(37,99,235,0.25))", border: "1px solid #2A4A7F" }}
-      >
-        <div className="flex justify-between items-center mb-3">
+      {/* Hero card: Nivel + XP */}
+      <div className="card-glow p-6">
+        <div className="flex items-end justify-between gap-4 mb-5">
           <div>
-            <p className="text-xs uppercase tracking-wider" style={{ color: "#A8BFDC" }}>Nivel {nivelInfo.nivel}</p>
-            <p className="font-bold text-lg" style={{ fontFamily: "var(--font-display)", color: "#F0F4FA" }}>{nivelInfo.nombre}</p>
+            <p
+              className="text-xs uppercase tracking-wider"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Nivel {nivelInfo.nivel}
+            </p>
+            <p
+              className="text-2xl font-bold mt-1"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {nivelInfo.nombre}
+            </p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-lg" style={{ color: "#F5A623", fontFamily: "var(--font-display)" }}>
-              {user.xpTotal.toLocaleString()} XP
+            <p
+              className="text-3xl font-extrabold text-gradient-gold"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {user.xpTotal.toLocaleString("es-CO")}
             </p>
-            <p className="text-xs" style={{ color: "#A8BFDC" }}>{user.simulacrosTotal} simulacros</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+              XP totales
+            </p>
           </div>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all"
-            style={{ background: "linear-gradient(90deg,#2563EB,#4A90D9)", width: `${progreso}%` }}
-          />
+        <div className="progress">
+          <div className="progress-fill" style={{ width: `${progreso}%` }} />
         </div>
-        <p className="text-xs mt-1" style={{ color: "#6B8BAD" }}>{progreso}% al siguiente nivel</p>
+        <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>
+          {progreso}% al siguiente nivel
+        </p>
+      </div>
+
+      {/* KPIs en grid */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Simulacros", v: user.simulacrosTotal, icon: "📝" },
+          { label: "Precisión", v: `${precision}%`, icon: "🎯" },
+          { label: "Mejor racha", v: user.rachaMasLarga, icon: "⚡" },
+        ].map((s) => (
+          <div key={s.label} className="card text-center p-4">
+            <p className="text-xl mb-1">{s.icon}</p>
+            <p
+              className="text-xl font-bold"
+              style={{ fontFamily: "var(--font-display)", color: "var(--text-primary)" }}
+            >
+              {s.v}
+            </p>
+            <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>
+              {s.label}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Mis OPECs */}
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="font-semibold" style={{ fontFamily: "var(--font-display)", color: "#F0F4FA" }}>Mis OPECs</h2>
-          <Link href="/opecs" className="text-sm font-medium" style={{ color: "#4A90D9" }}>Ver todas →</Link>
+      <section>
+        <div className="flex items-end justify-between mb-4">
+          <div>
+            <span className="eyebrow">Mis OPECs</span>
+            <h2 className="display-3 mt-1">Tu camino</h2>
+          </div>
+          <Link
+            href="/opecs"
+            className="text-sm font-semibold"
+            style={{ color: "var(--gold-300)" }}
+          >
+            Explorar →
+          </Link>
         </div>
 
         {user.inscripciones.length === 0 ? (
           <div
-            className="rounded-2xl p-8 text-center"
-            style={{ background: "rgba(30,61,110,0.40)", border: "1px solid #2A4A7F" }}
+            className="card-elevated text-center py-12"
+            style={{ borderStyle: "dashed", borderColor: "var(--border-default)" }}
           >
-            <p className="mb-4" style={{ color: "#A8BFDC" }}>Aún no te has inscrito a ninguna OPEC</p>
-            <Link href="/opecs" className="btn-primary text-sm px-5 py-2">Buscar OPECs disponibles</Link>
+            <p className="text-4xl mb-3">🎯</p>
+            <p className="font-semibold mb-1">Aún no te has inscrito a ninguna OPEC</p>
+            <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
+              Encuentra la vacante perfecta para ti
+            </p>
+            <Link href="/opecs" className="btn-primary">
+              Buscar OPECs disponibles →
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
@@ -105,38 +183,66 @@ export async function DashboardContent() {
               <Link
                 key={opec.id}
                 href={`/opecs/${opec.id}`}
-                className="block rounded-2xl p-4 transition-all hover:brightness-110"
-                style={{ background: "rgba(30,61,110,0.40)", border: "1px solid #2A4A7F" }}
+                className="card flex items-start justify-between gap-3 group"
               >
-                <p className="font-medium" style={{ color: "#F0F4FA" }}>{opec.nombreCargo}</p>
-                <p className="text-sm" style={{ color: "#A8BFDC" }}>{opec.entidad}</p>
-                {opec.fechaExamen && (
-                  <p className="text-xs mt-1" style={{ color: "#4A90D9" }}>
-                    📅 Examen: {new Date(opec.fechaExamen).toLocaleDateString("es-CO")}
+                <div className="min-w-0 flex-1">
+                  <p
+                    className="text-xs"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {opec.entidad}
                   </p>
-                )}
+                  <p
+                    className="font-bold mt-0.5 truncate"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {opec.nombreCargo}
+                  </p>
+                  {opec.fechaExamen && (
+                    <p
+                      className="text-xs mt-2 inline-flex items-center gap-1"
+                      style={{ color: "var(--gold-300)" }}
+                    >
+                      📅 Examen:{" "}
+                      {new Date(opec.fechaExamen).toLocaleDateString("es-CO", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </p>
+                  )}
+                </div>
+                <span
+                  className="text-2xl shrink-0 transition-transform group-hover:translate-x-1"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  →
+                </span>
               </Link>
             ))}
           </div>
         )}
-      </div>
+      </section>
 
       {/* Acciones rápidas */}
       <div className="grid grid-cols-2 gap-3">
-        {[
-          { href: "/opecs", icon: "🔍", label: "Buscar OPECs" },
-          { href: "/ranking", icon: "🏆", label: "Rankings" },
-        ].map((a) => (
-          <Link
-            key={a.href}
-            href={a.href}
-            className="rounded-2xl p-4 text-center transition-all hover:brightness-110"
-            style={{ background: "rgba(30,61,110,0.40)", border: "1px solid #2A4A7F" }}
+        <Link href="/opecs" className="card text-center p-5 group">
+          <p className="text-3xl mb-2 transition-transform group-hover:scale-110">🔍</p>
+          <p
+            className="text-sm font-bold"
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            <div className="text-2xl mb-1">{a.icon}</div>
-            <p className="text-sm font-medium" style={{ fontFamily: "var(--font-display)", color: "#F0F4FA" }}>{a.label}</p>
-          </Link>
-        ))}
+            Buscar OPECs
+          </p>
+        </Link>
+        <Link href="/ranking" className="card text-center p-5 group">
+          <p className="text-3xl mb-2 transition-transform group-hover:scale-110">🏆</p>
+          <p
+            className="text-sm font-bold"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Ver ranking
+          </p>
+        </Link>
       </div>
     </div>
   );

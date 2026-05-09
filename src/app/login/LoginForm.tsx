@@ -33,57 +33,121 @@ export function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-[#0f1623] to-[#1a2540] px-4">
-      <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-white mb-1">Iniciar sesión</h1>
-        <p className="text-gray-400 text-sm mb-6">Bienvenido de vuelta a PreparaOSS</p>
-
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">Email</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-              autoComplete="email"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">Contraseña</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded-lg px-3 py-2">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold py-2 rounded-lg transition"
+    <div
+      className="min-h-screen grid lg:grid-cols-2 noise-overlay"
+      style={{ background: "var(--gradient-hero)" }}
+    >
+      {/* ─── Form column ─── */}
+      <div className="flex flex-col p-6 sm:p-12">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-bold text-lg w-fit"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          <span
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
+            style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
           >
-            {loading ? "Ingresando..." : "Ingresar"}
-          </button>
-        </form>
+            P
+          </span>
+          <span className="text-gradient-gold">PreparaOSS</span>
+        </Link>
 
-        <p className="text-gray-400 text-sm text-center mt-6">
-          ¿No tienes cuenta?{" "}
-          <Link href="/registro" className="text-blue-400 hover:underline">
-            Regístrate gratis
-          </Link>
+        <div className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto py-12">
+          <span className="eyebrow">Bienvenido de vuelta</span>
+          <h1 className="display-3 mt-3">Iniciar sesión</h1>
+          <p className="mt-3" style={{ color: "var(--text-secondary)" }}>
+            Continúa donde lo dejaste.
+          </p>
+
+          <form onSubmit={onSubmit} className="mt-10 space-y-5">
+            <div>
+              <label className="block text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: "var(--text-muted)" }}>
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input"
+                placeholder="tu@email.com"
+                autoComplete="email"
+              />
+            </div>
+            <div>
+              <label className="block text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: "var(--text-muted)" }}>
+                Contraseña
+              </label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input"
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+            </div>
+
+            {error && (
+              <div
+                className="text-sm rounded-lg px-4 py-3 flex items-start gap-2"
+                style={{
+                  background: "rgba(239,68,68,0.08)",
+                  color: "#FCA5A5",
+                  border: "1px solid rgba(239,68,68,0.30)",
+                }}
+              >
+                <span>⚠</span>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button type="submit" disabled={loading} className="btn-primary w-full">
+              {loading ? "Ingresando…" : "Ingresar →"}
+            </button>
+          </form>
+
+          <p className="text-sm text-center mt-8" style={{ color: "var(--text-muted)" }}>
+            ¿No tienes cuenta?{" "}
+            <Link href="/registro" className="font-semibold" style={{ color: "var(--gold-300)" }}>
+              Regístrate gratis
+            </Link>
+          </p>
+        </div>
+
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+          © 2026 PreparaOSS
         </p>
+      </div>
+
+      {/* ─── Visual column ─── */}
+      <div
+        className="hidden lg:flex relative overflow-hidden items-center justify-center p-12"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, rgba(245,166,35,0.15) 0%, transparent 60%), linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-base) 100%)",
+        }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at 70% 70%, rgba(74,144,217,0.12) 0%, transparent 50%)",
+          }}
+        />
+        <div className="relative max-w-md text-center">
+          <span className="text-6xl">🏛️</span>
+          <h2 className="display-3 mt-8">
+            Cada día sin estudiar es{" "}
+            <span className="text-gradient-gold">un día más lejos</span> del cargo.
+          </h2>
+          <p className="mt-6" style={{ color: "var(--text-secondary)" }}>
+            Volvamos al simulacro donde te quedaste.
+          </p>
+        </div>
       </div>
     </div>
   );

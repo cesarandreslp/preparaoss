@@ -28,63 +28,75 @@ export function TopBar() {
 
   return (
     <header
-      className="sticky top-0 z-40 backdrop-blur border-b"
-      style={{ background: "rgba(13,31,60,0.95)", borderColor: "#2A4A7F" }}
+      className="sticky top-0 z-40 backdrop-blur-xl border-b"
+      style={{
+        background: "rgba(10, 19, 38, 0.78)",
+        borderColor: "var(--border-subtle)",
+      }}
     >
-      <div className="max-w-2xl mx-auto flex items-center justify-between px-4 py-3">
+      <div className="container-app max-w-3xl flex items-center justify-between py-4">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 font-bold text-lg"
+          className="flex items-center gap-2 font-bold text-base"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          🏛️{" "}
           <span
-            style={{
-              background: "linear-gradient(135deg,#4A90D9,#F5A623)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
+            style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
           >
-            PreparaOSS
+            P
           </span>
+          <span className="text-gradient-gold hidden sm:inline">PreparaOSS</span>
         </Link>
 
         <div className="relative" ref={ref}>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold text-white"
-            style={{ background: "linear-gradient(135deg,#2563EB,#4A90D9)" }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-transform hover:scale-105"
+            style={{
+              background: "var(--gradient-gold)",
+              color: "#1a0f00",
+              fontFamily: "var(--font-display)",
+            }}
             aria-label="Menú de usuario"
           >
             {initials}
           </button>
           {open && (
             <div
-              className="absolute right-0 mt-2 w-56 rounded-xl border shadow-lg overflow-hidden"
-              style={{ background: "#0D1F3C", borderColor: "#2A4A7F" }}
+              className="absolute right-0 mt-3 w-64 rounded-2xl border shadow-2xl overflow-hidden animate-fade-in"
+              style={{
+                background: "var(--bg-elevated)",
+                borderColor: "var(--border-default)",
+                boxShadow: "var(--shadow-elevated)",
+              }}
             >
-              <div className="px-4 py-3 border-b" style={{ borderColor: "#2A4A7F" }}>
-                <p className="text-sm font-medium" style={{ color: "#F0F4FA" }}>
-                  {session?.user?.nombre ?? "Usuario"}
-                </p>
-                <p className="text-xs truncate" style={{ color: "#A8BFDC" }}>
+              <div className="px-4 py-4 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+                <p className="text-sm font-semibold">{session?.user?.nombre ?? "Usuario"}</p>
+                <p className="text-xs truncate mt-0.5" style={{ color: "var(--text-muted)" }}>
                   {session?.user?.email}
                 </p>
               </div>
               <Link
                 href="/perfil"
-                className="block px-4 py-2 text-sm hover:bg-white/5"
-                style={{ color: "#F0F4FA" }}
+                className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/5 transition-colors"
                 onClick={() => setOpen(false)}
               >
-                Mi perfil
+                <span>👤</span> Mi perfil
+              </Link>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/5 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <span>📊</span> Dashboard
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-white/5"
-                style={{ color: "#F87171" }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/5 transition-colors border-t"
+                style={{ color: "#FCA5A5", borderColor: "var(--border-subtle)" }}
               >
-                Cerrar sesión
+                <span>↗</span> Cerrar sesión
               </button>
             </div>
           )}

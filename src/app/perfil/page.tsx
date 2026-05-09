@@ -39,93 +39,150 @@ export default async function PerfilPage() {
   const nivelInfo = calcularNivel(user.xpTotal);
   const progreso = porcentajeNivelActual(user.xpTotal);
   const xpFaltante = xpParaSiguienteNivel(user.xpTotal);
-  const precision = user.preguntasRespondidas > 0
-    ? Math.round((user.preguntasCorrectas / user.preguntasRespondidas) * 100)
-    : 0;
+  const precision =
+    user.preguntasRespondidas > 0
+      ? Math.round((user.preguntasCorrectas / user.preguntasRespondidas) * 100)
+      : 0;
+
+  const initials = user.nombre
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
-    <div className="space-y-6">
-      {/* Header perfil */}
-      <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg,rgba(27,58,107,0.50),rgba(37,99,235,0.25))', border: '1px solid #2A4A7F' }}>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>{user.nombre}</h1>
-            <p className="text-sm" style={{ color: '#A8BFDC' }}>{user.email}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs uppercase tracking-wide" style={{ color: '#6B8BAD' }}>Plan</p>
-            <span className="text-xs px-3 py-1 rounded-full font-medium" style={{ background: 'rgba(74,144,217,0.20)', color: '#4A90D9' }}>
-              {user.suscripcion?.plan ?? "GRATUITO"}
-            </span>
-          </div>
+    <div className="space-y-8">
+      {/* Hero perfil con avatar grande */}
+      <div className="card-glow p-6 sm:p-8 text-center">
+        <div
+          className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-2xl font-extrabold mb-4"
+          style={{
+            background: "var(--gradient-gold)",
+            color: "#1a0f00",
+            fontFamily: "var(--font-display)",
+            boxShadow: "var(--shadow-glow-gold)",
+          }}
+        >
+          {initials}
         </div>
+        <h1
+          className="text-2xl font-extrabold"
+          style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}
+        >
+          {user.nombre}
+        </h1>
+        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+          {user.email}
+        </p>
+        <div className="mt-5 flex justify-center">
+          <span className="tag tag-blue">{user.suscripcion?.plan ?? "GRATUITO"}</span>
+        </div>
+      </div>
 
-        {/* Nivel y XP */}
-        <div className="flex justify-between items-center mb-2">
-          <span className="font-semibold" style={{ color: '#F0F4FA' }}>
-            Nivel {nivelInfo.nivel} — {nivelInfo.nombre}
-          </span>
-          <span className="font-bold" style={{ color: '#F5A623', fontFamily: 'var(--font-display)' }}>{formatXP(user.xpTotal)}</span>
+      {/* Nivel y XP */}
+      <div className="card-elevated p-6">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <p className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              Nivel {nivelInfo.nivel}
+            </p>
+            <p
+              className="text-xl font-bold mt-1"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {nivelInfo.nombre}
+            </p>
+          </div>
+          <p
+            className="text-3xl font-extrabold text-gradient-gold"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            {formatXP(user.xpTotal)}
+          </p>
         </div>
-        <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-1">
-          <div
-            className="h-full rounded-full transition-all" style={{ background: 'linear-gradient(90deg,#2563EB,#4A90D9)', width: `${progreso}%` }}
-          />
+        <div className="progress">
+          <div className="progress-fill" style={{ width: `${progreso}%` }} />
         </div>
         {nivelInfo.nivel < 5 && (
-          <p className="text-xs" style={{ color: '#6B8BAD' }}>
-            Faltan {formatXP(xpFaltante)} para {NIVELES[nivelInfo.nivel as 0 | 1 | 2 | 3]?.nombre ?? "Élite"}
+          <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>
+            Faltan {formatXP(xpFaltante)} para{" "}
+            <span style={{ color: "var(--gold-300)" }}>
+              {NIVELES[nivelInfo.nivel as 0 | 1 | 2 | 3]?.nombre ?? "Élite"}
+            </span>
           </p>
         )}
       </div>
 
-      {/* Estadísticas */}
-      <div className="grid grid-cols-2 gap-3">
-        {[
-          { label: "Racha actual", value: `🔥 ${user.rachaActual} días` },
-          { label: "Racha más larga", value: `⚡ ${user.rachaMasLarga} días` },
-          { label: "Simulacros", value: user.simulacrosTotal },
-          { label: "Precisión", value: `${precision}%` },
-          { label: "Preguntas", value: user.preguntasRespondidas },
-          { label: "Correctas", value: user.preguntasCorrectas },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl p-4" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
-            <p className="font-bold text-lg" style={{ color: '#F0F4FA' }}>{String(s.value)}</p>
-            <p className="text-xs" style={{ color: '#A8BFDC' }}>{s.label}</p>
-          </div>
-        ))}
+      {/* Estadísticas grid */}
+      <div>
+        <span className="eyebrow">Estadísticas</span>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+          {[
+            { label: "Racha actual", value: user.rachaActual, suffix: "días", icon: "🔥" },
+            { label: "Mejor racha", value: user.rachaMasLarga, suffix: "días", icon: "⚡" },
+            { label: "Simulacros", value: user.simulacrosTotal, suffix: "", icon: "📝" },
+            { label: "Precisión", value: precision, suffix: "%", icon: "🎯" },
+            { label: "Preguntas", value: user.preguntasRespondidas, suffix: "", icon: "❓" },
+            { label: "Correctas", value: user.preguntasCorrectas, suffix: "", icon: "✅" },
+          ].map((s) => (
+            <div key={s.label} className="card p-4">
+              <p className="text-xl mb-1">{s.icon}</p>
+              <p
+                className="text-xl font-bold"
+                style={{ fontFamily: "var(--font-display)", color: "var(--text-primary)" }}
+              >
+                {s.value}
+                {s.suffix && (
+                  <span className="text-sm font-medium ml-1" style={{ color: "var(--text-muted)" }}>
+                    {s.suffix}
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>
+                {s.label}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Badges */}
       <div>
-        <h2 className="font-semibold mb-3" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>
-          Logros{" "}
-          <span className="text-sm font-normal" style={{ color: '#A8BFDC' }}>
-            ({user.badges.length})
-          </span>
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <span className="eyebrow">Logros</span>
+          <span className="tag tag-muted">{user.badges.length}</span>
+        </div>
 
         {user.badges.length === 0 ? (
-          <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
-            <p className="text-4xl mb-2">🏅</p>
-            <p className="text-sm" style={{ color: '#A8BFDC' }}>
-              Completa simulacros y mantén tu racha para ganar logros
+          <div
+            className="card-elevated text-center py-12"
+            style={{ borderStyle: "dashed", borderColor: "var(--border-default)" }}
+          >
+            <p className="text-5xl mb-3 opacity-60">🏅</p>
+            <p className="font-semibold mb-1">Aún sin logros</p>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              Completa simulacros y mantén tu racha para desbloquear badges
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {user.badges.map(({ badge, obtenidoAt }) => (
-              <div
-                key={badge.id}
-                className="rounded-xl p-4 flex items-start gap-3"
-                style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}
-              >
-                <span className="text-2xl">{badge.icono}</span>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: '#F0F4FA' }}>{badge.nombre}</p>
-                  <p className="text-xs" style={{ color: '#A8BFDC' }}>{badge.descripcion}</p>
-                  <p className="text-xs mt-1" style={{ color: '#6B8BAD' }}>
-                    {new Date(obtenidoAt).toLocaleDateString("es-CO")}
+              <div key={badge.id} className="card flex items-start gap-3 p-4">
+                <span className="text-3xl shrink-0">{badge.icono}</span>
+                <div className="min-w-0">
+                  <p className="font-bold" style={{ fontFamily: "var(--font-display)" }}>
+                    {badge.nombre}
+                  </p>
+                  <p className="text-sm leading-snug mt-0.5" style={{ color: "var(--text-secondary)" }}>
+                    {badge.descripcion}
+                  </p>
+                  <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>
+                    {new Date(obtenidoAt).toLocaleDateString("es-CO", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </p>
                 </div>
               </div>
@@ -134,16 +191,29 @@ export default async function PerfilPage() {
         )}
       </div>
 
-      {/* Mejorar plan */}
+      {/* CTA upgrade */}
       {(!user.suscripcion || user.suscripcion.plan === "GRATUITO") && (
-        <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg,rgba(201,150,43,0.20),rgba(245,166,35,0.15))', border: '1px solid rgba(245,166,35,0.35)' }}>
-          <p className="font-semibold mb-1" style={{ fontFamily: 'var(--font-display)', color: '#F5A623' }}>¡Desbloquea más simulacros!</p>
-          <p className="text-sm mb-3" style={{ color: '#A8BFDC' }}>
-            Con el Plan Pro tienes simulacros ilimitados, 40 preguntas y rankings avanzados.
+        <div
+          className="rounded-2xl p-6 relative overflow-hidden"
+          style={{
+            background:
+              "radial-gradient(circle at 100% 0%, rgba(245,166,35,0.18) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
+            border: "1px solid rgba(245,166,35,0.35)",
+          }}
+        >
+          <span className="eyebrow">Desbloquear todo</span>
+          <h3
+            className="text-xl font-bold mt-2"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            ¿Listo para subir de plan?
+          </h3>
+          <p className="text-sm mt-2 mb-5" style={{ color: "var(--text-secondary)" }}>
+            Con el Plan Pro tienes simulacros ilimitados, 40 preguntas por banco y rankings avanzados.
           </p>
-          <button className="btn-primary text-sm px-5 py-2">
+          <a href="/#planes" className="btn-primary">
             Ver planes →
-          </button>
+          </a>
         </div>
       )}
     </div>

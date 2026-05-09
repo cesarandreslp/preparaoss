@@ -39,87 +39,116 @@ export default function OpecsPage() {
   }, [busqueda, pagina]);
 
   useEffect(() => {
-    cargar();
-  }, [cargar]);
+    const t = setTimeout(cargar, busqueda ? 350 : 0);
+    return () => clearTimeout(t);
+  }, [cargar, busqueda]);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: '#F0F4FA' }}>Ofertas CNSC</h1>
-        <p className="text-sm" style={{ color: '#A8BFDC' }}>
-          {total.toLocaleString()} OPECs disponibles
+        <span className="eyebrow">Catálogo</span>
+        <h1
+          className="text-3xl font-extrabold mt-1"
+          style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}
+        >
+          Ofertas CNSC
+        </h1>
+        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+          {total.toLocaleString("es-CO")} OPECs disponibles · sincronizadas a diario
         </p>
       </div>
 
       {/* Búsqueda */}
-      <input
-        type="search"
-        placeholder="Busca cargo, entidad o número OPEC..."
-        value={busqueda}
-        onChange={(e) => { setBusqueda(e.target.value); setPagina(1); }}
-        className="w-full rounded-xl px-4 py-3 focus:outline-none"
-        style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F', color: '#F0F4FA' }}
-      />
+      <div className="relative">
+        <span
+          className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ color: "var(--text-muted)" }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </span>
+        <input
+          type="search"
+          placeholder="Cargo, entidad o número OPEC…"
+          value={busqueda}
+          onChange={(e) => {
+            setBusqueda(e.target.value);
+            setPagina(1);
+          }}
+          className="input pl-11"
+        />
+      </div>
 
       {/* Lista */}
       {cargando ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-24 rounded-2xl animate-pulse" style={{ background: 'rgba(30,61,110,0.40)' }} />
+            <div key={i} className="h-28 rounded-xl skeleton" />
           ))}
         </div>
       ) : opecs.length === 0 ? (
-        <div className="text-center py-16" style={{ color: '#A8BFDC' }}>
-          No se encontraron OPECs
+        <div
+          className="card-elevated text-center py-16"
+          style={{ borderStyle: "dashed", borderColor: "var(--border-default)" }}
+        >
+          <p className="text-5xl mb-3 opacity-60">🔍</p>
+          <p className="font-semibold">No se encontraron OPECs</p>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+            Prueba con otros términos de búsqueda
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
           {opecs.map((opec) => (
-            <Link
-              key={opec.id}
-              href={`/opecs/${opec.id}`}
-              className="block rounded-2xl p-4 transition-all hover:brightness-110"
-              style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}
-            >
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-mono px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,166,35,0.15)', color: '#F5A623', border: '1px solid rgba(245,166,35,0.25)' }}>
-                      OPEC #{opec.simoId}
-                    </span>
-                    {opec.numerConvocatoria && (
-                      <span className="text-xs font-mono px-1.5 py-0.5 rounded" style={{ background: 'rgba(74,144,217,0.15)', color: '#4A90D9', border: '1px solid rgba(74,144,217,0.25)' }}>
-                        Conv. {opec.numerConvocatoria}
-                      </span>
-                    )}
-                  </div>
-                  <p className="font-semibold truncate" style={{ color: '#F0F4FA' }}>{opec.nombreCargo}</p>
-                  <p className="text-sm truncate" style={{ color: '#A8BFDC' }}>{opec.entidad}</p>
-                  <p className="text-xs mt-1" style={{ color: '#6B8BAD' }}>
-                    {opec.municipio}, {opec.departamento} · {opec.numVacantes} vacante
-                    {opec.numVacantes !== 1 ? "s" : ""}
-                  </p>
-                  {opec.asignacionBasica && (
-                    <p className="text-xs mt-1 font-medium" style={{ color: '#27AE60' }}>
-                      💰 {opec.asignacionBasica.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 })}/mes
-                    </p>
+            <Link key={opec.id} href={`/opecs/${opec.id}`} className="card flex flex-col gap-3 group">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="tag tag-gold">OPEC #{opec.simoId}</span>
+                  {opec.numerConvocatoria && (
+                    <span className="tag tag-blue">Conv. {opec.numerConvocatoria}</span>
                   )}
+                  <span className="tag tag-muted">{opec.nivelJerarquico}</span>
                 </div>
-                <div className="text-right shrink-0">
-                  <span className="text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(74,144,217,0.20)', color: '#4A90D9' }}>
-                    {opec.nivelJerarquico}
-                  </span>
-                  {opec._count.preguntas > 0 && (
-                    <p className="text-xs mt-1" style={{ color: '#27AE60' }}>✅ Simulacros listos</p>
-                  )}
-                </div>
+                {opec._count.preguntas > 0 && (
+                  <span className="tag tag-success shrink-0">✓ Simulacros</span>
+                )}
               </div>
-
-              {opec.fechaLimiteInscripcion && (
-                <p className="text-xs mt-2" style={{ color: '#F5A623' }}>
-                  🗓 Cierra: {new Date(opec.fechaLimiteInscripcion).toLocaleDateString("es-CO")}
+              <div>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  {opec.entidad}
                 </p>
-              )}
+                <h3
+                  className="text-lg font-bold leading-snug mt-0.5 transition-colors group-hover:text-white"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {opec.nombreCargo}
+                </h3>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
+                <span>📍 {opec.municipio}, {opec.departamento}</span>
+                <span>👥 {opec.numVacantes} vacante{opec.numVacantes !== 1 ? "s" : ""}</span>
+                {opec.asignacionBasica && (
+                  <span style={{ color: "#86EFAC" }}>
+                    💰{" "}
+                    {opec.asignacionBasica.toLocaleString("es-CO", {
+                      style: "currency",
+                      currency: "COP",
+                      maximumFractionDigits: 0,
+                    })}
+                  </span>
+                )}
+                {opec.fechaLimiteInscripcion && (
+                  <span style={{ color: "var(--gold-300)" }}>
+                    🗓{" "}
+                    {new Date(opec.fechaLimiteInscripcion).toLocaleDateString("es-CO", {
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                )}
+              </div>
             </Link>
           ))}
         </div>
@@ -127,23 +156,21 @@ export default function OpecsPage() {
 
       {/* Paginación */}
       {total > 20 && (
-        <div className="flex justify-center gap-3 pt-4">
+        <div className="flex justify-center items-center gap-3 pt-6">
           <button
             onClick={() => setPagina((p) => Math.max(1, p - 1))}
             disabled={pagina === 1}
-            className="px-4 py-2 rounded-xl disabled:opacity-40 text-sm"
-            style={{ background: 'rgba(30,61,110,0.50)', color: '#A8BFDC', border: '1px solid #2A4A7F' }}
+            className="btn-secondary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             ← Anterior
           </button>
-          <span className="px-4 py-2 text-sm" style={{ color: '#A8BFDC' }}>
-            Pág. {pagina} de {Math.ceil(total / 20)}
+          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+            {pagina} / {Math.ceil(total / 20)}
           </span>
           <button
             onClick={() => setPagina((p) => p + 1)}
             disabled={pagina >= Math.ceil(total / 20)}
-            className="px-4 py-2 rounded-xl disabled:opacity-40 text-sm"
-            style={{ background: 'rgba(30,61,110,0.50)', color: '#A8BFDC', border: '1px solid #2A4A7F' }}
+            className="btn-secondary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Siguiente →
           </button>
