@@ -59,7 +59,7 @@ export default async function PerfilPage() {
           className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-2xl font-extrabold mb-4"
           style={{
             background: "var(--gradient-gold)",
-            color: "#1a0f00",
+            color: "#FFFFFF",
             fontFamily: "var(--font-display)",
             boxShadow: "var(--shadow-glow-gold)",
           }}
@@ -197,8 +197,8 @@ export default async function PerfilPage() {
           className="rounded-2xl p-6 relative overflow-hidden"
           style={{
             background:
-              "radial-gradient(circle at 100% 0%, rgba(245,166,35,0.18) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
-            border: "1px solid rgba(245,166,35,0.35)",
+              "radial-gradient(circle at 100% 0%, rgba(208, 74, 28, 0.18) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
+            border: "1px solid rgba(208, 74, 28, 0.35)",
           }}
         >
           <span className="eyebrow">Desbloquear todo</span>

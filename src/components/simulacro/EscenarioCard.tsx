@@ -11,16 +11,16 @@ interface Props {
 
 export function EscenarioCard({ numero, escenario, respuestas, onRespuesta }: Props) {
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(30,61,110,0.40)', border: '1px solid #2A4A7F' }}>
+    <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.40)', border: '1px solid var(--border-default)' }}>
       {/* Escenario */}
-      <div className="p-5" style={{ background: 'rgba(37,99,235,0.12)', borderBottom: '1px solid #2A4A7F' }}>
+      <div className="p-5" style={{ background: 'rgba(37,99,235,0.12)', borderBottom: '1px solid var(--border-default)' }}>
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1B3A6B,#2563EB)', color: '#F0F4FA', fontFamily: 'var(--font-display)' }}>
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,var(--bg-card),#2563EB)', color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
             CASO {numero}
           </span>
-          <span className="text-xs" style={{ color: '#A8BFDC' }}>Juicio situacional</span>
+          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Juicio situacional</span>
         </div>
-        <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#A8BFDC' }}>
+        <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
           {escenario.contenido}
         </p>
       </div>
@@ -56,7 +56,7 @@ function SubPregunta({
 }) {
   return (
     <div className="p-5 space-y-3">
-      <p className="font-medium text-sm" style={{ color: '#F0F4FA' }}>
+      <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
         <span className="font-bold mr-1" style={{ color: '#4A90D9' }}>{letra})</span>
         {pregunta.texto}
       </p>
@@ -71,8 +71,8 @@ function SubPregunta({
               onClick={() => onSeleccionar(opcion.id)}
             className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all border"
               style={marcada
-                ? { background: 'rgba(37,99,235,0.35)', borderColor: '#4A90D9', color: '#F0F4FA' }
-                : { background: 'rgba(30,61,110,0.30)', borderColor: '#2A4A7F', color: '#A8BFDC' }}
+                ? { background: 'rgba(37,99,235,0.35)', borderColor: '#4A90D9', color: 'var(--text-primary)' }
+                : { background: 'rgba(255, 255, 255, 0.30)', borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}
             >
               <span className="font-bold mr-2" style={{ color: '#4A90D9' }}>{opcion.letra}.</span>
               {opcion.texto}

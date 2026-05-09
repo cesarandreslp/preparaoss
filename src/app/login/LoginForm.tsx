@@ -46,7 +46,7 @@ export function LoginForm() {
         >
           <span
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-            style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
+            style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
           >
             P
           </span>
@@ -96,7 +96,7 @@ export function LoginForm() {
                 className="text-sm rounded-lg px-4 py-3 flex items-start gap-2"
                 style={{
                   background: "rgba(239,68,68,0.08)",
-                  color: "#FCA5A5",
+                  color: "var(--error)",
                   border: "1px solid rgba(239,68,68,0.30)",
                 }}
               >
@@ -128,14 +128,14 @@ export function LoginForm() {
         className="hidden lg:flex relative overflow-hidden items-center justify-center p-12"
         style={{
           background:
-            "radial-gradient(circle at 30% 30%, rgba(245,166,35,0.15) 0%, transparent 60%), linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-base) 100%)",
+            "radial-gradient(circle at 30% 30%, rgba(208, 74, 28, 0.15) 0%, transparent 60%), linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-base) 100%)",
         }}
       >
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(circle at 70% 70%, rgba(74,144,217,0.12) 0%, transparent 50%)",
+              "radial-gradient(circle at 70% 70%, rgba(44, 84, 122, 0.12) 0%, transparent 50%)",
           }}
         />
         <div className="relative max-w-md text-center">

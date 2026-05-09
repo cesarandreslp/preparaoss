@@ -30,7 +30,7 @@ export function TopBar() {
     <header
       className="sticky top-0 z-40 backdrop-blur-xl border-b"
       style={{
-        background: "rgba(10, 19, 38, 0.78)",
+        background: "rgba(250, 247, 242, 0.78)",
         borderColor: "var(--border-subtle)",
       }}
     >
@@ -42,7 +42,7 @@ export function TopBar() {
         >
           <span
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-            style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
+            style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
           >
             P
           </span>
@@ -55,7 +55,7 @@ export function TopBar() {
             className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-transform hover:scale-105"
             style={{
               background: "var(--gradient-gold)",
-              color: "#1a0f00",
+              color: "#FFFFFF",
               fontFamily: "var(--font-display)",
             }}
             aria-label="Menú de usuario"
@@ -94,7 +94,7 @@ export function TopBar() {
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/5 transition-colors border-t"
-                style={{ color: "#FCA5A5", borderColor: "var(--border-subtle)" }}
+                style={{ color: "var(--error)", borderColor: "var(--border-subtle)" }}
               >
                 <span>↗</span> Cerrar sesión
               </button>

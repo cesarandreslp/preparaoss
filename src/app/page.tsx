@@ -26,7 +26,7 @@ export default function LandingPage() {
       <nav
         className="fixed top-0 inset-x-0 z-50 transition-all"
         style={{
-          background: scrolled ? "rgba(10, 19, 38, 0.78)" : "transparent",
+          background: scrolled ? "rgba(250, 247, 242, 0.78)" : "transparent",
           backdropFilter: scrolled ? "blur(16px)" : "none",
           borderBottom: scrolled ? "1px solid var(--border-subtle)" : "1px solid transparent",
         }}
@@ -35,7 +35,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
             <span
               className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-              style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
+              style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
             >
               P
             </span>
@@ -69,7 +69,7 @@ export default function LandingPage() {
             right: "-10%",
             width: "560px",
             height: "560px",
-            background: "radial-gradient(circle, rgba(245,166,35,0.18) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(208, 74, 28, 0.18) 0%, transparent 70%)",
             filter: "blur(40px)",
           }}
         />
@@ -80,7 +80,7 @@ export default function LandingPage() {
             left: "-15%",
             width: "640px",
             height: "640px",
-            background: "radial-gradient(circle, rgba(74,144,217,0.15) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(44, 84, 122, 0.15) 0%, transparent 70%)",
             filter: "blur(60px)",
           }}
         />
@@ -241,7 +241,7 @@ export default function LandingPage() {
                   <div
                     className="mt-6 p-4 rounded-xl text-sm italic"
                     style={{
-                      background: "rgba(255,255,255,0.03)",
+                      background: "rgba(10, 10, 10, 0.03)",
                       color: "var(--text-secondary)",
                       borderLeft: "2px solid var(--gold-500)",
                     }}
@@ -278,7 +278,7 @@ export default function LandingPage() {
                 <li key={li} className="flex items-start gap-3" style={{ color: "var(--text-secondary)" }}>
                   <span
                     className="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0"
-                    style={{ background: "rgba(245,166,35,0.15)", color: "var(--gold-500)" }}
+                    style={{ background: "rgba(208, 74, 28, 0.15)", color: "var(--gold-500)" }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                       <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -333,7 +333,7 @@ export default function LandingPage() {
                           ? "rgba(34,197,94,0.08)"
                           : opt.state === "wrong"
                           ? "rgba(239,68,68,0.06)"
-                          : "rgba(255,255,255,0.02)",
+                          : "rgba(10, 10, 10, 0.02)",
                       borderColor:
                         opt.state === "correct"
                           ? "rgba(34,197,94,0.40)"
@@ -350,7 +350,7 @@ export default function LandingPage() {
                             ? "var(--success)"
                             : opt.state === "wrong"
                             ? "var(--error)"
-                            : "rgba(255,255,255,0.06)",
+                            : "rgba(10, 10, 10, 0.06)",
                         color: opt.state === "default" ? "var(--text-secondary)" : "white",
                       }}
                     >
@@ -361,9 +361,9 @@ export default function LandingPage() {
                       style={{
                         color:
                           opt.state === "correct"
-                            ? "#86EFAC"
+                            ? "var(--success)"
                             : opt.state === "wrong"
-                            ? "#FCA5A5"
+                            ? "var(--error)"
                             : "var(--text-primary)",
                       }}
                     >
@@ -576,7 +576,7 @@ export default function LandingPage() {
               <Reveal key={p.name} delay={i * 80}>
                 <div
                   className={p.highlight ? "card-glow h-full flex flex-col" : "card h-full flex flex-col"}
-                  style={p.highlight ? { background: "linear-gradient(180deg, rgba(245,166,35,0.06), var(--bg-card))" } : {}}
+                  style={p.highlight ? { background: "linear-gradient(180deg, rgba(208, 74, 28, 0.06), var(--bg-card))" } : {}}
                 >
                   {p.highlight && (
                     <span className="tag tag-gold mb-4 self-start animate-pulse">✨ Más elegido</span>
@@ -602,8 +602,8 @@ export default function LandingPage() {
                         <span
                           className="mt-1 inline-flex items-center justify-center w-4 h-4 rounded-full shrink-0"
                           style={{
-                            background: p.highlight ? "var(--gold-500)" : "rgba(255,255,255,0.06)",
-                            color: p.highlight ? "#1a0f00" : "var(--text-secondary)",
+                            background: p.highlight ? "var(--gold-500)" : "rgba(10, 10, 10, 0.06)",
+                            color: p.highlight ? "#FFFFFF" : "var(--text-secondary)",
                           }}
                         >
                           <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
@@ -679,7 +679,7 @@ export default function LandingPage() {
               className="rounded-3xl p-12 text-center relative overflow-hidden"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 0%, rgba(245,166,35,0.20) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
+                  "radial-gradient(circle at 50% 0%, rgba(208, 74, 28, 0.20) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
                 border: "1px solid var(--border-default)",
               }}
             >
@@ -713,7 +713,7 @@ export default function LandingPage() {
             <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
               <span
                 className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-                style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
+                style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
               >
                 P
               </span>
@@ -726,25 +726,25 @@ export default function LandingPage() {
           <div>
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Producto</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
-              <li><a href="#como-funciona" className="hover:text-white transition-colors">Cómo funciona</a></li>
-              <li><a href="#opecs" className="hover:text-white transition-colors">OPECs activas</a></li>
-              <li><a href="#planes" className="hover:text-white transition-colors">Planes</a></li>
-              <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+              <li><a href="#como-funciona" className="hover:text-[#D04A1C] transition-colors">Cómo funciona</a></li>
+              <li><a href="#opecs" className="hover:text-[#D04A1C] transition-colors">OPECs activas</a></li>
+              <li><a href="#planes" className="hover:text-[#D04A1C] transition-colors">Planes</a></li>
+              <li><a href="#faq" className="hover:text-[#D04A1C] transition-colors">FAQ</a></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Cuenta</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
-              <li><Link href="/login" className="hover:text-white transition-colors">Iniciar sesión</Link></li>
-              <li><Link href="/registro" className="hover:text-white transition-colors">Crear cuenta</Link></li>
-              <li><Link href="/dashboard" className="hover:text-white transition-colors">Mi dashboard</Link></li>
+              <li><Link href="/login" className="hover:text-[#D04A1C] transition-colors">Iniciar sesión</Link></li>
+              <li><Link href="/registro" className="hover:text-[#D04A1C] transition-colors">Crear cuenta</Link></li>
+              <li><Link href="/dashboard" className="hover:text-[#D04A1C] transition-colors">Mi dashboard</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Recursos</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
-              <li><a href="https://www.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">CNSC oficial ↗</a></li>
-              <li><a href="https://simo.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">SIMO ↗</a></li>
+              <li><a href="https://www.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-[#D04A1C] transition-colors">CNSC oficial ↗</a></li>
+              <li><a href="https://simo.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-[#D04A1C] transition-colors">SIMO ↗</a></li>
             </ul>
           </div>
         </div>

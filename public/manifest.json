@@ -4,8 +4,8 @@
   "description": "Prepárate para los concursos de méritos de la CNSC con simulacros de IA y gamificación",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#0D1F3C",
-  "theme_color": "#1B3A6B",
+  "background_color": "#FAF7F2",
+  "theme_color": "#FAF7F2",
   "orientation": "portrait",
   "icons": [
     {

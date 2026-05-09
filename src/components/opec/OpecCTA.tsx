@@ -33,10 +33,10 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
       ) : (
         <div
           className="w-full px-6 py-4 rounded-2xl text-center"
-          style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.25)', color: '#F5A623' }}
+          style={{ background: 'rgba(208, 74, 28, 0.08)', border: '1px solid rgba(208, 74, 28, 0.25)', color: 'var(--accent-500)' }}
         >
           <p className="font-medium">⏳ Banco de preguntas en preparación</p>
-          <p className="text-xs mt-1" style={{ color: '#A8BFDC' }}>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
             El simulacro estará disponible pronto. ¡Sigue esta OPEC para estar al tanto!
           </p>
         </div>
@@ -47,8 +47,8 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
         disabled={cargando}
         className="w-full px-6 py-3 rounded-2xl text-sm font-medium transition-all disabled:opacity-60"
         style={inscrito
-          ? { background: 'rgba(39,174,96,0.15)', color: '#27AE60', border: '1px solid rgba(39,174,96,0.35)' }
-          : { background: 'rgba(74,144,217,0.15)', color: '#4A90D9', border: '1px solid rgba(74,144,217,0.35)' }}
+          ? { background: 'rgba(39,174,96,0.15)', color: 'var(--success)', border: '1px solid rgba(39,174,96,0.35)' }
+          : { background: 'rgba(44, 84, 122, 0.15)', color: '#4A90D9', border: '1px solid rgba(44, 84, 122, 0.35)' }}
       >
         {inscrito ? "✅ Siguiendo esta OPEC (click para dejar de seguir)" : "➕ Seguir esta OPEC"}
       </button>
@@ -56,7 +56,7 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
       <Link
         href={`/ranking?opecId=${opecId}`}
         className="block w-full text-center px-6 py-3 rounded-2xl text-sm font-medium transition-all"
-        style={{ background: 'rgba(30,61,110,0.40)', color: '#A8BFDC', border: '1px solid #2A4A7F' }}
+        style={{ background: 'rgba(255, 255, 255, 0.40)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}
       >
         🏆 Ver ranking de aspirantes
       </Link>

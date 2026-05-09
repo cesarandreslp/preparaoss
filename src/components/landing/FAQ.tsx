@@ -30,8 +30,8 @@ export function FAQ({ items }: { items: QA[] }) {
             <span
               className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full transition-all"
               style={{
-                background: open === i ? "var(--gold-500)" : "rgba(255,255,255,0.04)",
-                color: open === i ? "#0A0E1A" : "var(--text-secondary)",
+                background: open === i ? "var(--gold-500)" : "rgba(10, 10, 10, 0.04)",
+                color: open === i ? "var(--bg-base)" : "var(--text-secondary)",
                 transform: open === i ? "rotate(45deg)" : "rotate(0)",
               }}
             >

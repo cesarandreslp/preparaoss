@@ -66,7 +66,7 @@ export default async function OpecDetailPage({
         {[
           { v: opec.numVacantes, label: "Vacantes", icon: "👥", accent: "var(--gold-300)" },
           { v: opec._count.inscripciones, label: "Aspirantes", icon: "🎯", accent: "var(--blue-300)" },
-          { v: opec._count.preguntas, label: "Preguntas", icon: "❓", accent: "#86EFAC" },
+          { v: opec._count.preguntas, label: "Preguntas", icon: "❓", accent: "var(--success)" },
         ].map((s) => (
           <div key={s.label} className="card text-center p-4">
             <p className="text-xl">{s.icon}</p>
@@ -126,7 +126,7 @@ export default async function OpecDetailPage({
                       month: "long",
                       year: "numeric",
                     }),
-                    accent: "#86EFAC",
+                    accent: "var(--success)",
                   },
                 ]
               : []),
@@ -159,14 +159,14 @@ export default async function OpecDetailPage({
         <div className="mt-5 space-y-3 text-sm" style={{ color: "var(--text-secondary)" }}>
           <p>
             📝{" "}
-            <strong className="text-white">Funcional Específica:</strong>{" "}
+            <strong style={{ color: "var(--text-primary)" }}>Funcional Específica:</strong>{" "}
             escenario situacional con 3 preguntas, 3 opciones cada una.
           </p>
           <p>
-            📋 <strong className="text-white">Funcional Transversal:</strong> pregunta directa con 4 opciones (A, B, C, D).
+            📋 <strong style={{ color: "var(--text-primary)" }}>Funcional Transversal:</strong> pregunta directa con 4 opciones (A, B, C, D).
           </p>
           <p>
-            🧠 <strong className="text-white">Comportamental:</strong> escala Likert 1-5 según nivel de responsabilidad.
+            🧠 <strong style={{ color: "var(--text-primary)" }}>Comportamental:</strong> escala Likert 1-5 según nivel de responsabilidad.
           </p>
         </div>
       </div>

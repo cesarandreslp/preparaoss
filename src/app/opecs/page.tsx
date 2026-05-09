@@ -120,7 +120,7 @@ export default function OpecsPage() {
                   {opec.entidad}
                 </p>
                 <h3
-                  className="text-lg font-bold leading-snug mt-0.5 transition-colors group-hover:text-white"
+                  className="text-lg font-bold leading-snug mt-0.5 transition-colors group-hover:text-[#D04A1C]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {opec.nombreCargo}
@@ -130,7 +130,7 @@ export default function OpecsPage() {
                 <span>📍 {opec.municipio}, {opec.departamento}</span>
                 <span>👥 {opec.numVacantes} vacante{opec.numVacantes !== 1 ? "s" : ""}</span>
                 {opec.asignacionBasica && (
-                  <span style={{ color: "#86EFAC" }}>
+                  <span style={{ color: "var(--success)" }}>
                     💰{" "}
                     {opec.asignacionBasica.toLocaleString("es-CO", {
                       style: "currency",

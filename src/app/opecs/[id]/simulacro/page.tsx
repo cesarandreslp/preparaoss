@@ -131,7 +131,7 @@ export default function SimulacroPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#4A90D9', borderTopColor: 'transparent' }} />
-        <p style={{ color: '#A8BFDC' }}>Preparando tu simulacro...</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Preparando tu simulacro...</p>
       </div>
     );
   }
@@ -139,8 +139,8 @@ export default function SimulacroPage() {
   if (estado === "finalizando") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#27AE60', borderTopColor: 'transparent' }} />
-        <p style={{ color: '#A8BFDC' }}>Calculando tu puntaje...</p>
+        <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--success)', borderTopColor: 'transparent' }} />
+        <p style={{ color: 'var(--text-secondary)' }}>Calculando tu puntaje...</p>
       </div>
     );
   }
@@ -149,7 +149,7 @@ export default function SimulacroPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-center px-4">
         <p className="text-4xl">❌</p>
-        <p className="font-semibold" style={{ color: '#F0F4FA' }}>{error}</p>
+        <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{error}</p>
         <button
           onClick={() => router.back()}
           className="btn-primary px-5 py-2"
@@ -176,10 +176,10 @@ export default function SimulacroPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Barra de progreso */}
-      <div className="sticky top-0 backdrop-blur pt-2 pb-3 z-10" style={{ background: 'rgba(13,31,60,0.95)' }}>
+      <div className="sticky top-0 backdrop-blur pt-2 pb-3 z-10" style={{ background: 'rgba(250, 247, 242, 0.95)' }}>
         <div className="flex justify-between text-xs text-slate-400 mb-1">
-          <span style={{ color: '#A8BFDC' }}>{respondidas} / {totalPreguntas} respondidas</span>
-          <span style={{ color: '#A8BFDC' }}>{Math.round((respondidas / totalPreguntas) * 100)}%</span>
+          <span style={{ color: 'var(--text-secondary)' }}>{respondidas} / {totalPreguntas} respondidas</span>
+          <span style={{ color: 'var(--text-secondary)' }}>{Math.round((respondidas / totalPreguntas) * 100)}%</span>
         </div>
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <div

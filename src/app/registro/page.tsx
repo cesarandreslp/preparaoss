@@ -60,7 +60,7 @@ export default function RegistroPage() {
         className="hidden lg:flex relative overflow-hidden items-center justify-center p-12 order-2"
         style={{
           background:
-            "radial-gradient(circle at 70% 30%, rgba(245,166,35,0.18) 0%, transparent 60%), linear-gradient(135deg, var(--bg-base) 0%, var(--bg-elevated) 100%)",
+            "radial-gradient(circle at 70% 30%, rgba(208, 74, 28, 0.18) 0%, transparent 60%), linear-gradient(135deg, var(--bg-base) 0%, var(--bg-elevated) 100%)",
         }}
       >
         <div className="relative max-w-md">
@@ -79,7 +79,7 @@ export default function RegistroPage() {
               <li key={li} className="flex items-start gap-3">
                 <span
                   className="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0"
-                  style={{ background: "var(--gold-500)", color: "#1a0f00" }}
+                  style={{ background: "var(--gold-500)", color: "#FFFFFF" }}
                 >
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                     <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -101,7 +101,7 @@ export default function RegistroPage() {
         >
           <span
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-            style={{ background: "var(--gradient-gold)", color: "#1a0f00" }}
+            style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
           >
             P
           </span>
@@ -166,7 +166,7 @@ export default function RegistroPage() {
                 className="text-sm rounded-lg px-4 py-3 flex items-start gap-2"
                 style={{
                   background: "rgba(239,68,68,0.08)",
-                  color: "#FCA5A5",
+                  color: "var(--error)",
                   border: "1px solid rgba(239,68,68,0.30)",
                 }}
               >

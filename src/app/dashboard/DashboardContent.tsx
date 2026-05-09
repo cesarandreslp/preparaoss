@@ -69,8 +69,8 @@ export async function DashboardContent() {
         <div
           className="flex items-center gap-2 px-4 py-2.5 rounded-full"
           style={{
-            background: "rgba(245,166,35,0.10)",
-            border: "1px solid rgba(245,166,35,0.30)",
+            background: "rgba(208, 74, 28, 0.10)",
+            border: "1px solid rgba(208, 74, 28, 0.30)",
           }}
         >
           <span className="text-xl">🔥</span>
