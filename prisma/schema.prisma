@@ -494,3 +494,59 @@ model RecursoBiblioteca {
 
   @@index([bloque, vigente, orden])
 }
+
+// ─────────────────────────────────────────────────────────
+// ENTIDADES DE RÉGIMEN ESPECIAL (Procuraduría, Banrep, etc.)
+// Cada una con su propio sistema de convocatorias fuera de SIMO/CNSC.
+// ─────────────────────────────────────────────────────────
+
+model EntidadEspecial {
+  id          String   @id @default(cuid())
+  slug        String   @unique          // "procuraduria"
+  nombre      String                    // "Procuraduría General de la Nación"
+  descripcion String?  @db.Text
+  /// URL al endpoint JSON paginado (admin la pega desde DevTools)
+  apiUrl      String
+  /// Página web pública para que usuarios consulten más detalles
+  webUrl      String?
+  /// Nombre del query param para la página (default Spring: "page")
+  pageParam   String   @default("page")
+  /// Nombre del query param para el tamaño (default: "size")
+  sizeParam   String   @default("size")
+  pageSize    Int      @default(25)
+  /// Key dentro del JSON donde está el array de items
+  itemsKey    String   @default("convocatorias")
+  /// Key opcional con el total para saber cuántas páginas pedir
+  totalKey    String   @default("totalElementos")
+  activo      Boolean  @default(true)
+  ultimoScrape DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  opecs       OpecEspecial[]
+}
+
+model OpecEspecial {
+  id                  String   @id @default(cuid())
+  entidadId           String
+  entidad             EntidadEspecial @relation(fields: [entidadId], references: [id], onDelete: Cascade)
+  externalId          String              // id en sistema origen
+  cargo               String
+  codigoConvocatoria  String
+  grado               String?
+  nivel               String?
+  salario             Int?
+  costoInscripcion    Int?
+  numeroPlazas        Int      @default(0)
+  totalInscritos      Int      @default(0)
+  esActiva            Boolean  @default(true)
+  sedes               String[]
+  /// URL del PDF del manual / convocatoria (admin la edita; no viene en el JSON)
+  pdfUrl              String?
+  raw                 Json?     // backup del item completo
+  scrapedAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([entidadId, externalId])
+  @@index([entidadId, esActiva])
+}

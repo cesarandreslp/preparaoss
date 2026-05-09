@@ -1,0 +1,754 @@
+{
+  "convocatorias": [
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "01-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 1,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 153,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 2,
+          "nombreSede": "ANTIOQUIA"
+        },
+        {
+          "id": 4,
+          "nombreSede": "ATLÁNTICO"
+        },
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        },
+        {
+          "id": 6,
+          "nombreSede": "BOLÍVAR"
+        },
+        {
+          "id": 9,
+          "nombreSede": "CAQUETÁ"
+        },
+        {
+          "id": 13,
+          "nombreSede": "CHOCÓ"
+        },
+        {
+          "id": 14,
+          "nombreSede": "CÓRDOBA"
+        },
+        {
+          "id": 19,
+          "nombreSede": "MAGDALENA"
+        },
+        {
+          "id": 20,
+          "nombreSede": "META"
+        },
+        {
+          "id": 22,
+          "nombreSede": "NORTE DE SANTANDER"
+        },
+        {
+          "id": 24,
+          "nombreSede": "QUINDÍO"
+        },
+        {
+          "id": 25,
+          "nombreSede": "RISARALDA"
+        },
+        {
+          "id": 26,
+          "nombreSede": "SAN ANDRÉS"
+        },
+        {
+          "id": 27,
+          "nombreSede": "SANTANDER"
+        },
+        {
+          "id": 28,
+          "nombreSede": "SUCRE"
+        },
+        {
+          "id": 89,
+          "nombreSede": "VALLE DE ABURRÁ"
+        },
+        {
+          "id": 30,
+          "nombreSede": "VALLE DEL CAUCA"
+        },
+        {
+          "id": 31,
+          "nombreSede": "VAUPÉS"
+        },
+        {
+          "id": 33,
+          "nombreSede": "Amagá"
+        },
+        {
+          "id": 36,
+          "nombreSede": "Armenia"
+        },
+        {
+          "id": 39,
+          "nombreSede": "Barrancabermeja"
+        },
+        {
+          "id": 40,
+          "nombreSede": "Barranquilla"
+        },
+        {
+          "id": 42,
+          "nombreSede": "Bucaramanga"
+        },
+        {
+          "id": 43,
+          "nombreSede": "Buenaventura"
+        },
+        {
+          "id": 44,
+          "nombreSede": "Bugalagrande"
+        },
+        {
+          "id": 47,
+          "nombreSede": "Cartagena de Indias"
+        },
+        {
+          "id": 48,
+          "nombreSede": "Cartago"
+        },
+        {
+          "id": 49,
+          "nombreSede": "Chaparral"
+        },
+        {
+          "id": 50,
+          "nombreSede": "Chiquinquirá"
+        },
+        {
+          "id": 38,
+          "nombreSede": "El Banco"
+        },
+        {
+          "id": 53,
+          "nombreSede": "Facatativá"
+        },
+        {
+          "id": 55,
+          "nombreSede": "Fusagasugá"
+        },
+        {
+          "id": 56,
+          "nombreSede": "Garzón"
+        },
+        {
+          "id": 58,
+          "nombreSede": "Girardot"
+        },
+        {
+          "id": 59,
+          "nombreSede": "Guateque"
+        },
+        {
+          "id": 60,
+          "nombreSede": "Honda"
+        },
+        {
+          "id": 61,
+          "nombreSede": "Ibagué"
+        },
+        {
+          "id": 62,
+          "nombreSede": "Ipiales"
+        },
+        {
+          "id": 63,
+          "nombreSede": "Istmina"
+        },
+        {
+          "id": 65,
+          "nombreSede": "Magangué"
+        },
+        {
+          "id": 69,
+          "nombreSede": "Montería"
+        },
+        {
+          "id": 71,
+          "nombreSede": "Neiva"
+        },
+        {
+          "id": 72,
+          "nombreSede": "Ocaña"
+        },
+        {
+          "id": 73,
+          "nombreSede": "Pasto"
+        },
+        {
+          "id": 74,
+          "nombreSede": "Pereira"
+        },
+        {
+          "id": 76,
+          "nombreSede": "Popayán"
+        },
+        {
+          "id": 37,
+          "nombreSede": "Puerto Asís"
+        },
+        {
+          "id": 41,
+          "nombreSede": "Puerto Berrío"
+        },
+        {
+          "id": 70,
+          "nombreSede": "Rionegro"
+        },
+        {
+          "id": 80,
+          "nombreSede": "Sabanalarga"
+        },
+        {
+          "id": 87,
+          "nombreSede": "San Andrés de Tumaco"
+        },
+        {
+          "id": 57,
+          "nombreSede": "San Gil"
+        },
+        {
+          "id": 51,
+          "nombreSede": "San José de Cúcuta"
+        },
+        {
+          "id": 64,
+          "nombreSede": "San Juan Del Cesar"
+        },
+        {
+          "id": 82,
+          "nombreSede": "Santander de Quilichao"
+        },
+        {
+          "id": 79,
+          "nombreSede": "Santa Rosa de Viterbo"
+        },
+        {
+          "id": 45,
+          "nombreSede": "Santiago de Cali"
+        },
+        {
+          "id": 83,
+          "nombreSede": "Sincelejo"
+        },
+        {
+          "id": 84,
+          "nombreSede": "Soacha"
+        },
+        {
+          "id": 85,
+          "nombreSede": "Sogamoso"
+        },
+        {
+          "id": 88,
+          "nombreSede": "Tunja"
+        },
+        {
+          "id": 90,
+          "nombreSede": "Valledupar"
+        },
+        {
+          "id": 91,
+          "nombreSede": "Vélez"
+        },
+        {
+          "id": 92,
+          "nombreSede": "Villavicencio"
+        },
+        {
+          "id": 93,
+          "nombreSede": "Yarumal"
+        },
+        {
+          "id": 95,
+          "nombreSede": "Zipaquirá"
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "02-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 2,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 6,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "03-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 3,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "04-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 4,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 4,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "05-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 5,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "06-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 6,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "07-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 7,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 3,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "08-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 8,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "09-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 9,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "10-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 10,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "11-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 11,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        },
+        {
+          "id": 68,
+          "nombreSede": "Medellín"
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "12-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 12,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "13-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 13,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 3,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        },
+        {
+          "id": 68,
+          "nombreSede": "Medellín"
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "14-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 14,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        },
+        {
+          "id": 68,
+          "nombreSede": "Medellín"
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "15-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 15,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 5,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "16-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 16,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "17-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 17,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 3,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "18-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 18,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "19-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 19,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 3,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "20-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 20,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "21-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 21,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 3,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "22-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 22,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 4,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "23-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 23,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 8,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "24-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 24,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 1,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    },
+    {
+      "cargo": "Asesor",
+      "codigoConvocatoria": "25-2026",
+      "costoInscripcion": 87500,
+      "esActiva": false,
+      "grado": "1AS-19",
+      "id": 25,
+      "idConcurso": 1,
+      "nivel": "Asesor",
+      "numeroPlazas": 2,
+      "salario": 10403514,
+      "sedes": [
+        {
+          "id": 5,
+          "nombreSede": "BOGOTA, D.C."
+        }
+      ],
+      "totalInscritos": 0
+    }
+  ],
+  "longitudPagina": 25,
+  "numeroPagina": 0,
+  "totalElementos": 290
+}
