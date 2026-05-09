@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,7 +13,6 @@ interface Concurso {
 
 export function ConcursosSlider() {
   const [items, setItems] = useState<Concurso[] | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let alive = true;
@@ -28,21 +27,22 @@ export function ConcursosSlider() {
     };
   }, []);
 
-  function scroll(dir: 1 | -1) {
-    const el = trackRef.current;
-    if (!el) return;
-    const w = el.clientWidth;
-    el.scrollBy({ left: dir * (w * 0.8), behavior: "smooth" });
-  }
-
   if (items === null) {
     return (
-      <div className="flex gap-5 overflow-hidden">
-        {[0, 1, 2, 3].map((i) => (
+      <div
+        className="flex gap-5 overflow-hidden"
+        style={{
+          maskImage:
+            "linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%)",
+        }}
+      >
+        {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
             className="skeleton rounded-2xl shrink-0"
-            style={{ width: "min(85vw, 420px)", aspectRatio: "1200 / 630" }}
+            style={{ width: "min(85vw, 380px)", aspectRatio: "1200 / 630" }}
           />
         ))}
       </div>
@@ -51,66 +51,36 @@ export function ConcursosSlider() {
 
   if (items.length === 0) return null;
 
-  return (
-    <div className="relative">
-      <div className="flex items-center justify-between mb-6">
-        <Link
-          href="/concursos-en-desarrollo"
-          className="btn-ghost text-sm"
-        >
-          Ver todos →
-        </Link>
-        <div className="flex gap-2">
-          <button
-            onClick={() => scroll(-1)}
-            aria-label="Anterior"
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105"
-            style={{
-              background: "var(--bg-card)",
-              border: "1px solid var(--border-default)",
-              color: "var(--text-primary)",
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </button>
-          <button
-            onClick={() => scroll(1)}
-            aria-label="Siguiente"
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105"
-            style={{
-              background: "var(--accent-500)",
-              color: "#FFFFFF",
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-      </div>
+  // Duplicamos los items para loop seamless (nuestro track muestra 2x la lista
+  // y la animación trasla -50% para terminar exactamente donde empieza).
+  const looped = [...items, ...items];
+  // Velocidad: ~9s por item — 28 items → ~250s vuelta completa, suave.
+  const seconds = Math.max(items.length * 9, 30);
 
+  return (
+    <div
+      className="relative overflow-hidden"
+      style={{
+        maskImage:
+          "linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%)",
+      }}
+    >
       <div
-        ref={trackRef}
-        className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth"
+        className="flex gap-5 will-change-transform animate-scroll-x hover:[animation-play-state:paused]"
         style={{
-          scrollbarWidth: "none",
-          WebkitOverflowScrolling: "touch",
+          width: "max-content",
+          animationDuration: `${seconds}s`,
         }}
       >
-        <style jsx>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-
-        {items.map((c) => (
+        {looped.map((c, idx) => (
           <Link
-            key={c.slug}
+            key={`${c.slug}-${idx}`}
             href="/concursos-en-desarrollo"
-            className="shrink-0 snap-start group"
-            style={{ width: "min(85vw, 420px)" }}
+            className="shrink-0 group block"
+            style={{ width: "min(85vw, 380px)" }}
+            aria-label={c.nombre}
           >
             <div
               className="relative w-full overflow-hidden rounded-2xl border transition-all group-hover:-translate-y-1 group-hover:shadow-xl"
@@ -124,28 +94,41 @@ export function ConcursosSlider() {
                 src={c.imagen}
                 alt={c.nombre}
                 fill
-                sizes="(max-width: 640px) 85vw, 420px"
+                sizes="(max-width: 640px) 85vw, 380px"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized
               />
             </div>
-            <div className="mt-4 px-1">
-              <h3
-                className="text-base font-bold leading-snug line-clamp-2"
-                style={{ fontFamily: "var(--font-display)", color: "var(--text-primary)" }}
-              >
-                {c.nombre}
-              </h3>
-              <p
-                className="text-xs mt-1 transition-colors group-hover:text-[#D04A1C]"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Ver detalles →
-              </p>
-            </div>
+            <h3
+              className="mt-4 px-1 text-sm font-bold leading-snug line-clamp-2 transition-colors group-hover:text-[#D04A1C]"
+              style={{ fontFamily: "var(--font-display)", color: "var(--text-primary)" }}
+            >
+              {c.nombre}
+            </h3>
           </Link>
         ))}
       </div>
+
+      <style jsx>{`
+        @keyframes scrollX {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-scroll-x {
+          animation-name: scrollX;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-scroll-x {
+            animation: none;
+          }
+        }
+      `}</style>
     </div>
   );
 }

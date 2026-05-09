@@ -51,6 +51,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased">
+        {/* Sello institucional — bandera de Colombia (top de documento) */}
+        <div className="flag-stripe" aria-hidden="true" />
         <SessionProvider>
           {children}
         </SessionProvider>
