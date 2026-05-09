@@ -18,7 +18,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const BATCH = 50;
+  // Batch=10 cabe holgado en 60s (Vercel Hobby). Si tienes Pro, súbelo.
+  const BATCH = 10;
 
   try {
     const opecsSinPreguntas = await getOpecssinPreguntas(BATCH);

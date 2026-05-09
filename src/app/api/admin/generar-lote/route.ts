@@ -10,8 +10,10 @@
 
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getOpecssinPreguntas } from "@/lib/scraper";
+import { prisma } from "@/lib/prisma";
 import { generarBancoCompleto } from "@/lib/ia-generator";
+
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -21,18 +23,26 @@ export async function POST(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const batch = Math.min(parseInt(searchParams.get("batch") ?? "50"), 100);
+  const batch = Math.min(parseInt(searchParams.get("batch") ?? "10"), 50);
   const offset = parseInt(searchParams.get("offset") ?? "0");
 
   try {
-    const opecsSinPreguntas = await getOpecssinPreguntas();
-    const pendientesTotal = opecsSinPreguntas.length;
+    const pendientesTotal = await prisma.opec.count({
+      where: { estado: "ACTIVA", preguntas: { none: {} } },
+    });
 
     if (pendientesTotal === 0) {
       return NextResponse.json({ ok: true, mensaje: "Todas las OPECs ya tienen preguntas", pendientes: 0 });
     }
 
-    const lote = opecsSinPreguntas.slice(offset, offset + batch);
+    const opecs = await prisma.opec.findMany({
+      where: { estado: "ACTIVA", preguntas: { none: {} } },
+      select: { id: true },
+      orderBy: { createdAt: "asc" },
+      skip: offset,
+      take: batch,
+    });
+    const lote = opecs.map((o) => o.id);
     const generadas: string[] = [];
     const errores: { id: string; error: string }[] = [];
 
