@@ -8,12 +8,20 @@
 
 /* ─── Design Tokens ──────────────────────────────────────────── */
 :root {
-  /* Surfaces — warm linen / paper */
-  --bg-base:        #EDE9E3;
-  --bg-primary:     #E5E0D6;
+  /* Surfaces — cream plano (sin gradientes) */
+  --bg-base:        #F5F0E6;
+  --bg-primary:     #F5F0E6;
   --bg-elevated:    #FFFFFF;
   --bg-card:        #FFFFFF;
-  --bg-card-hover:  #F8F4EC;
+  --bg-card-hover:  #FBF7EE;
+
+  /* Botones — colores bandera Colombia */
+  --btn-blue:        #003893;
+  --btn-blue-hover:  #002B73;
+  --btn-red:         #CE1126;
+  --btn-red-hover:   #A50E1F;
+  --btn-yellow:      #FCD116;
+  --btn-yellow-hover:#E5BD00;
 
   /* Borders & dividers */
   --border-subtle:   rgba(10, 10, 10, 0.06);
@@ -50,9 +58,8 @@
   --warning: #A65D00;
 
   /* Gradients */
-  --gradient-hero: radial-gradient(circle at 80% 0%, rgba(208, 74, 28, 0.10) 0%, transparent 50%),
-                   radial-gradient(circle at 0% 100%, rgba(208, 74, 28, 0.06) 0%, transparent 50%),
-                   linear-gradient(180deg, var(--bg-base) 0%, var(--bg-primary) 100%);
+  /* hero: cream plano, sin degrade */
+  --gradient-hero: var(--bg-base);
   --gradient-gold: linear-gradient(135deg, #E66932 0%, #D04A1C 60%, #A8390F 100%);
   --gradient-text-gold: linear-gradient(135deg, #E66932 0%, #D04A1C 60%, #A8390F 100%);
   --gradient-text-blue: linear-gradient(135deg, #4A6F92 0%, #2C547A 100%);
@@ -87,8 +94,8 @@
 }
 
 @theme inline {
-  --color-base:         #EDE9E3;
-  --color-primary-bg:   #E5E0D6;
+  --color-base:         #F5F0E6;
+  --color-primary-bg:   #F5F0E6;
   --color-elevated:     #FFFFFF;
   --color-card:         #FFFFFF;
   --color-card-hover:   #FBF7EE;
@@ -244,7 +251,7 @@ p { color: var(--text-secondary); }
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   border-radius: var(--radius-full);
-  background: var(--accent-500);
+  background: var(--btn-blue);
   color: #FFFFFF;
   font-family: var(--font-display);
   font-weight: 700;
@@ -252,19 +259,30 @@ p { color: var(--text-secondary); }
   letter-spacing: -0.01em;
   border: none;
   cursor: pointer;
-  box-shadow: var(--shadow-glow-gold);
+  box-shadow: 0 8px 24px rgba(0, 56, 147, 0.25), 0 2px 8px rgba(0, 56, 147, 0.15);
   transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
   white-space: nowrap;
 }
 
 .btn-primary:hover {
-  background: var(--accent-700);
+  background: var(--btn-blue-hover);
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(208, 74, 28, 0.30), 0 4px 12px rgba(208, 74, 28, 0.18);
+  box-shadow: 0 12px 32px rgba(0, 56, 147, 0.35), 0 4px 12px rgba(0, 56, 147, 0.20);
 }
 
 .btn-primary:active {
   transform: translateY(0);
+}
+
+/* Variante roja (bandera) — alterna con la azul en distintas secciones */
+.btn-primary.is-red {
+  background: var(--btn-red);
+  box-shadow: 0 8px 24px rgba(206, 17, 38, 0.25), 0 2px 8px rgba(206, 17, 38, 0.15);
+}
+
+.btn-primary.is-red:hover {
+  background: var(--btn-red-hover);
+  box-shadow: 0 12px 32px rgba(206, 17, 38, 0.35), 0 4px 12px rgba(206, 17, 38, 0.20);
 }
 
 .btn-secondary {

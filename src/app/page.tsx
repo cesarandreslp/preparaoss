@@ -63,29 +63,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ─── HERO ─── */}
-      <section className="relative pt-40 pb-32 overflow-hidden">
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "10%",
-            right: "-10%",
-            width: "560px",
-            height: "560px",
-            background: "radial-gradient(circle, rgba(208, 74, 28, 0.18) 0%, transparent 70%)",
-            filter: "blur(40px)",
-          }}
-        />
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            bottom: "0%",
-            left: "-15%",
-            width: "640px",
-            height: "640px",
-            background: "radial-gradient(circle, rgba(44, 84, 122, 0.15) 0%, transparent 70%)",
-            filter: "blur(60px)",
-          }}
-        />
+      <section className="relative pt-40 pb-32">
         <div className="container-app relative">
           <Reveal>
             <span className="eyebrow">Concursos de méritos · CNSC</span>
@@ -105,12 +83,12 @@ export default function LandingPage() {
           <Reveal delay={240}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               {isAuthed ? (
-                <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
+                <Link href="/dashboard" className="btn-primary is-red text-base px-8 py-4">
                   Ir al dashboard →
                 </Link>
               ) : (
                 <>
-                  <Link href="/registro" className="btn-primary text-base px-8 py-4">
+                  <Link href="/registro" className="btn-primary is-red text-base px-8 py-4">
                     Empezar gratis · 3 simulacros/mes
                   </Link>
                   <Link href="/login" className="btn-secondary text-base px-8 py-4">
@@ -714,11 +692,11 @@ export default function LandingPage() {
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 {isAuthed ? (
-                  <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
+                  <Link href="/dashboard" className="btn-primary is-red text-base px-8 py-4">
                     Ir al dashboard →
                   </Link>
                 ) : (
-                  <Link href="/registro" className="btn-primary text-base px-8 py-4">
+                  <Link href="/registro" className="btn-primary is-red text-base px-8 py-4">
                     Crear cuenta gratis →
                   </Link>
                 )}

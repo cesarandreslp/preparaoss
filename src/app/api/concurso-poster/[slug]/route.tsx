@@ -7,13 +7,13 @@ const W = 1200;
 const H = 630;
 
 const COLORS = {
-  bg: "#EDE9E3",
-  bg2: "#E0DAD0",
+  bg: "#F5F0E6",
+  bg2: "#F5F0E6",
   ink: "#0A0A0A",
   inkSoft: "#3F3A35",
   muted: "#7A736B",
-  accent: "#D04A1C",
-  accent2: "#E66932",
+  accent: "#003893",
+  accent2: "#CE1126",
 };
 
 export async function GET(
