@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Sora, DM_Sans } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 
 const sora = Sora({
@@ -51,9 +51,9 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased">
-        <ClerkProvider>
+        <SessionProvider>
           {children}
-        </ClerkProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@
  * Elimina un documento (no toca preguntas ya generadas a partir de él).
  */
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -11,7 +11,8 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }

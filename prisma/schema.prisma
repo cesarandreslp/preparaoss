@@ -200,9 +200,10 @@ model OpcionRespuesta {
 // ─────────────────────────────────────────────────────────
 
 model UserProfile {
-  id     String @id // Clerk user ID
-  email  String @unique
-  nombre String
+  id           String @id @default(cuid())
+  email        String @unique
+  nombre       String
+  passwordHash String
 
   // Gamificación
   xpTotal          Int      @default(0)

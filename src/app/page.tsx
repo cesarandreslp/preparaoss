@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Show, SignUpButton, SignInButton } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 
 export default function LandingPage() {
+  const { status } = useSession();
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
@@ -33,26 +34,24 @@ export default function LandingPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Show when="signed-out">
-            <SignUpButton>
-              <button className="btn-primary text-lg px-8 py-3">
+          {status === "authenticated" ? (
+            <Link href="/dashboard" className="btn-primary text-lg px-8 py-3">
+              Ir al Dashboard →
+            </Link>
+          ) : (
+            <>
+              <Link href="/registro" className="btn-primary text-lg px-8 py-3">
                 Empezar gratis
-              </button>
-            </SignUpButton>
-            <SignInButton>
-              <button
+              </Link>
+              <Link
+                href="/login"
                 className="btn-secondary text-lg px-8 py-3"
                 style={{ borderRadius: "9999px" }}
               >
                 Ingresar
-              </button>
-            </SignInButton>
-          </Show>
-          <Show when="signed-in">
-            <Link href="/dashboard" className="btn-primary text-lg px-8 py-3">
-              Ir al Dashboard →
-            </Link>
-          </Show>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 

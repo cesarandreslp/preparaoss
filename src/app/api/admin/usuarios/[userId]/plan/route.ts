@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PlanSuscripcion, EstadoSuscripcion } from "@prisma/client";
@@ -9,7 +9,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
-  const { userId: adminId } = await auth();
+  const session = await auth();
+  const adminId = session?.user?.id;
   if (!adminId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { userId } = await params;

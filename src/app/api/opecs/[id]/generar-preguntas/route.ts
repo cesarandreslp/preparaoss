@@ -4,7 +4,7 @@
  * (llamado manualmente desde el detalle de la OPEC cuando no hay preguntas)
  */
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generarBancoCompleto } from "@/lib/ia-generator";
@@ -14,7 +14,8 @@ interface Params {
 }
 
 export async function POST(req: NextRequest, { params }: Params) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }

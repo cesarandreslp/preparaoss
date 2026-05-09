@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { armarSimulacro, PREGUNTAS_POR_PLAN } from "@/lib/simulacro-engine";
 import { verificarLimiteSimulacro } from "@/lib/gamification";
@@ -7,7 +7,8 @@ import { TipoSimulacro } from "@prisma/client";
 
 // POST /api/simulacros — Crear nuevo simulacro
 export async function POST(request: Request) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const body = await request.json();
@@ -82,7 +83,8 @@ export async function POST(request: Request) {
 
 // GET /api/simulacros — Historial de simulacros del usuario
 export async function GET(request: Request) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);

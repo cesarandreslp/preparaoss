@@ -1,10 +1,11 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/admin/usuarios?page=0&search=email
 export async function GET(request: NextRequest) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);

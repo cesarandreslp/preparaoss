@@ -8,13 +8,14 @@
  *   ?offset=0      → saltar las primeras N OPECs (para paginar manualmente)
  */
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getOpecssinPreguntas } from "@/lib/scraper";
 import { generarBancoCompleto } from "@/lib/ia-generator";
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }

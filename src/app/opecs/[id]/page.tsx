@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { OpecCTA } from "@/components/opec/OpecCTA";
@@ -10,8 +10,9 @@ export default async function OpecDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) redirect("/login");
 
   const opec = await prisma.opec.findUnique({
     where: { id },

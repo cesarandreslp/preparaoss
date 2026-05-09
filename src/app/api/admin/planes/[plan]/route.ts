@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PlanSuscripcion } from "@prisma/client";
@@ -8,7 +8,8 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ plan: string }> }
 ) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { plan } = await params;

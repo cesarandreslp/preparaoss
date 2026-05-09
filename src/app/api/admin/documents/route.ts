@@ -3,12 +3,13 @@
  * Lista los documentos de una OPEC (sin parsedContent, solo metadatos).
  */
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }

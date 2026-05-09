@@ -1,15 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { ensureUserProfile } from "@/lib/ensure-profile";
 import { calcularNivel, porcentajeNivelActual } from "@/lib/gamification";
 import Link from "next/link";
 
 export async function DashboardContent() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
-
-  await ensureUserProfile(userId);
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) redirect("/login");
 
   const user = await prisma.userProfile.findUnique({
     where: { id: userId },
@@ -36,7 +34,7 @@ export async function DashboardContent() {
     },
   });
 
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/login");
 
   const nivelInfo = calcularNivel(user.xpTotal);
   const progreso = porcentajeNivelActual(user.xpTotal);
