@@ -107,6 +107,13 @@ export default function AdminPage() {
             <p className="text-gray-500 text-xs">Manuales y guías por OPEC</p>
           </div>
         </a>
+        <a href="/admin/concursos" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
+          <span className="text-2xl">🎯</span>
+          <div>
+            <p className="font-semibold">Concursos CNSC</p>
+            <p className="text-gray-500 text-xs">Slider de landing · CMS</p>
+          </div>
+        </a>
         <a href="/dashboard" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
           <span className="text-2xl">📊</span>
           <div>

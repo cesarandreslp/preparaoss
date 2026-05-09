@@ -431,3 +431,31 @@ model Document {
 
   @@index([opecId])
 }
+
+// ─────────────────────────────────────────────────────────
+// CONCURSOS EN DESARROLLO — Slider/CMS de la landing
+// Sincronizado a diario desde cnsc.gov.co/convocatorias/en-desarrollo
+// ─────────────────────────────────────────────────────────
+
+model ConcursoEnDesarrollo {
+  id            String   @id @default(cuid())
+  /// Slug derivado del path original en cnsc.gov.co (último segmento)
+  slug          String   @unique
+  /// Nombre tal como viene del scraper
+  nombreScraped String
+  /// Override editable desde el admin; si null se usa nombreScraped
+  nombreOverride String?
+  /// URL externa al detalle en CNSC
+  linkCnsc      String
+  /// Imagen custom subida por admin; si null se usa la generada con next/og
+  imagenCustomUrl String?
+  /// Mostrar en slider público
+  visible       Boolean  @default(true)
+  /// Orden manual (asc); empate → orden alfabético
+  orden         Int      @default(0)
+
+  scrapedAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([visible, orden])
+}

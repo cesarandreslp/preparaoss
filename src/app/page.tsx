@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Reveal } from "@/components/landing/Reveal";
 import { Counter } from "@/components/landing/Counter";
 import { FAQ } from "@/components/landing/FAQ";
+import { ConcursosSlider } from "@/components/landing/ConcursosSlider";
 
 export default function LandingPage() {
   const { status } = useSession();
@@ -146,6 +147,26 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ─── CONCURSOS EN DESARROLLO (slider scraping CNSC) ─── */}
+      <section id="concursos-en-desarrollo" className="section-sm">
+        <div className="container-app">
+          <Reveal>
+            <div className="flex items-end justify-between gap-6 mb-6 flex-wrap">
+              <div>
+                <span className="eyebrow">Concursos CNSC</span>
+                <h2 className="display-3 mt-3 max-w-2xl">
+                  En desarrollo ahora mismo
+                </h2>
+                <p className="mt-3 text-base max-w-xl" style={{ color: "var(--text-secondary)" }}>
+                  Sincronizado a diario con cnsc.gov.co. Click para ver el detalle oficial.
+                </p>
+              </div>
+            </div>
+            <ConcursosSlider />
           </Reveal>
         </div>
       </section>

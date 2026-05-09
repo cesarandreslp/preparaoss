@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/recordatorios",
       "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/concursos-cnsc",
+      "schedule": "0 13 * * *"
     }
   ]
 }
