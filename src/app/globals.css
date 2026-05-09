@@ -8,12 +8,12 @@
 
 /* ─── Design Tokens ──────────────────────────────────────────── */
 :root {
-  /* Surfaces — cream / paper */
-  --bg-base:        #FAF7F2;
-  --bg-primary:     #F5F1E8;
+  /* Surfaces — warm linen / paper */
+  --bg-base:        #EDE9E3;
+  --bg-primary:     #E5E0D6;
   --bg-elevated:    #FFFFFF;
   --bg-card:        #FFFFFF;
-  --bg-card-hover:  #FBF7EE;
+  --bg-card-hover:  #F8F4EC;
 
   /* Borders & dividers */
   --border-subtle:   rgba(10, 10, 10, 0.06);
@@ -87,8 +87,8 @@
 }
 
 @theme inline {
-  --color-base:         #FAF7F2;
-  --color-primary-bg:   #F5F1E8;
+  --color-base:         #EDE9E3;
+  --color-primary-bg:   #E5E0D6;
   --color-elevated:     #FFFFFF;
   --color-card:         #FFFFFF;
   --color-card-hover:   #FBF7EE;

@@ -7,8 +7,8 @@ const W = 1200;
 const H = 630;
 
 const COLORS = {
-  bg: "#FAF7F2",
-  bg2: "#F2EBDD",
+  bg: "#EDE9E3",
+  bg2: "#E0DAD0",
   ink: "#0A0A0A",
   inkSoft: "#3F3A35",
   muted: "#7A736B",
