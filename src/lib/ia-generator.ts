@@ -8,7 +8,7 @@
  * 3. COMPORTAMENTAL        → Escala Likert 1-5 según nivel de responsabilidad del cargo
  */
 
-import { groq, GROQ_MODEL } from "./groq";
+import { llmJson } from "./llm";
 import { prisma } from "./prisma";
 import { z } from "zod";
 
@@ -168,14 +168,7 @@ Responde ÚNICAMENTE con JSON válido con esta estructura exacta:
   "dificultad": "INTERMEDIO"
 }`;
 
-    const completion = await groq.chat.completions.create({
-      model: GROQ_MODEL,
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-    });
-
-    const raw = JSON.parse(completion.choices[0].message.content ?? "{}");
+    const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7 });
     const parsed = PreguntaFuncEspSchema.parse(raw);
 
     // Guardar en BD
@@ -254,15 +247,10 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos con esta est
   }
 ]`;
 
-  const completion = await groq.chat.completions.create({
-    model: GROQ_MODEL,
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-    temperature: 0.7,
-  });
-
-  const raw = JSON.parse(completion.choices[0].message.content ?? "{}");
-  const preguntas = z.array(PreguntaFuncTransSchema).parse(raw.preguntas ?? raw);
+  const { data: raw } = await llmJson<{ preguntas?: unknown[] } & unknown[]>(prompt, { temperature: 0.7 });
+  const preguntas = z.array(PreguntaFuncTransSchema).parse(
+    Array.isArray(raw) ? raw : raw.preguntas ?? raw
+  );
 
   for (const p of preguntas) {
     await prisma.pregunta.create({
@@ -345,15 +333,10 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
   }
 ]`;
 
-  const completion = await groq.chat.completions.create({
-    model: GROQ_MODEL,
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-    temperature: 0.6,
-  });
-
-  const raw = JSON.parse(completion.choices[0].message.content ?? "{}");
-  const preguntas = z.array(PreguntaComportamentalSchema).parse(raw.preguntas ?? raw);
+  const { data: raw } = await llmJson<{ preguntas?: unknown[] } & unknown[]>(prompt, { temperature: 0.6 });
+  const preguntas = z.array(PreguntaComportamentalSchema).parse(
+    Array.isArray(raw) ? raw : raw.preguntas ?? raw
+  );
 
   for (const p of preguntas) {
     await prisma.pregunta.create({

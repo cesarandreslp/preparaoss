@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface LoteResult {
   ok: boolean;
@@ -12,70 +12,95 @@ interface LoteResult {
 }
 
 export default function AdminPage() {
-  const [offset, setOffset] = useState(0);
-  const [batch, setBatch] = useState(50);
+  const [batch, setBatch] = useState(10);
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [pendientesTotal, setPendientesTotal] = useState<number | null>(null);
   const [autoMode, setAutoMode] = useState(false);
+  // Ref para que el loop pueda detenerse desde el botón "Detener" sin
+  // depender del state (closure bug clásico).
+  const autoStopRef = useRef(false);
 
   function addLog(msg: string) {
     setLog((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev]);
   }
 
-  async function generarLote(currentOffset: number, auto = false): Promise<number> {
+  async function generarLote(): Promise<LoteResult | null> {
     setLoading(true);
     try {
+      // Siempre offset 0 — los OPECs ya generadas salen del query (preguntas: { none })
       const res = await fetch(
-        `/api/admin/generar-lote?batch=${batch}&offset=${currentOffset}`,
+        `/api/admin/generar-lote?batch=${batch}&offset=0`,
         { method: "POST" }
       );
       const data: LoteResult = await res.json();
 
       if (!res.ok) {
         addLog(`❌ Error HTTP ${res.status}`);
-        return -1;
+        return null;
       }
 
       if (data.mensaje) {
         addLog(`✅ ${data.mensaje}`);
         setPendientesTotal(0);
-        return -1;
+        return data;
       }
 
       setPendientesTotal(data.pendientesTotal - data.bancosGenerados);
       addLog(
-        `✅ Offset ${currentOffset}: +${data.bancosGenerados} generadas, ${data.errores} errores. Pendientes: ${data.pendientesTotal - data.bancosGenerados}`
+        `✅ +${data.bancosGenerados} generadas · ${data.errores} errores · pendientes ${data.pendientesTotal - data.bancosGenerados}`
       );
-      setOffset(data.siguienteOffset);
-
-      if (auto && data.bancosGenerados > 0 && data.pendientesTotal - data.bancosGenerados > 0) {
-        // Pausa 3s entre lotes para respetar rate limit de Groq
-        addLog(`⏳ Esperando 3s antes del siguiente lote...`);
-        await new Promise((r) => setTimeout(r, 3000));
-        return data.siguienteOffset;
-      }
-      return data.siguienteOffset;
+      return data;
     } catch (e) {
       addLog(`❌ Error de red: ${e}`);
-      return -1;
+      return null;
     } finally {
       setLoading(false);
     }
   }
 
   async function handleManual() {
-    await generarLote(offset);
+    await generarLote();
   }
 
   async function handleAuto() {
+    autoStopRef.current = false;
     setAutoMode(true);
-    let current = offset;
-    while (current >= 0) {
-      current = await generarLote(current, true);
-      if (current < 0) break;
-      if (!autoMode) break; // usuario detuvo
+    let consecutiveZeros = 0;
+
+    while (!autoStopRef.current) {
+      const data = await generarLote();
+      if (autoStopRef.current) break;
+
+      // Done → ya no hay pendientes
+      if (!data || data.pendientesTotal === 0) {
+        addLog("🎉 No quedan OPECs pendientes");
+        break;
+      }
+
+      if (data.bancosGenerados === 0) {
+        // Probablemente rate-limit Groq + Zhipu o errores persistentes.
+        // Cooldown progresivo: 30s, 60s, 120s.
+        consecutiveZeros++;
+        if (consecutiveZeros >= 5) {
+          addLog("⏹ 5 lotes seguidos sin generar — detengo auto-mode");
+          break;
+        }
+        const wait = Math.min(30 + consecutiveZeros * 30, 120);
+        addLog(`⏳ Sin progreso · esperando ${wait}s y reintento (${consecutiveZeros}/5)`);
+        await new Promise((r) => setTimeout(r, wait * 1000));
+      } else {
+        consecutiveZeros = 0;
+        // Pausa corta entre lotes exitosos
+        await new Promise((r) => setTimeout(r, 3000));
+      }
     }
+    setAutoMode(false);
+    addLog("⏹ Auto-mode detenido");
+  }
+
+  function detenerAuto() {
+    autoStopRef.current = true;
     setAutoMode(false);
   }
 
@@ -146,8 +171,10 @@ export default function AdminPage() {
           </p>
         </div>
         <div>
-          <p className="text-gray-500 text-sm">Offset actual</p>
-          <p className="text-4xl font-bold text-blue-400">{offset}</p>
+          <p className="text-gray-500 text-sm">Estado</p>
+          <p className="text-4xl font-bold text-blue-400">
+            {autoMode ? "AUTO" : loading ? "..." : "—"}
+          </p>
         </div>
         <div>
           <p className="text-gray-500 text-sm">Batch size</p>
@@ -173,7 +200,7 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={autoMode ? () => setAutoMode(false) : handleAuto}
+          onClick={autoMode ? detenerAuto : handleAuto}
           disabled={loading && !autoMode}
           className={`px-6 py-3 rounded-lg font-semibold transition ${
             autoMode
@@ -185,11 +212,11 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => { setOffset(0); setLog([]); }}
+          onClick={() => setLog([])}
           disabled={loading}
           className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 px-6 py-3 rounded-lg font-semibold transition"
         >
-          ↺ Reiniciar offset
+          ↺ Limpiar log
         </button>
       </div>
 
