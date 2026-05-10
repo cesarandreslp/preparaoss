@@ -13,4 +13,4 @@ export const zhipu = new OpenAI({
   baseURL: "https://open.bigmodel.cn/api/paas/v4",
 });
 
-export const ZHIPU_MODEL = "glm-4-flash";
+export const ZHIPU_MODEL = process.env.ZHIPU_MODEL ?? "GLM-4.7-Flash";
