@@ -3,7 +3,7 @@
  * Elimina un documento (no toca preguntas ya generadas a partir de él).
  */
 
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -12,10 +12,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const userId = guard.userId;
 
   const { id } = await params;
 

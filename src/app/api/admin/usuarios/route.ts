@@ -1,12 +1,11 @@
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/admin/usuarios?page=0&search=email
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get("page") ?? "0");

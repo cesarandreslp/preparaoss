@@ -3,16 +3,15 @@
  * Lista los documentos de una OPEC (sin parsedContent, solo metadatos).
  */
 
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const userId = guard.userId;
 
   const opecId = req.nextUrl.searchParams.get("opecId");
   if (!opecId) {

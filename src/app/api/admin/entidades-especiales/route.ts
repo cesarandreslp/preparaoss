@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
   const entidades = await prisma.entidadEspecial.findMany({
     orderBy: { nombre: "asc" },
     include: { _count: { select: { opecs: true } } },
@@ -30,10 +28,8 @@ const createSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
   const body = await req.json().catch(() => ({}));
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {

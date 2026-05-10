@@ -8,19 +8,16 @@
  *   ?offset=0      → saltar las primeras N OPECs (para paginar manualmente)
  */
 
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { generarBancoCompleto } from "@/lib/ia-generator";
 
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   const { searchParams } = new URL(request.url);
   const batch = Math.min(parseInt(searchParams.get("batch") ?? "10"), 50);

@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   const recursos = await prisma.recursoBiblioteca.findMany({
     orderBy: [{ bloque: "asc" }, { orden: "asc" }, { titulo: "asc" }],

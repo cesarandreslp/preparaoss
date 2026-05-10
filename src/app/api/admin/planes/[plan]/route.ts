@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PlanSuscripcion } from "@prisma/client";
@@ -8,9 +8,8 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ plan: string }> }
 ) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   const { plan } = await params;
   const planKey = plan.toUpperCase() as PlanSuscripcion;

@@ -9,17 +9,16 @@
  * Delega la lógica de scraping a `lib/scraper.ts` (única fuente de verdad).
  */
 
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { fetchPage, mapToPrisma, SIMO_PAGE_SIZE } from "@/lib/scraper";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const userId = guard.userId;
 
   const { searchParams } = new URL(req.url);
   const maxPages = parseInt(searchParams.get("maxPages") ?? "999", 10);

@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { sincronizarConcursosCNSC } from "@/lib/concursos-cnsc-scraper";
 
 export async function POST() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   try {
     const resultado = await sincronizarConcursosCNSC();

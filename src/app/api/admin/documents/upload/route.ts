@@ -10,7 +10,7 @@
  *   - type: DocumentType (MANUAL_FUNCIONES | GUIA_ORIENTACION | EJES_TEMATICOS | DOCUMENTO_ENTIDAD | OTHER)
  */
 
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parseDocument, cleanText } from "@/lib/document-parser";
@@ -27,10 +27,9 @@ const VALID_TYPES: DocumentType[] = [
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const userId = guard.userId;
 
   let formData: FormData;
   try {

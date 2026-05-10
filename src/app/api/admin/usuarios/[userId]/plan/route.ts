@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/require-admin";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PlanSuscripcion, EstadoSuscripcion } from "@prisma/client";
@@ -9,9 +9,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
-  const session = await auth();
-  const adminId = session?.user?.id;
-  if (!adminId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const adminId = guard.userId;
 
   const { userId } = await params;
   const body = await request.json();

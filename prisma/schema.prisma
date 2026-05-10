@@ -66,6 +66,11 @@ enum EstadoOpec {
   VENCIDA
 }
 
+enum Rol {
+  USUARIO
+  ADMIN
+}
+
 enum DocumentType {
   MANUAL_FUNCIONES
   GUIA_ORIENTACION
@@ -204,6 +209,7 @@ model UserProfile {
   email        String @unique
   nombre       String
   passwordHash String
+  rol          Rol    @default(USUARIO)
 
   // Gamificación
   xpTotal          Int      @default(0)

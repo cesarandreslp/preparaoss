@@ -1,10 +1,12 @@
 import "next-auth";
+import type { Rol } from "@prisma/client";
 
 declare module "next-auth" {
   interface User {
     id: string;
     email: string;
     nombre: string;
+    rol: Rol;
   }
 
   interface Session {
@@ -12,6 +14,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       nombre: string;
+      rol: Rol;
     };
   }
 }
@@ -21,5 +24,6 @@ declare module "next-auth/jwt" {
     id: string;
     email: string;
     nombre: string;
+    rol: Rol;
   }
 }
