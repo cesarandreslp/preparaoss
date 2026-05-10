@@ -35,6 +35,12 @@ interface ChatResult {
 let groqCooldownUntil = 0;
 const GROQ_COOLDOWN_MS = 5 * 60_000;
 
+// Zhipu free tier acepta ~1-2 req/seg. Si en un mismo route hacemos N
+// OPECs × 4 LLM calls cada una, se nos van encima y devuelve 429
+// "您的账户已达到速率限制". Throttle local para no provocarlo.
+let zhipuLastCallAt = 0;
+const ZHIPU_MIN_INTERVAL_MS = 1500;
+
 function isRateLimit(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
   const e = err as Record<string, unknown>;
@@ -70,6 +76,15 @@ async function callZhipu(
   messages: ChatMessage[],
   opts: ChatOptions
 ): Promise<string> {
+  const now = Date.now();
+  const wait = zhipuLastCallAt + ZHIPU_MIN_INTERVAL_MS - now;
+  if (wait > 0) {
+    await new Promise((r) => setTimeout(r, wait));
+  }
+  // Reservamos el timestamp ANTES del await para que dos calls
+  // concurrentes (Promise.all) en el mismo proceso no se pisen.
+  zhipuLastCallAt = Date.now();
+
   const completion = await zhipu.chat.completions.create(
     {
       model: ZHIPU_MODEL,

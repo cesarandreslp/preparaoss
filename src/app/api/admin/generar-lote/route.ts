@@ -77,6 +77,20 @@ export async function POST(request: NextRequest) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error(`[Admin/GenerarLote] Error OPEC ${opecId}:`, msg);
         errores.push({ id: opecId, error: msg });
+
+        // Si Groq O Zhipu devolvieron rate-limit, no tiene sentido seguir
+        // golpeando: las siguientes OPECs van a fallar igual en milisegundos.
+        // Mejor devolvemos parcial y dejamos que auto-mode aplique su backoff.
+        const lower = msg.toLowerCase();
+        if (
+          lower.includes("rate_limit") ||
+          lower.includes("rate limit") ||
+          lower.includes("429") ||
+          msg.includes("速率限制")
+        ) {
+          console.warn("[Admin/GenerarLote] Rate limit detectado, deteniendo lote");
+          break;
+        }
       }
     }
 
