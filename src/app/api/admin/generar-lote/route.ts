@@ -44,11 +44,21 @@ export async function POST(request: NextRequest) {
     const errores: { id: string; error: string }[] = [];
 
     // Vercel mata la función a los 60s y devuelve HTML genérico que rompe el
-    // JSON.parse del frontend. Cortamos el lote con margen para alcanzar a
-    // serializar la respuesta.
+    // JSON.parse del frontend. Dos defensas:
+    //   - Budget global entre iteraciones (rompe el for con margen).
+    //   - Timeout por OPEC: si un generarBancoCompleto se cuelga (Zhipu lento)
+    //     race contra 45s, throw, y dejamos que el for continúe o rompa.
     const startedAt = Date.now();
     const BUDGET_MS = 50_000;
+    const PER_OPEC_TIMEOUT_MS = 45_000;
     let timedOut = false;
+
+    function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+      return new Promise<T>((resolve, reject) => {
+        const t = setTimeout(() => reject(new Error(`Timeout: ${label} > ${ms}ms`)), ms);
+        p.then((v) => { clearTimeout(t); resolve(v); }, (e) => { clearTimeout(t); reject(e); });
+      });
+    }
 
     for (const opecId of lote) {
       if (Date.now() - startedAt > BUDGET_MS) {
@@ -57,7 +67,11 @@ export async function POST(request: NextRequest) {
         break;
       }
       try {
-        await generarBancoCompleto(opecId);
+        await withTimeout(
+          generarBancoCompleto(opecId),
+          PER_OPEC_TIMEOUT_MS,
+          `OPEC ${opecId}`
+        );
         generadas.push(opecId);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);

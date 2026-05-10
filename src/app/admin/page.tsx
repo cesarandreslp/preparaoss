@@ -72,8 +72,23 @@ export default function AdminPage() {
       const data = await generarLote();
       if (autoStopRef.current) break;
 
-      // Done → ya no hay pendientes
-      if (!data || data.pendientesTotal === 0) {
+      // Error de red / timeout de Vercel — generarLote ya logueó el detalle.
+      // Tratamos como "lote sin progreso" y aplicamos backoff abajo en lugar
+      // de salir como si hubiéramos terminado.
+      if (!data) {
+        consecutiveZeros++;
+        if (consecutiveZeros >= 5) {
+          addLog("⏹ 5 errores seguidos — detengo auto-mode");
+          break;
+        }
+        const wait = Math.min(30 + consecutiveZeros * 30, 120);
+        addLog(`⏳ Reintentando tras error · ${wait}s (${consecutiveZeros}/5)`);
+        await new Promise((r) => setTimeout(r, wait * 1000));
+        continue;
+      }
+
+      // Done → ya no hay pendientes (data confirmada por la API)
+      if (data.pendientesTotal === 0) {
         addLog("🎉 No quedan OPECs pendientes");
         break;
       }
