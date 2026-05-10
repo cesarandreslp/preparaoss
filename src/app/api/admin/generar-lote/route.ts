@@ -43,7 +43,19 @@ export async function POST(request: NextRequest) {
     const generadas: string[] = [];
     const errores: { id: string; error: string }[] = [];
 
+    // Vercel mata la función a los 60s y devuelve HTML genérico que rompe el
+    // JSON.parse del frontend. Cortamos el lote con margen para alcanzar a
+    // serializar la respuesta.
+    const startedAt = Date.now();
+    const BUDGET_MS = 50_000;
+    let timedOut = false;
+
     for (const opecId of lote) {
+      if (Date.now() - startedAt > BUDGET_MS) {
+        console.warn("[Admin/GenerarLote] Budget de 50s agotado, devolviendo lote parcial");
+        timedOut = true;
+        break;
+      }
       try {
         await generarBancoCompleto(opecId);
         generadas.push(opecId);
@@ -51,12 +63,6 @@ export async function POST(request: NextRequest) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error(`[Admin/GenerarLote] Error OPEC ${opecId}:`, msg);
         errores.push({ id: opecId, error: msg });
-
-        // Detener si hay rate limit de Groq
-        if (msg.includes("rate_limit") || msg.includes("429")) {
-          console.warn("[Admin/GenerarLote] Rate limit Groq, deteniendo lote");
-          break;
-        }
       }
     }
 
@@ -68,6 +74,7 @@ export async function POST(request: NextRequest) {
       bancosGenerados: generadas.length,
       errores: errores.length,
       detalleErrores: errores,
+      timedOut,
       // Para llamar el siguiente lote:
       siguienteOffset: offset + generadas.length + errores.length,
     });

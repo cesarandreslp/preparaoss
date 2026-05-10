@@ -28,6 +28,13 @@ interface ChatResult {
   provider: "groq" | "zhipu";
 }
 
+// Cuando Groq devuelve 429 (TPD agotado o por minuto), evitamos seguir
+// llamándolo durante el resto del proceso. Cada llamada Groq sin esto
+// gasta ~10s en reintentos internos del SDK antes de rendirse, lo cual
+// agota fácilmente el timeout de 60s del route en Vercel.
+let groqCooldownUntil = 0;
+const GROQ_COOLDOWN_MS = 5 * 60_000;
+
 function isRateLimit(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
   const e = err as Record<string, unknown>;
@@ -47,12 +54,15 @@ async function callGroq(
   messages: ChatMessage[],
   opts: ChatOptions
 ): Promise<string> {
-  const completion = await groq.chat.completions.create({
-    model: GROQ_MODEL,
-    messages,
-    temperature: opts.temperature ?? 0.7,
-    ...(opts.json ? { response_format: { type: "json_object" as const } } : {}),
-  });
+  const completion = await groq.chat.completions.create(
+    {
+      model: GROQ_MODEL,
+      messages,
+      temperature: opts.temperature ?? 0.7,
+      ...(opts.json ? { response_format: { type: "json_object" as const } } : {}),
+    },
+    { maxRetries: 0 }
+  );
   return completion.choices[0]?.message?.content ?? "";
 }
 
@@ -60,12 +70,15 @@ async function callZhipu(
   messages: ChatMessage[],
   opts: ChatOptions
 ): Promise<string> {
-  const completion = await zhipu.chat.completions.create({
-    model: ZHIPU_MODEL,
-    messages,
-    temperature: opts.temperature ?? 0.7,
-    ...(opts.json ? { response_format: { type: "json_object" as const } } : {}),
-  });
+  const completion = await zhipu.chat.completions.create(
+    {
+      model: ZHIPU_MODEL,
+      messages,
+      temperature: opts.temperature ?? 0.7,
+      ...(opts.json ? { response_format: { type: "json_object" as const } } : {}),
+    },
+    { maxRetries: 0 }
+  );
   return completion.choices[0]?.message?.content ?? "";
 }
 
@@ -73,24 +86,30 @@ export async function llmChat(
   messages: ChatMessage[],
   opts: ChatOptions = {}
 ): Promise<ChatResult> {
-  try {
-    const content = await callGroq(messages, opts);
-    return { content, provider: "groq" };
-  } catch (err) {
-    if (!isRateLimit(err)) throw err;
-    if (!process.env.ZHIPU_API_KEY) {
-      console.warn("[llm] Groq rate-limit y ZHIPU_API_KEY no configurada — propago error");
-      throw err;
-    }
-    console.warn("[llm] Groq rate-limit → fallback a Zhipu");
+  const groqEnCooldown = Date.now() < groqCooldownUntil;
+
+  if (!groqEnCooldown) {
     try {
-      const content = await callZhipu(messages, opts);
-      return { content, provider: "zhipu" };
-    } catch (zhipuErr) {
-      console.error("[llm] Zhipu también falló:", zhipuErr instanceof Error ? zhipuErr.message : zhipuErr);
-      // Propagamos el error original de Groq (más informativo) si Zhipu falló igual
-      throw err;
+      const content = await callGroq(messages, opts);
+      return { content, provider: "groq" };
+    } catch (err) {
+      if (!isRateLimit(err)) throw err;
+      groqCooldownUntil = Date.now() + GROQ_COOLDOWN_MS;
+      console.warn("[llm] Groq rate-limit → cooldown 5min activado, fallback a Zhipu");
     }
+  }
+
+  if (!process.env.ZHIPU_API_KEY) {
+    throw new Error("Groq en cooldown y ZHIPU_API_KEY no configurada");
+  }
+
+  try {
+    const content = await callZhipu(messages, opts);
+    return { content, provider: "zhipu" };
+  } catch (zhipuErr) {
+    const msg = zhipuErr instanceof Error ? zhipuErr.message : String(zhipuErr);
+    console.error("[llm] Zhipu también falló:", msg);
+    throw zhipuErr;
   }
 }
 
