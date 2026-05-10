@@ -104,132 +104,147 @@ export default function AdminPage() {
     setAutoMode(false);
   }
 
+  const navCards = [
+    { href: "/admin/membresias",         icon: "💎", title: "Membresías",        sub: "Planes y usuarios" },
+    { href: "/admin/configuracion",      icon: "✉️", title: "Email SMTP",        sub: "Configuración de correo" },
+    { href: "/admin/documentos",         icon: "📚", title: "Documentos",        sub: "Manuales y guías por OPEC" },
+    { href: "/admin/concursos",          icon: "🎯", title: "Concursos CNSC",    sub: "Slider de landing · CMS" },
+    { href: "/admin/biblioteca",         icon: "📖", title: "Biblioteca",        sub: "Leyes y normas · subir PDFs" },
+    { href: "/admin/entidades-especiales", icon: "🏛️", title: "Régimen especial", sub: "Procuraduría · Banrep · scraping" },
+    { href: "/dashboard",                icon: "📊", title: "Dashboard",         sub: "Vista de usuario" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
-      <h1 className="text-3xl font-bold mb-2">🛠️ Panel Admin</h1>
-      <p className="text-gray-400 mb-6">Generación masiva de bancos de preguntas IA</p>
-
-      {/* Nav cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-        <a href="/admin/membresias" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">💎</span>
-          <div>
-            <p className="font-semibold">Membresías</p>
-            <p className="text-gray-500 text-xs">Planes y usuarios</p>
-          </div>
-        </a>
-        <a href="/admin/configuracion" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">✉️</span>
-          <div>
-            <p className="font-semibold">Email SMTP</p>
-            <p className="text-gray-500 text-xs">Configuración de correo</p>
-          </div>
-        </a>
-        <a href="/admin/documentos" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">📚</span>
-          <div>
-            <p className="font-semibold">Documentos</p>
-            <p className="text-gray-500 text-xs">Manuales y guías por OPEC</p>
-          </div>
-        </a>
-        <a href="/admin/concursos" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">🎯</span>
-          <div>
-            <p className="font-semibold">Concursos CNSC</p>
-            <p className="text-gray-500 text-xs">Slider de landing · CMS</p>
-          </div>
-        </a>
-        <a href="/admin/biblioteca" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">📖</span>
-          <div>
-            <p className="font-semibold">Biblioteca</p>
-            <p className="text-gray-500 text-xs">Leyes y normas · subir PDFs</p>
-          </div>
-        </a>
-        <a href="/admin/entidades-especiales" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">🏛️</span>
-          <div>
-            <p className="font-semibold">Régimen especial</p>
-            <p className="text-gray-500 text-xs">Procuraduría, Banrep · scraping</p>
-          </div>
-        </a>
-        <a href="/dashboard" className="bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl p-4 flex items-center gap-3 transition">
-          <span className="text-2xl">📊</span>
-          <div>
-            <p className="font-semibold">Dashboard</p>
-            <p className="text-gray-500 text-xs">Vista de usuario</p>
-          </div>
-        </a>
-      </div>
-
-      {/* Stats */}
-      <div className="bg-gray-900 rounded-xl p-6 mb-6 flex gap-8">
-        <div>
-          <p className="text-gray-500 text-sm">OPECs pendientes</p>
-          <p className="text-4xl font-bold text-yellow-400">
-            {pendientesTotal === null ? "—" : pendientesTotal.toLocaleString()}
+    <main className="min-h-screen noise-overlay" style={{ background: "var(--gradient-hero)" }}>
+      <div className="container-app section">
+        <header className="mb-10">
+          <span className="eyebrow">Panel admin</span>
+          <h1 className="display-2 mt-3">🛠️ Centro de control</h1>
+          <p className="mt-3 text-base max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Generación masiva de bancos de preguntas IA y CMS de toda la plataforma.
           </p>
+        </header>
+
+        {/* Nav cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+          {navCards.map((c) => (
+            <a key={c.href} href={c.href} className="card flex items-center gap-4 group">
+              <span className="text-3xl shrink-0">{c.icon}</span>
+              <div className="min-w-0">
+                <p className="font-bold transition-colors group-hover:text-[#003893]" style={{ fontFamily: "var(--font-display)" }}>
+                  {c.title}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                  {c.sub}
+                </p>
+              </div>
+            </a>
+          ))}
         </div>
-        <div>
-          <p className="text-gray-500 text-sm">Estado</p>
-          <p className="text-4xl font-bold text-blue-400">
-            {autoMode ? "AUTO" : loading ? "..." : "—"}
-          </p>
+
+        {/* Stats */}
+        <section className="card-elevated p-6 mb-8">
+          <div className="grid grid-cols-3 gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                OPECs pendientes
+              </p>
+              <p
+                className="text-4xl font-extrabold mt-1 text-gradient-gold"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {pendientesTotal === null ? "—" : pendientesTotal.toLocaleString("es-CO")}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                Estado
+              </p>
+              <p
+                className="text-4xl font-extrabold mt-1"
+                style={{ fontFamily: "var(--font-display)", color: autoMode ? "var(--btn-red)" : "var(--btn-blue)" }}
+              >
+                {autoMode ? "AUTO" : loading ? "…" : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                Batch size
+              </p>
+              <input
+                type="number"
+                value={batch}
+                min={1}
+                max={50}
+                onChange={(e) => setBatch(parseInt(e.target.value) || 10)}
+                className="text-4xl font-extrabold mt-1 bg-transparent w-24 outline-none"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  color: "var(--success)",
+                  borderBottom: "1px solid var(--border-default)",
+                }}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Botones */}
+        <div className="flex gap-3 flex-wrap mb-8">
+          <button
+            onClick={handleManual}
+            disabled={loading}
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading && !autoMode ? "⏳ Generando…" : "▶ Generar 1 lote"}
+          </button>
+
+          <button
+            onClick={autoMode ? detenerAuto : handleAuto}
+            disabled={loading && !autoMode}
+            className={`btn-primary ${autoMode ? "is-red" : ""} disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {autoMode ? "⏹ Detener auto" : "🚀 Modo automático (lote tras lote)"}
+          </button>
+
+          <button
+            onClick={() => setLog([])}
+            disabled={loading}
+            className="btn-secondary disabled:opacity-50"
+          >
+            ↺ Limpiar log
+          </button>
         </div>
-        <div>
-          <p className="text-gray-500 text-sm">Batch size</p>
-          <input
-            type="number"
-            value={batch}
-            min={1}
-            max={100}
-            onChange={(e) => setBatch(parseInt(e.target.value) || 50)}
-            className="text-4xl font-bold text-green-400 bg-transparent w-24 border-b border-gray-700 focus:outline-none"
-          />
-        </div>
+
+        {/* Log */}
+        <section>
+          <span className="eyebrow">Log de ejecución</span>
+          <div
+            className="mt-3 rounded-2xl p-4 h-96 overflow-y-auto font-mono text-sm border"
+            style={{
+              background: "var(--bg-card)",
+              borderColor: "var(--border-default)",
+              boxShadow: "var(--shadow-card)",
+            }}
+          >
+            {log.length === 0 ? (
+              <p style={{ color: "var(--text-muted)" }}>El log aparecerá aquí cuando inicies la generación…</p>
+            ) : (
+              log.map((line, i) => (
+                <p
+                  key={i}
+                  className="py-1.5"
+                  style={{
+                    borderBottom: "1px solid var(--border-subtle)",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  {line}
+                </p>
+              ))
+            )}
+          </div>
+        </section>
       </div>
-
-      {/* Botones */}
-      <div className="flex gap-4 mb-8">
-        <button
-          onClick={handleManual}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-6 py-3 rounded-lg font-semibold transition"
-        >
-          {loading && !autoMode ? "⏳ Generando..." : "▶ Generar 1 lote"}
-        </button>
-
-        <button
-          onClick={autoMode ? detenerAuto : handleAuto}
-          disabled={loading && !autoMode}
-          className={`px-6 py-3 rounded-lg font-semibold transition ${
-            autoMode
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-green-600 hover:bg-green-700 disabled:opacity-50"
-          }`}
-        >
-          {autoMode ? "⏹ Detener auto" : "🚀 Modo automático (lote tras lote)"}
-        </button>
-
-        <button
-          onClick={() => setLog([])}
-          disabled={loading}
-          className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 px-6 py-3 rounded-lg font-semibold transition"
-        >
-          ↺ Limpiar log
-        </button>
-      </div>
-
-      {/* Log */}
-      <div className="bg-gray-900 rounded-xl p-4 h-96 overflow-y-auto font-mono text-sm">
-        {log.length === 0 ? (
-          <p className="text-gray-600">El log aparecerá aquí...</p>
-        ) : (
-          log.map((line, i) => (
-            <p key={i} className="border-b border-gray-800 py-1">{line}</p>
-          ))
-        )}
-      </div>
-    </div>
+    </main>
   );
 }
