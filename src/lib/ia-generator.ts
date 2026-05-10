@@ -247,10 +247,11 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos con esta est
   }
 ]`;
 
-  const { data: raw } = await llmJson<{ preguntas?: unknown[] } & unknown[]>(prompt, { temperature: 0.7 });
-  const preguntas = z.array(PreguntaFuncTransSchema).parse(
-    Array.isArray(raw) ? raw : raw.preguntas ?? raw
-  );
+  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7 });
+  const items = Array.isArray(raw)
+    ? raw
+    : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
+  const preguntas = z.array(PreguntaFuncTransSchema).parse(items);
 
   for (const p of preguntas) {
     await prisma.pregunta.create({
@@ -333,10 +334,11 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
   }
 ]`;
 
-  const { data: raw } = await llmJson<{ preguntas?: unknown[] } & unknown[]>(prompt, { temperature: 0.6 });
-  const preguntas = z.array(PreguntaComportamentalSchema).parse(
-    Array.isArray(raw) ? raw : raw.preguntas ?? raw
-  );
+  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.6 });
+  const items = Array.isArray(raw)
+    ? raw
+    : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
+  const preguntas = z.array(PreguntaComportamentalSchema).parse(items);
 
   for (const p of preguntas) {
     await prisma.pregunta.create({
