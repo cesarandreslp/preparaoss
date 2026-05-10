@@ -133,10 +133,9 @@ export async function generarPreguntasFuncionalEspecifica(
 
   const contexto = await obtenerContextoDocumentos(opecId);
 
-  for (let i = 0; i < cantidad; i++) {
-    const prompt = `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
+  const promptBase = (i: number) => `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
 
-Genera UN escenario de juicio situacional para el cargo: "${opec.nombreCargo}" en "${opec.entidad}" (nivel: ${opec.nivelJerarquico}).
+Genera UN escenario de juicio situacional (variante #${i + 1}) para el cargo: "${opec.nombreCargo}" en "${opec.entidad}" (nivel: ${opec.nivelJerarquico}).
 Competencias evaluadas: ${opec.competencias.join(", ")}.${bloqueContexto(contexto)}
 
 REGLAS ESTRICTAS para el escenario:
@@ -168,35 +167,39 @@ Responde ÚNICAMENTE con JSON válido con esta estructura exacta:
   "dificultad": "INTERMEDIO"
 }`;
 
-    const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7 });
-    const parsed = PreguntaFuncEspSchema.parse(raw);
+  // Las N iteraciones son independientes — escenarios distintos, sin
+  // referencias cruzadas. Las disparamos en paralelo.
+  await Promise.all(
+    Array.from({ length: cantidad }, async (_, i) => {
+      const { data: raw } = await llmJson<unknown>(promptBase(i), { temperature: 0.7 });
+      const parsed = PreguntaFuncEspSchema.parse(raw);
 
-    // Guardar en BD
-    const escenario = await prisma.escenarioSituacional.create({
-      data: { contenido: parsed.escenario, opecId },
-    });
-
-    for (const p of parsed.preguntas) {
-      await prisma.pregunta.create({
-        data: {
-          tipo: "FUNCIONAL_ESPECIFICA",
-          texto: p.texto,
-          escenarioId: escenario.id,
-          opecId,
-          categoria: parsed.categoria,
-          dificultad: parsed.dificultad,
-          explicacion: p.explicacion,
-          opciones: {
-            create: p.opciones.map((o) => ({
-              letra: o.letra,
-              texto: o.texto,
-              esCorrecta: o.esCorrecta,
-            })),
-          },
-        },
+      const escenario = await prisma.escenarioSituacional.create({
+        data: { contenido: parsed.escenario, opecId },
       });
-    }
-  }
+
+      for (const p of parsed.preguntas) {
+        await prisma.pregunta.create({
+          data: {
+            tipo: "FUNCIONAL_ESPECIFICA",
+            texto: p.texto,
+            escenarioId: escenario.id,
+            opecId,
+            categoria: parsed.categoria,
+            dificultad: parsed.dificultad,
+            explicacion: p.explicacion,
+            opciones: {
+              create: p.opciones.map((o) => ({
+                letra: o.letra,
+                texto: o.texto,
+                esCorrecta: o.esCorrecta,
+              })),
+            },
+          },
+        });
+      }
+    })
+  );
 }
 
 // ─────────────────────────────────────────────────
@@ -378,17 +381,15 @@ export async function generarBancoCompleto(opecId: string): Promise<ResultadoBan
   console.log(`[IA] Generando banco de preguntas para OPEC: ${opecId}`);
 
   try {
-    // 2 escenarios situacionales × 3 preguntas = 6 preguntas FUNCIONAL_ESPECIFICA
-    await generarPreguntasFuncionalEspecifica(opecId, 2);
-    console.log("[IA] ✅ Funcional Específica generada");
-
-    // 10 preguntas transversales
-    await generarPreguntasFuncionalTransversal(opecId, 10);
-    console.log("[IA] ✅ Funcional Transversal generada");
-
-    // 10 preguntas comportamentales
-    await generarPreguntasComportamental(opecId, 10);
-    console.log("[IA] ✅ Comportamental generada");
+    // Las 3 funciones son independientes (escriben preguntas distintas con
+    // distinto `tipo`), así que las disparamos en paralelo. La función de
+    // específica internamente paraleliza también las 2 iteraciones de
+    // escenarios. Resultado: wall-clock ≈ 1 LLM call en vez de 4 secuenciales.
+    await Promise.all([
+      generarPreguntasFuncionalEspecifica(opecId, 2),
+      generarPreguntasFuncionalTransversal(opecId, 10),
+      generarPreguntasComportamental(opecId, 10),
+    ]);
 
     const escenarios = 2;
     const transversales = 10;

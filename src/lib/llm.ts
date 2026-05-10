@@ -37,9 +37,11 @@ const GROQ_COOLDOWN_MS = 5 * 60_000;
 
 // Zhipu free tier acepta ~1-2 req/seg. Si en un mismo route hacemos N
 // OPECs × 4 LLM calls cada una, se nos van encima y devuelve 429
-// "您的账户已达到速率限制". Throttle local para no provocarlo.
-let zhipuLastCallAt = 0;
+// "您的账户已达到速率限制". Patron de reserva: cada call adelanta el
+// timestamp ANTES de dormir, así N llamadas concurrentes (Promise.all)
+// se serializan correctamente espaciadas 1500ms entre sí.
 const ZHIPU_MIN_INTERVAL_MS = 1500;
+let zhipuNextSlotAt = 0;
 
 function isRateLimit(err: unknown): boolean {
   if (!err || typeof err !== "object") return false;
@@ -76,14 +78,16 @@ async function callZhipu(
   messages: ChatMessage[],
   opts: ChatOptions
 ): Promise<string> {
+  // Reserva atómica: tomo MI slot adelantando el contador antes del await,
+  // así calls concurrentes ven el slot ya reservado y se serializan a 1500ms
+  // entre sí en lugar de pegarse todos al mismo timestamp.
   const now = Date.now();
-  const wait = zhipuLastCallAt + ZHIPU_MIN_INTERVAL_MS - now;
+  const fireAt = Math.max(now, zhipuNextSlotAt);
+  zhipuNextSlotAt = fireAt + ZHIPU_MIN_INTERVAL_MS;
+  const wait = fireAt - now;
   if (wait > 0) {
     await new Promise((r) => setTimeout(r, wait));
   }
-  // Reservamos el timestamp ANTES del await para que dos calls
-  // concurrentes (Promise.all) en el mismo proceso no se pisen.
-  zhipuLastCallAt = Date.now();
 
   const completion = await zhipu.chat.completions.create(
     {
