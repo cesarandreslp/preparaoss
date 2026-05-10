@@ -26,7 +26,6 @@ const VALID_TYPES: DocumentType[] = [
 ];
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
   const userId = guard.userId;

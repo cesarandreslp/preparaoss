@@ -11,7 +11,6 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
   const userId = guard.userId;

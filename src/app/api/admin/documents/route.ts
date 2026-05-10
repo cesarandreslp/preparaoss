@@ -8,7 +8,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
-  const session = await auth();
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
   const userId = guard.userId;
