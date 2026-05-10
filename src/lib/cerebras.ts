@@ -14,8 +14,4 @@ export const cerebras = new Cerebras({
   apiKey: process.env.CEREBRAS_API_KEY,
 });
 
-// Modelo verificado en el catálogo de la cuenta:
-//   qwen-3-235b-a22b-instruct-2507 — 235B MoE (~22B activos), instruct-tuned,
-//   multilingual fuerte y sigue JSON schemas estrictos. Configurable vía
-//   CEREBRAS_MODEL env var.
-export const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL ?? "qwen-3-235b-a22b-instruct-2507";
+export const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL ?? "llama-3.3-70b";
