@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") ?? "/dashboard";
+  const callbackUrl = params.get("callbackUrl");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,12 +23,20 @@ export function LoginForm() {
       password,
       redirect: false,
     });
-    setLoading(false);
     if (res?.error) {
+      setLoading(false);
       setError("Email o contraseña incorrectos.");
       return;
     }
-    router.push(callbackUrl);
+    // Si el caller pidió un destino específico (?callbackUrl=…), respetarlo.
+    // Si no, ADMIN va a /admin y USUARIO a /dashboard.
+    let destino = callbackUrl;
+    if (!destino) {
+      const session = await getSession();
+      destino = session?.user?.rol === "ADMIN" ? "/admin" : "/dashboard";
+    }
+    setLoading(false);
+    router.push(destino);
     router.refresh();
   }
 
