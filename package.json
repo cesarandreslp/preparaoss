@@ -16,6 +16,7 @@
     "@ai-sdk/groq": "^3.0.29",
     "@capacitor/cli": "^8.1.0",
     "@capacitor/core": "^8.1.0",
+    "@cerebras/cerebras_cloud_sdk": "^1.64.1",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@neondatabase/serverless": "^1.0.2",
     "@phosphor-icons/react": "^2.1.10",
