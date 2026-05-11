@@ -12,7 +12,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { generarBancoCompleto } from "@/lib/ia-generator";
-import { DocumentType } from "@prisma/client";
 
 export const maxDuration = 60;
 
@@ -25,16 +24,13 @@ export async function POST(request: NextRequest) {
   const offset = parseInt(searchParams.get("offset") ?? "0");
 
   try {
-    // Compuerta: la IA solo corre sobre OPECs cuyo manual de funciones ya
-    // fue descargado y OCR'ado por el cron parser (Document MANUAL_FUNCIONES
-    // con isParsed: true). Sin contexto del manual las preguntas saldrian
-    // genéricas.
+    // La IA usa el texto completo de funciones (e.competencias del JSON SIMO)
+    // como contexto principal del prompt. Si además existe un Document
+    // MANUAL_FUNCIONES parseado por el cron parser, se enriquece — pero no
+    // bloqueamos generación esperándolo.
     const whereListas = {
       estado: "ACTIVA" as const,
       preguntas: { none: {} },
-      documentos: {
-        some: { type: DocumentType.MANUAL_FUNCIONES, isParsed: true },
-      },
     };
 
     const pendientesTotal = await prisma.opec.count({ where: whereListas });
@@ -42,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (pendientesTotal === 0) {
       return NextResponse.json({
         ok: true,
-        mensaje: "No hay OPECs con manual parseado pendientes de generar. El cron parser debe correr primero.",
+        mensaje: "Todas las OPECs activas ya tienen preguntas generadas",
         pendientes: 0,
       });
     }

@@ -112,7 +112,11 @@ export function mapToPrisma(item: SimoOpecItem) {
     departamento: deptos.slice(0, 10).join(", ") || "Nacional",
     requisitosEstudio: req.estudio || "Ver convocatoria en SIMO CNSC",
     requisitosExp: req.experiencia || "Ver convocatoria en SIMO CNSC",
-    competencias: e.funciones.slice(0, 8).map((f) => f.descripcion.slice(0, 300)).filter(Boolean),
+    // Texto completo de TODAS las funciones del cargo (sin truncar). Estas
+    // son el equivalente textual del "manual de funciones" — el PDF tiene
+    // mismo contenido con formato. Las usamos como contexto principal del
+    // prompt IA cuando el OCR del PDF aún no ha corrido.
+    competencias: e.funciones.map((f) => f.descripcion?.trim()).filter((s): s is string => Boolean(s && s.length > 10)),
     tipoPruebas: pruebas,
     nivelResponsabilidad: mapNivel(e.gradoNivel.nivelNombre),
     asignacionBasica: e.asignacionSalarial ?? null,
@@ -257,12 +261,6 @@ export async function getOpecssinPreguntas(limit = 50): Promise<string[]> {
     where: {
       estado: "ACTIVA",
       preguntas: { none: {} },
-      // Solo OPECs cuyo manual de funciones ya fue parseado vía OCR (o que ya
-      // tenían algún documento parseado subido manualmente). Sin contexto del
-      // manual la IA termina generando preguntas genéricas — mejor esperar.
-      documentos: {
-        some: { type: DocumentType.MANUAL_FUNCIONES, isParsed: true },
-      },
     },
     select: { id: true },
     take: limit,
