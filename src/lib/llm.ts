@@ -35,7 +35,16 @@ let geminiCooldownUntil = 0;
 let groqCooldownUntil = 0;
 const COOLDOWN_MS = 5 * 60_000;
 
-// Throttle reservado para Zhipu (free tier muy restrictivo).
+// Throttle reservado para providers con rate-limit estricto. Patrón:
+// cada call adelanta el contador ANTES del await, así N llamadas
+// concurrentes (Promise.all en generarBancoCompleto) se serializan
+// correctamente espaciadas en lugar de pegarse al mismo timestamp.
+
+// Gemini free tier de flash-lite tolera ~30 RPM, dejamos margen.
+const GEMINI_MIN_INTERVAL_MS = 2000;
+let geminiNextSlotAt = 0;
+
+// Zhipu free tier ~1 RPM en frío, deja margen mayor.
 const ZHIPU_MIN_INTERVAL_MS = 1500;
 let zhipuNextSlotAt = 0;
 
@@ -59,6 +68,13 @@ async function callGemini(
   messages: ChatMessage[],
   opts: ChatOptions
 ): Promise<string> {
+  // Reserva atómica del slot (ver comentario arriba del bloque de throttles).
+  const now = Date.now();
+  const fireAt = Math.max(now, geminiNextSlotAt);
+  geminiNextSlotAt = fireAt + GEMINI_MIN_INTERVAL_MS;
+  const wait = fireAt - now;
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+
   const completion = await gemini.chat.completions.create(
     {
       model: GEMINI_MODEL,
@@ -155,6 +171,55 @@ export async function llmChat(
 }
 
 /**
+ * Sanea la respuesta JSON del LLM. Algunos modelos (especialmente Gemini
+ * Flash) a veces devuelven:
+ *   - markdown fences ```json ... ```
+ *   - texto adicional después del cierre del objeto/array
+ *   - dos objetos JSON concatenados
+ * En esos casos, extraemos el primer objeto/array balanceado y descartamos
+ * el resto. Si nada de eso aplica, devuelve el original.
+ */
+function sanitizeJson(raw: string): string {
+  let s = raw.trim();
+  // Quitar fences de markdown si vinieron
+  s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+
+  if (!s) return s;
+  const first = s[0];
+  if (first !== "{" && first !== "[") return s;
+  const opener = first;
+  const closer = opener === "{" ? "}" : "]";
+
+  // Balance brackets respetando strings y escapes — devolvemos el sub-string
+  // que abarca el primer objeto/array balanceado.
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (c === "\\" && inString) {
+      escape = true;
+      continue;
+    }
+    if (c === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (c === opener) depth++;
+    else if (c === closer) {
+      depth--;
+      if (depth === 0) return s.slice(0, i + 1);
+    }
+  }
+  return s; // no balanceó — que falle el JSON.parse con el original
+}
+
+/**
  * Helper específico para preguntas con response_format JSON.
  * Devuelve el JSON parseado.
  */
@@ -166,5 +231,6 @@ export async function llmJson<T>(
     [{ role: "user", content: prompt }],
     { ...opts, json: true }
   );
-  return { data: JSON.parse(content || "{}") as T, provider };
+  const sane = sanitizeJson(content || "{}");
+  return { data: JSON.parse(sane) as T, provider };
 }
