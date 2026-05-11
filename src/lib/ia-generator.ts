@@ -67,6 +67,21 @@ function bloqueContexto(contexto: string): string {
 // SCHEMAS ZOD de validación
 // ─────────────────────────────────────────────────
 
+/**
+ * Normalizador tolerante para el enum de dificultad.
+ * Los modelos LLM (especialmente Zhipu/GLM y Llama 8B) devuelven a veces
+ * "basico", "Básico", "BÁSICO" en lugar del literal exacto. Preprocess
+ * uppercase + sin diacríticos antes de validar contra el enum.
+ */
+const DificultadSchema = z.preprocess((v) => {
+  if (typeof v !== "string") return v;
+  return v
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // quita acentos
+    .toUpperCase()
+    .trim();
+}, z.enum(["BASICO", "INTERMEDIO", "AVANZADO"]));
+
 const OpcionSchema = z.object({
   letra: z.string(),
   texto: z.string(),
@@ -84,7 +99,7 @@ const PreguntaFuncEspSchema = z.object({
     })
   ).length(3), // Exactamente 3 preguntas por escenario
   categoria: z.string(),
-  dificultad: z.enum(["BASICO", "INTERMEDIO", "AVANZADO"]),
+  dificultad: DificultadSchema,
 });
 
 const PreguntaFuncTransSchema = z.object({
@@ -93,7 +108,7 @@ const PreguntaFuncTransSchema = z.object({
   respuestaCorrecta: z.string(), // "A", "B", "C" o "D"
   explicacion: z.string().min(50),
   categoria: z.string(),
-  dificultad: z.enum(["BASICO", "INTERMEDIO", "AVANZADO"]),
+  dificultad: DificultadSchema,
 });
 
 const PreguntaComportamentalSchema = z.object({
