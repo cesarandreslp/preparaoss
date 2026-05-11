@@ -152,8 +152,17 @@ model Pregunta {
   escenarioId String?
   escenario   EscenarioSituacional? @relation(fields: [escenarioId], references: [id], onDelete: SetNull)
 
-  opecId   String
-  opec     Opec         @relation(fields: [opecId], references: [id], onDelete: Cascade)
+  // opecId: solo para FUNCIONAL_ESPECIFICA (preguntas atadas al cargo
+  // específico). FUNCIONAL_TRANSVERSAL y COMPORTAMENTAL viven en pools
+  // globales y NO pertenecen a una OPEC — su opecId es null y se
+  // identifican por poolKey.
+  opecId   String?
+  opec     Opec?        @relation(fields: [opecId], references: [id], onDelete: Cascade)
+
+  // Pool al que pertenece la pregunta (solo si opecId es null):
+  // - "TRANSVERSAL_GLOBAL" → normatividad/gestión pública compartida
+  // - "COMPORT_NIVEL_1".."COMPORT_NIVEL_5" → Likert por nivel
+  poolKey  String?
 
   opciones OpcionRespuesta[]
 
@@ -178,6 +187,7 @@ model Pregunta {
 
   @@index([opecId, tipo])
   @@index([tipo, validada])
+  @@index([poolKey, tipo]) // muestreo rápido al armar simulacro
 }
 
 model OpcionRespuesta {

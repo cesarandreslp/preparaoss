@@ -43,9 +43,29 @@ export async function armarSimulacro(
 
   let preguntasRestantes = maxPreguntas;
 
+  // Necesitamos el nivelResponsabilidad de la OPEC para seleccionar el pool
+  // comportamental correcto. Lo cargamos una sola vez al inicio.
+  const opec = await prisma.opec.findUnique({
+    where: { id: opecId },
+    select: { nivelResponsabilidad: true },
+  });
+  const nivelOpec = opec?.nivelResponsabilidad ?? 3;
+
+  // ── Composición para MIXTO: 60% conocimiento (transversal + específica) /
+  //    40% comportamental (Likert por nivel del cargo) ──
+  // Distribuye así para maxPreguntas: comp = 40%, escenarios ≈ 20% (en chunks
+  // de 3 preguntas), transversal = lo que queda para completar el 60%.
+  const cuotaComport = tipoSimulacro === "MIXTO" ? Math.round(maxPreguntas * 0.4) : 0;
+  const cuotaEscenarios = tipoSimulacro === "MIXTO"
+    ? Math.max(1, Math.floor((maxPreguntas * 0.2) / 3))
+    : 0; // ya se calcula abajo para tipoSimulacro != MIXTO
+
   // ── FUNCIONAL ESPECÍFICA (por escenarios, 3 preguntas c/u) ──
+  // Únicas atadas al cargo concreto — generadas por OPEC.
   if (tiposAIncluir.includes("FUNCIONAL_ESPECIFICA") && preguntasRestantes > 0) {
-    const numEscenarios = tipoSimulacro === "MIXTO" ? 1 : Math.ceil(maxPreguntas / 3);
+    const numEscenarios = tipoSimulacro === "MIXTO"
+      ? cuotaEscenarios
+      : Math.ceil(maxPreguntas / 3);
 
     const escenariosDB = await prisma.escenarioSituacional.findMany({
       where: {
@@ -60,10 +80,8 @@ export async function armarSimulacro(
         },
       },
       orderBy: { createdAt: "desc" },
-      // Aleatoriedad: tomar más y luego mezclar
     });
 
-    // Mezclar y tomar numEscenarios
     const mezclados = escenariosDB.sort(() => Math.random() - 0.5).slice(0, numEscenarios);
 
     for (const esc of mezclados) {
@@ -78,13 +96,16 @@ export async function armarSimulacro(
   }
 
   // ── FUNCIONAL TRANSVERSAL (preguntas individuales con 4 opciones) ──
+  // Pool global compartido entre todas las OPECs — normatividad/gestión pública.
+  // En MIXTO: lo que sobra del 60% knowledge tras los escenarios.
   if (tiposAIncluir.includes("FUNCIONAL_TRANSVERSAL") && preguntasRestantes > 0) {
-    const cantidad = tipoSimulacro === "MIXTO" ? Math.ceil(preguntasRestantes / 2) : preguntasRestantes;
+    const cantidad = tipoSimulacro === "MIXTO"
+      ? Math.max(0, preguntasRestantes - cuotaComport)
+      : preguntasRestantes;
 
     const preguntas = await prisma.pregunta.findMany({
-      where: { opecId, tipo: "FUNCIONAL_TRANSVERSAL", validada: true },
+      where: { poolKey: "TRANSVERSAL_GLOBAL", tipo: "FUNCIONAL_TRANSVERSAL", validada: true },
       include: { opciones: true },
-      orderBy: { createdAt: "desc" },
     });
 
     const seleccionadas = preguntas.sort(() => Math.random() - 0.5).slice(0, cantidad);
@@ -92,10 +113,15 @@ export async function armarSimulacro(
     preguntasRestantes -= seleccionadas.length;
   }
 
-  // ── COMPORTAMENTAL (Likert 1-5) ──
+  // ── COMPORTAMENTAL (Likert 1-5) — 40% del simulacro MIXTO ──
+  // Pool por nivel de responsabilidad del cargo (1=Auxiliar..5=Directivo).
   if (tiposAIncluir.includes("COMPORTAMENTAL") && preguntasRestantes > 0) {
     const preguntas = await prisma.pregunta.findMany({
-      where: { opecId, tipo: "COMPORTAMENTAL", validada: true },
+      where: {
+        poolKey: `COMPORT_NIVEL_${nivelOpec}`,
+        tipo: "COMPORTAMENTAL",
+        validada: true,
+      },
       include: { opciones: true },
     });
 

@@ -393,28 +393,175 @@ export interface ResultadoBanco {
 }
 
 export async function generarBancoCompleto(opecId: string): Promise<ResultadoBanco> {
-  console.log(`[IA] Generando banco de preguntas para OPEC: ${opecId}`);
+  console.log(`[IA] Generando escenarios situacionales para OPEC: ${opecId}`);
 
   try {
-    // Las 3 funciones son independientes (escriben preguntas distintas con
-    // distinto `tipo`), así que las disparamos en paralelo. La función de
-    // específica internamente paraleliza también las 2 iteraciones de
-    // escenarios. Resultado: wall-clock ≈ 1 LLM call en vez de 4 secuenciales.
-    await Promise.all([
-      generarPreguntasFuncionalEspecifica(opecId, 2),
-      generarPreguntasFuncionalTransversal(opecId, 10),
-      generarPreguntasComportamental(opecId, 10),
-    ]);
+    // SOLO escenarios específicos del cargo. Las preguntas funcionales
+    // transversales (normatividad genérica) y las comportamentales (Likert
+    // por nivel) viven en pools globales — se generan UNA VEZ por
+    // /api/admin/pools/generar y se reusan en TODOS los simulacros.
+    // Eso reduce ~50% el costo de la generación masiva.
+    await generarPreguntasFuncionalEspecifica(opecId, 2);
 
     const escenarios = 2;
-    const transversales = 10;
-    const comportamentales = 10;
-    const total = escenarios * 3 + transversales + comportamentales;
+    const total = escenarios * 3;
 
-    console.log(`[IA] 🎉 Banco completo generado para OPEC: ${opecId} (${total} preguntas)`);
-    return { total, escenarios, transversales, comportamentales };
+    console.log(`[IA] 🎉 Banco específico generado para OPEC: ${opecId} (${total} preguntas)`);
+    return { total, escenarios, transversales: 0, comportamentales: 0 };
   } catch (error) {
     console.error("[IA] ❌ Error generando banco:", error);
     throw error;
   }
+}
+
+// ─────────────────────────────────────────────────
+// POOLS GLOBALES — preguntas reutilizables entre OPECs
+// ─────────────────────────────────────────────────
+
+/**
+ * Genera un lote de preguntas transversales para el pool global.
+ * Se ejecuta UNA SOLA VEZ (o cuando se necesite ampliar el pool).
+ * Cada lote son `cantidad` preguntas en un único LLM call.
+ */
+export async function generarLotePoolTransversal(cantidad: number = 10): Promise<number> {
+  const prompt = `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
+
+Genera EXACTAMENTE ${cantidad} preguntas de competencias funcionales transversales aplicables a CUALQUIER servidor público colombiano (no a un cargo específico).
+
+REGLAS:
+- Cada pregunta tiene EXACTAMENTE 4 opciones (A, B, C, D).
+- Solo UNA es correcta.
+- La explicación justifica el porqué de la respuesta correcta y por qué las demás son incorrectas (mínimo 50 caracteres).
+- Cubrir temas diversos: Constitución Política, Ley 909 (carrera administrativa), Ley 1437 (CPACA), Código Disciplinario Único (Ley 1952), ética del servidor público, Ley 1755 (derecho de petición), Ley 1581 (protección de datos), planeación estratégica, control interno, gestión documental, presupuesto público.
+- DIVERSIDAD: cada una de las ${cantidad} preguntas debe tratar un tema/ley distinto. No repitas tópicos.
+- Dificultad mixta entre BASICO, INTERMEDIO y AVANZADO.
+
+Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos con esta estructura:
+[
+  {
+    "texto": "pregunta...",
+    "opciones": [
+      {"letra": "A", "texto": "...", "esCorrecta": false},
+      {"letra": "B", "texto": "...", "esCorrecta": true},
+      {"letra": "C", "texto": "...", "esCorrecta": false},
+      {"letra": "D", "texto": "...", "esCorrecta": false}
+    ],
+    "respuestaCorrecta": "B",
+    "explicacion": "La opción B es correcta porque...",
+    "categoria": "Normatividad",
+    "dificultad": "INTERMEDIO"
+  }
+]`;
+
+  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.8 });
+  const items = Array.isArray(raw)
+    ? raw
+    : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
+  const preguntas = z.array(PreguntaFuncTransSchema).parse(items);
+
+  for (const p of preguntas) {
+    await prisma.pregunta.create({
+      data: {
+        tipo: "FUNCIONAL_TRANSVERSAL",
+        texto: p.texto,
+        poolKey: "TRANSVERSAL_GLOBAL",
+        validada: true,
+        categoria: p.categoria,
+        dificultad: p.dificultad,
+        explicacion: p.explicacion,
+        opciones: {
+          create: p.opciones.map((o) => ({
+            letra: o.letra,
+            texto: o.texto,
+            esCorrecta: o.esCorrecta,
+          })),
+        },
+      },
+    });
+  }
+
+  return preguntas.length;
+}
+
+/**
+ * Genera un lote de preguntas comportamentales (Likert 1-5) para el pool del
+ * nivel de responsabilidad indicado. Pool válido por nivel: 1..5.
+ */
+export async function generarLotePoolComportamental(
+  nivelResponsabilidad: number,
+  cantidad: number = 10
+): Promise<number> {
+  if (nivelResponsabilidad < 1 || nivelResponsabilidad > 5) {
+    throw new Error(`nivelResponsabilidad debe estar entre 1 y 5 (recibido: ${nivelResponsabilidad})`);
+  }
+
+  const descripcionNivel = [
+    "",
+    "Auxiliar (nivel 1): tareas operativas básicas, seguimiento de instrucciones",
+    "Técnico (nivel 2): aplicación de conocimientos técnicos específicos",
+    "Profesional (nivel 3): análisis, propuestas, toma de decisiones operativas",
+    "Asesor (nivel 4): liderazgo técnico, orientación a otros, impacto institucional",
+    "Directivo (nivel 5): liderazgo estratégico, toma de decisiones de alto impacto, gestión de equipos",
+  ][nivelResponsabilidad];
+
+  const prompt = `Eres un experto en evaluación de competencias comportamentales para el Estado colombiano (CNSC).
+
+Genera EXACTAMENTE ${cantidad} preguntas de comportamiento laboral en escala Likert para cargos de nivel: ${descripcionNivel}.
+
+REGLAS:
+- Cada pregunta describe una SITUACIÓN LABORAL concreta aplicable a cualquier cargo del nivel ${nivelResponsabilidad}.
+- El evaluado responde con qué frecuencia haría eso: 1=Nunca, 2=Casi nunca, 3=A veces, 4=Casi siempre, 5=Siempre.
+- La respuesta "socialmente deseable" (esCorrecta: true) va calibrada según el nivel ${nivelResponsabilidad}.
+- Para niveles directivos (4-5): se esperan frecuencias altas en liderazgo, iniciativa, decisión.
+- Para niveles auxiliares/técnicos (1-2): se esperan frecuencias altas en seguimiento de normas, precisión, colaboración.
+- DIVERSIDAD: cada pregunta evalúa una competencia distinta (orientación al logro, trabajo en equipo, comunicación, manejo del cambio, integridad, etc.).
+- La explicación argumenta por qué esa es la respuesta esperada para este nivel.
+
+Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
+[
+  {
+    "texto": "Cuando recibo instrucciones que considero no son óptimas...",
+    "opciones": [
+      {"letra": "1", "texto": "Nunca consulto, solo ejecuto", "valorLikert": 1, "esCorrecta": false},
+      {"letra": "2", "texto": "Casi nunca menciono mis dudas", "valorLikert": 2, "esCorrecta": false},
+      {"letra": "3", "texto": "A veces comento informalmente", "valorLikert": 3, "esCorrecta": false},
+      {"letra": "4", "texto": "Casi siempre expreso propuestas respetuosamente", "valorLikert": 4, "esCorrecta": true},
+      {"letra": "5", "texto": "Siempre cuestiono y exijo justificación formal", "valorLikert": 5, "esCorrecta": false}
+    ],
+    "nivelResponsabilidadAplicado": ${nivelResponsabilidad},
+    "explicacion": "Para un nivel ${nivelResponsabilidad}, la respuesta esperada es 4 porque...",
+    "categoria": "Orientación al logro"
+  }
+]`;
+
+  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7 });
+  const items = Array.isArray(raw)
+    ? raw
+    : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
+  const preguntas = z.array(PreguntaComportamentalSchema).parse(items);
+
+  for (const p of preguntas) {
+    await prisma.pregunta.create({
+      data: {
+        tipo: "COMPORTAMENTAL",
+        texto: p.texto,
+        poolKey: `COMPORT_NIVEL_${nivelResponsabilidad}`,
+        validada: true,
+        nivelResponsabilidad,
+        categoria: p.categoria,
+        dificultad: "INTERMEDIO",
+        explicacion: p.explicacion,
+        opciones: {
+          create: p.opciones.map((o) => ({
+            letra: o.letra,
+            texto: o.texto,
+            esCorrecta: o.esCorrecta,
+            valorLikert: o.valorLikert,
+          })),
+        },
+      },
+    });
+  }
+
+  return preguntas.length;
 }
