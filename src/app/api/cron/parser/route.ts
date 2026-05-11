@@ -98,28 +98,43 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  // Pre-fetch rápido para incluir info útil en la respuesta inmediata
-  const pendientes = await prisma.document.count({
-    where: {
-      isParsed: false,
-      sourceUrl: { not: null },
-      type: DocumentType.MANUAL_FUNCIONES,
+  // Filtro de prioridad: docs cuya OPEC esté ACTIVA y SIN preguntas
+  // generadas. Eso desbloquea OPECs candidatas a IA antes que perder tiempo
+  // parseando manuales de OPECs que ya tienen banco.
+  const filtroPrioritario = {
+    isParsed: false,
+    sourceUrl: { not: null },
+    type: DocumentType.MANUAL_FUNCIONES,
+    parseError: null,
+    opec: {
+      estado: "ACTIVA" as const,
+      preguntas: { none: {} },
     },
-  });
+  };
 
-  if (pendientes === 0) {
+  // Filtro fallback: cuando ya no quedan prioritarios, parseamos el resto
+  // (docs de OPECs vencidas o que ya tienen preguntas). Sirve para tener el
+  // contenido del manual disponible aunque no sirva para IA inmediatamente.
+  const filtroResto = {
+    isParsed: false,
+    sourceUrl: { not: null },
+    type: DocumentType.MANUAL_FUNCIONES,
+    parseError: null,
+  };
+
+  const [pendientesPrioritarios, pendientesTotal] = await Promise.all([
+    prisma.document.count({ where: filtroPrioritario }),
+    prisma.document.count({ where: filtroResto }),
+  ]);
+
+  if (pendientesTotal === 0) {
     return NextResponse.json({ ok: true, mensaje: "Sin documentos pendientes", pendientes: 0 });
   }
 
+  const where = pendientesPrioritarios > 0 ? filtroPrioritario : filtroResto;
+
   const lote = await prisma.document.findMany({
-    where: {
-      isParsed: false,
-      sourceUrl: { not: null },
-      type: DocumentType.MANUAL_FUNCIONES,
-      // Evitamos retomar docs que ya fallaron muchas veces — los marcamos con
-      // parseError y los reintentamos después solo si se limpia el error.
-      parseError: null,
-    },
+    where,
     select: { id: true, opecId: true, sourceUrl: true, fileName: true },
     take: BATCH,
     orderBy: { uploadedAt: "asc" },
@@ -151,8 +166,10 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    pendientes,
+    pendientesPrioritarios,
+    pendientesTotal,
     started: trabajos.length,
+    fase: pendientesPrioritarios > 0 ? "prioritaria" : "resto",
     note: "Parseo lanzado en background. Revisa logs en Vercel.",
   });
 }
