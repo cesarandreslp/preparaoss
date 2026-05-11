@@ -433,9 +433,14 @@ model Document {
   parseError    String?
   ocrUsed       Boolean      @default(false)
 
+  /// URL desde donde se descarga el PDF/imagen (ej. SIMO get-document?docId=...).
+  /// null = el documento se subió manualmente y no tiene fuente externa.
+  sourceUrl     String?
+
   uploadedAt    DateTime     @default(now())
 
   @@index([opecId])
+  @@index([type, isParsed]) // para el cron parser que filtra docs pendientes
 }
 
 // ─────────────────────────────────────────────────────────

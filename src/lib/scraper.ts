@@ -10,7 +10,7 @@
  */
 
 import { prisma } from "./prisma";
-import { EstadoOpec } from "@prisma/client";
+import { EstadoOpec, DocumentType } from "@prisma/client";
 
 const SIMO_BASE = "https://simo.cnsc.gov.co";
 const PAGE_SIZE = 100;
@@ -23,6 +23,20 @@ const MAX_PAGES = 40; // Techo de seguridad (3400+ OPECs ÷ 100 = ~34 páginas)
 interface SimoVacante {
   municipio: { nombre: string; departamento: { nombre: string } } | null;
   cantidad: number;
+}
+
+/**
+ * Metadatos del PDF del manual de funciones que SIMO adjunta a cada empleo.
+ * El PDF se descarga en:
+ *   GET {SIMO_BASE}/documents/get-document?docId={version}&contentType={contentType}
+ */
+interface SimoDocumento {
+  id: number;
+  nombre: string;
+  rutaArchivo: string;
+  contentType: string;
+  /** UUID-like que SIMO usa como docId en la URL de descarga */
+  version: string;
 }
 
 export interface SimoOpecItem {
@@ -42,7 +56,15 @@ export interface SimoOpecItem {
     funciones: Array<{ descripcion: string }>;
     requisitosMinimos: Array<{ estudio: string; experiencia: string }>;
     vacantes: SimoVacante[];
+    documento?: SimoDocumento | null;
   };
+}
+
+/** Construye la URL de descarga del PDF del manual desde el SIMO. */
+export function buildSimoPdfUrl(doc: SimoDocumento): string {
+  return `${SIMO_BASE}/documents/get-document?docId=${encodeURIComponent(
+    doc.version
+  )}&contentType=${encodeURIComponent(doc.contentType)}`;
 }
 
 export const SIMO_API_BASE = SIMO_BASE;
@@ -138,8 +160,12 @@ export async function fetchPage(page: number): Promise<SimoOpecItem[]> {
   });
   if (!res.ok) throw new Error(`SIMO HTTP ${res.status} en página ${page}`);
   const data = await res.json();
-  if (!Array.isArray(data)) return [];
-  return data as SimoOpecItem[];
+
+  // SIMO ahora devuelve { value: [...], Count: N }. Antes era array plano.
+  // Soportamos ambos por compatibilidad.
+  if (Array.isArray(data)) return data as SimoOpecItem[];
+  if (data && Array.isArray(data.value)) return data.value as SimoOpecItem[];
+  return [];
 }
 
 // ─────────────────────────────────────────────────
@@ -188,6 +214,12 @@ export async function sincronizarOpecs(): Promise<{
         } else {
           actualizadas++;
         }
+
+        // Si SIMO adjuntó el PDF del manual de funciones, registramos/actualizamos
+        // el Document como pendiente de parseo. El cron parser lo descargará y
+        // OCRará después. No tocamos isParsed/parsedContent si ya estaba parseado
+        // (otro scraper o admin lo cargó antes).
+        await upsertManualFunciones(result.id, item.empleo.documento);
       } catch (e) {
         console.error(`[Scraper] Error procesando OPEC ${item.id}:`, e);
         errores++;
@@ -225,10 +257,75 @@ export async function getOpecssinPreguntas(limit = 50): Promise<string[]> {
     where: {
       estado: "ACTIVA",
       preguntas: { none: {} },
+      // Solo OPECs cuyo manual de funciones ya fue parseado vía OCR (o que ya
+      // tenían algún documento parseado subido manualmente). Sin contexto del
+      // manual la IA termina generando preguntas genéricas — mejor esperar.
+      documentos: {
+        some: { type: DocumentType.MANUAL_FUNCIONES, isParsed: true },
+      },
     },
     select: { id: true },
     take: limit,
   });
 
   return opecs.map((o) => o.id);
+}
+
+// ─────────────────────────────────────────────────
+// DOCUMENT del manual de funciones (descubierto por scraper)
+// ─────────────────────────────────────────────────
+
+/**
+ * Para una OPEC recién scrapeada, registra/actualiza el `Document` del manual
+ * de funciones si SIMO lo adjuntó. No re-procesa parseo: solo registra la URL
+ * de descarga y deja el archivo en estado pendiente para el cron parser.
+ *
+ * Idempotente — si ya existe un Document MANUAL_FUNCIONES con la misma
+ * sourceUrl, no hace nada. Si la URL cambió (SIMO publicó nueva versión),
+ * resetea isParsed para que se vuelva a parsear.
+ */
+async function upsertManualFunciones(
+  opecId: string,
+  documento: SimoDocumento | null | undefined
+): Promise<void> {
+  if (!documento || !documento.version) return;
+
+  const sourceUrl = buildSimoPdfUrl(documento);
+  const fileName = `${documento.nombre || documento.version}.pdf`;
+
+  const existente = await prisma.document.findFirst({
+    where: { opecId, type: DocumentType.MANUAL_FUNCIONES },
+    select: { id: true, sourceUrl: true, isParsed: true },
+  });
+
+  if (!existente) {
+    await prisma.document.create({
+      data: {
+        opecId,
+        type: DocumentType.MANUAL_FUNCIONES,
+        fileName,
+        fileSize: 0, // se actualizará al descargar
+        isParsed: false,
+        ocrUsed: false,
+        sourceUrl,
+      },
+    });
+    return;
+  }
+
+  // Si SIMO cambió la URL (nueva versión del manual), invalidamos el parseo
+  // anterior para forzar re-OCR. Si no cambió, no tocamos nada.
+  if (existente.sourceUrl !== sourceUrl) {
+    await prisma.document.update({
+      where: { id: existente.id },
+      data: {
+        sourceUrl,
+        fileName,
+        isParsed: false,
+        parsedContent: null,
+        parseError: null,
+        ocrUsed: false,
+      },
+    });
+  }
 }
