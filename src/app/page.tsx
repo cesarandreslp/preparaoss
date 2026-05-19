@@ -35,25 +35,16 @@ export default function LandingPage() {
   return (
     <main
       className="relative noise-overlay"
-      style={{
-        // Capa 1: blanco al 88% (deja pasar el watermark al ~12%).
-        // Capa 2: imagen watermark cover, fija al viewport.
-        // Capa 3: bg base sólido por si la imagen no carga.
-        background: `
-          linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)),
-          url('/images/landing-bg.webp') center center / cover no-repeat fixed,
-          var(--bg-base)
-        `,
-      }}
+      style={{ background: "var(--gradient-hero)" }}
     >
       {/* ─── NAV ─── */}
       <nav
         className="fixed top-0 inset-x-0 z-50 transition-all"
         style={{
-          background: scrolled ? "rgba(135, 206, 235, 0.35)" : "rgba(135, 206, 235, 0.15)",
+          background: scrolled ? "rgba(11, 23, 51, 0.78)" : "rgba(11, 23, 51, 0.35)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: scrolled ? "1px solid rgba(0, 56, 147, 0.12)" : "1px solid transparent",
+          borderBottom: scrolled ? "1px solid var(--border-subtle)" : "1px solid transparent",
         }}
       >
         <div className="container-app flex items-center justify-between py-4">
