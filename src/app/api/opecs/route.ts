@@ -11,7 +11,13 @@ export async function GET(request: Request) {
   const pagina = Number(searchParams.get("pagina") ?? 1);
   const porPagina = 20;
 
-  const where: Record<string, unknown> = { estado: "ACTIVA" };
+  // Por defecto mostramos OPECs vigentes: ACTIVA (inscripciones abiertas) +
+  // EN_PRUEBAS (inscripción cerrada pero prueba pendiente — el usuario aún
+  // se puede preparar). Filtro opcional ?soloAbiertas=1 limita a ACTIVA.
+  const soloAbiertas = searchParams.get("soloAbiertas") === "1";
+  const where: Record<string, unknown> = {
+    estado: soloAbiertas ? "ACTIVA" : { in: ["ACTIVA", "EN_PRUEBAS"] },
+  };
   if (departamento) where.departamento = departamento;
   if (entidad) where.entidad = { contains: entidad, mode: "insensitive" };
   if (nivel) where.nivelJerarquico = { contains: nivel, mode: "insensitive" };

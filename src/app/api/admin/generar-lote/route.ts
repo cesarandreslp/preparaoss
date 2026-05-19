@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { EstadoOpec } from "@prisma/client";
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
 import { generarBancoCompleto } from "@/lib/ia-generator";
@@ -28,8 +29,11 @@ export async function POST(request: NextRequest) {
     // como contexto principal del prompt. Si además existe un Document
     // MANUAL_FUNCIONES parseado por el cron parser, se enriquece — pero no
     // bloqueamos generación esperándolo.
+    // Generamos para OPECs vigentes: ACTIVA (inscripciones abiertas) y
+    // EN_PRUEBAS (inscripción cerrada pero prueba pendiente). Las CERRADAs
+    // ya no aportan valor al usuario.
     const whereListas = {
-      estado: "ACTIVA" as const,
+      estado: { in: [EstadoOpec.ACTIVA, EstadoOpec.EN_PRUEBAS] },
       preguntas: { none: {} },
     };
 
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
     if (pendientesTotal === 0) {
       return NextResponse.json({
         ok: true,
-        mensaje: "Todas las OPECs activas ya tienen preguntas generadas",
+        mensaje: "Todas las OPECs vigentes ya tienen preguntas generadas",
         pendientes: 0,
       });
     }

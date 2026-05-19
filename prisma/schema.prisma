@@ -61,9 +61,9 @@ enum TipoBadge {
 }
 
 enum EstadoOpec {
-  ACTIVA
-  CERRADA
-  VENCIDA
+  ACTIVA       // Inscripciones abiertas
+  EN_PRUEBAS   // Inscripción cerrada, examen pendiente o sin fecha
+  CERRADA      // Examen ya presentado o convocatoria retirada de SIMO
 }
 
 enum Rol {

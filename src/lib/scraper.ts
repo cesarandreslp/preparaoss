@@ -236,13 +236,24 @@ export async function sincronizarOpecs(): Promise<{
     await new Promise((r) => setTimeout(r, 300));
   }
 
-  // Marcar como VENCIDAS las OPECs con fecha límite pasada
+  // Reclasificación por fechas:
+  //   ACTIVA con fechaLimiteInscripcion < now → EN_PRUEBAS (inscripción cerrada,
+  //                                              prueba aún por presentar).
+  //   EN_PRUEBAS con fechaExamen < now        → CERRADA (prueba ya presentada).
+  // CERRADA también se asigna desde el reconciliador cuando SIMO retira la OPEC.
   await prisma.opec.updateMany({
     where: {
       estado: "ACTIVA",
       fechaLimiteInscripcion: { lt: new Date() },
     },
-    data: { estado: "VENCIDA" },
+    data: { estado: "EN_PRUEBAS" },
+  });
+  await prisma.opec.updateMany({
+    where: {
+      estado: "EN_PRUEBAS",
+      fechaExamen: { lt: new Date() },
+    },
+    data: { estado: "CERRADA" },
   });
 
   console.log(
@@ -257,9 +268,12 @@ export async function sincronizarOpecs(): Promise<{
 // ─────────────────────────────────────────────────
 
 export async function getOpecssinPreguntas(limit = 50): Promise<string[]> {
+  // Generamos preguntas para OPECs vigentes (ACTIVA o EN_PRUEBAS): los
+  // usuarios pueden estar preparándose tanto si la inscripción sigue abierta
+  // como si ya cerró pero aún no se presenta el examen.
   const opecs = await prisma.opec.findMany({
     where: {
-      estado: "ACTIVA",
+      estado: { in: ["ACTIVA", "EN_PRUEBAS"] },
       preguntas: { none: {} },
     },
     select: { id: true },

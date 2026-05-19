@@ -12,9 +12,10 @@ export async function GET(request: Request) {
 
   const semana = getLunesDeEstaSemana();
 
-  // Recalcular posiciones en rankings activos
+  // Recalcular posiciones en rankings de OPECs vigentes (ACTIVA + EN_PRUEBAS).
+  // Los usuarios siguen haciendo simulacros aún con la inscripción cerrada.
   const opecs = await prisma.opec.findMany({
-    where: { estado: "ACTIVA" },
+    where: { estado: { in: ["ACTIVA", "EN_PRUEBAS"] } },
     select: { id: true },
   });
 

@@ -15,7 +15,7 @@ import { NextResponse } from "next/server";
 import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parseDocument, cleanText } from "@/lib/document-parser";
-import { DocumentType } from "@prisma/client";
+import { DocumentType, EstadoOpec } from "@prisma/client";
 
 export const maxDuration = 60;
 
@@ -98,16 +98,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  // Filtro de prioridad: docs cuya OPEC esté ACTIVA y SIN preguntas
-  // generadas. Eso desbloquea OPECs candidatas a IA antes que perder tiempo
-  // parseando manuales de OPECs que ya tienen banco.
+  // Filtro de prioridad: docs cuya OPEC esté vigente (ACTIVA o EN_PRUEBAS) y
+  // SIN preguntas generadas. Eso desbloquea OPECs candidatas a IA antes que
+  // perder tiempo parseando manuales de OPECs cerradas o ya con banco.
   const filtroPrioritario = {
     isParsed: false,
     sourceUrl: { not: null },
     type: DocumentType.MANUAL_FUNCIONES,
     parseError: null,
     opec: {
-      estado: "ACTIVA" as const,
+      estado: { in: [EstadoOpec.ACTIVA, EstadoOpec.EN_PRUEBAS] },
       preguntas: { none: {} },
     },
   };
