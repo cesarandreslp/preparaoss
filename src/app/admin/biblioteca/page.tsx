@@ -99,26 +99,26 @@ export default function AdminBibliotecaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
+    <div className="min-h-screen p-8" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-end justify-between mb-2 flex-wrap gap-4">
           <div>
-            <p className="text-xs uppercase tracking-widest text-gray-500">Admin · CMS</p>
-            <h1 className="text-3xl font-bold mt-1">Biblioteca de recursos</h1>
-            <p className="text-gray-400 mt-1 text-sm">
+            <p className="text-xs uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Admin · CMS</p>
+            <h1 className="text-3xl font-bold mt-1" style={{ color: "var(--text-primary)" }}>Biblioteca de recursos</h1>
+            <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
               {items.length} documentos · {items.filter((i) => i.pdfUrl).length} con PDF cargado
             </p>
           </div>
-          <a href="/admin" className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition">
+          <a href="/admin" className="btn-secondary text-sm">
             ← Admin
           </a>
         </div>
 
-        <div className="mt-6 mb-2 rounded-xl px-4 py-3 flex items-start gap-3 text-sm" style={{ background: "rgba(245,166,35,0.10)", border: "1px solid rgba(245,166,35,0.35)", color: "#FBBF24" }}>
+        <div className="mt-6 mb-2 rounded-xl px-4 py-3 flex items-start gap-3 text-sm" style={{ background: "rgba(245,166,35,0.10)", border: "1px solid rgba(245,166,35,0.35)", color: "var(--warning)" }}>
           <span className="text-lg leading-none">💡</span>
           <p>
-            <strong className="text-white">Sube PDF:</strong> click en "Subir PDF" para cada recurso. Requiere
-            tener configurado <code className="bg-black/40 px-1 rounded">BLOB_READ_WRITE_TOKEN</code> en Vercel
+            <strong style={{ color: "var(--text-primary)" }}>Sube PDF:</strong> click en "Subir PDF" para cada recurso. Requiere
+            tener configurado <code className="px-1 rounded" style={{ background: "rgba(0,0,0,0.4)" }}>BLOB_READ_WRITE_TOKEN</code> en Vercel
             (Project → Storage → Create Blob Store). Como alternativa puedes pegar una URL externa al PDF
             directamente en el campo "URL del PDF" y guardar.
           </p>
@@ -127,17 +127,17 @@ export default function AdminBibliotecaPage() {
         {loading ? (
           <div className="space-y-3 mt-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-900 rounded-xl animate-pulse" />
+              <div key={i} className="h-24 rounded-xl animate-pulse" style={{ background: "var(--bg-card)" }} />
             ))}
           </div>
         ) : (
           <div className="mt-6 space-y-8">
             {Object.entries(grouped).map(([bloque, recursos]) => (
               <section key={bloque}>
-                <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-                  <span className="text-orange-500">▍</span>
+                <h2 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                  <span style={{ color: "var(--accent-500)" }}>▍</span>
                   {BLOQUE_LABEL[bloque] ?? bloque}
-                  <span className="text-xs text-gray-500 font-normal">({recursos.length})</span>
+                  <span className="text-xs font-normal" style={{ color: "var(--text-muted)" }}>({recursos.length})</span>
                 </h2>
                 <div className="space-y-3">
                   {recursos.map((r) => {
@@ -149,8 +149,9 @@ export default function AdminBibliotecaPage() {
                     const pdfUrl = e.pdfUrl !== undefined ? e.pdfUrl : r.pdfUrl;
                     const vigente = e.vigente !== undefined ? e.vigente : r.vigente;
 
+                    const inputStyle = { background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" };
                     return (
-                      <div key={r.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
+                      <div key={r.id} className="rounded-xl p-4 space-y-3" style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}>
                         <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-start">
                           <div className="space-y-2">
                             <div className="flex flex-wrap gap-2">
@@ -158,12 +159,14 @@ export default function AdminBibliotecaPage() {
                                 value={numeroNorma ?? ""}
                                 placeholder="Ley XXX de YYYY"
                                 onChange={(ev) => setField(r.id, "numeroNorma", ev.target.value || null)}
-                                className="bg-gray-800 border border-gray-700 rounded-md px-2 py-1 text-xs w-44 focus:outline-none focus:border-orange-600"
+                                className="rounded-md px-2 py-1 text-xs w-44 focus:outline-none"
+                                style={inputStyle}
                               />
                               <input
                                 value={titulo}
                                 onChange={(ev) => setField(r.id, "titulo", ev.target.value)}
-                                className="flex-1 min-w-[240px] bg-gray-800 border border-gray-700 rounded-md px-3 py-1 text-sm font-semibold focus:outline-none focus:border-orange-600"
+                                className="flex-1 min-w-[240px] rounded-md px-3 py-1 text-sm font-semibold focus:outline-none"
+                                style={inputStyle}
                               />
                             </div>
                             <textarea
@@ -171,15 +174,17 @@ export default function AdminBibliotecaPage() {
                               placeholder="Descripción breve"
                               onChange={(ev) => setField(r.id, "descripcion", ev.target.value || null)}
                               rows={2}
-                              className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1 text-xs focus:outline-none focus:border-orange-600"
+                              className="w-full rounded-md px-3 py-1 text-xs focus:outline-none"
+                              style={inputStyle}
                             />
                             <input
                               value={pdfUrl ?? ""}
                               placeholder="URL del PDF (https://… o deja vacío y sube archivo)"
                               onChange={(ev) => setField(r.id, "pdfUrl", ev.target.value || null)}
-                              className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1 text-xs font-mono focus:outline-none focus:border-orange-600"
+                              className="w-full rounded-md px-3 py-1 text-xs font-mono focus:outline-none"
+                              style={inputStyle}
                             />
-                            <label className="flex items-center gap-2 text-xs">
+                            <label className="flex items-center gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
                               <input
                                 type="checkbox"
                                 checked={vigente}
@@ -196,24 +201,29 @@ export default function AdminBibliotecaPage() {
                                   href={r.pdfUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="px-3 py-2 bg-green-700 hover:bg-green-600 rounded-md text-xs text-center font-semibold transition"
+                                  className="px-3 py-2 rounded-md text-xs text-center font-semibold transition"
+                                  style={{ background: "var(--success)", color: "#0B1733" }}
                                 >
                                   📄 Ver PDF actual
                                 </a>
                                 {r.pdfFileName && (
-                                  <p className="text-[10px] text-gray-500 truncate" title={r.pdfFileName}>
+                                  <p className="text-[10px] truncate" title={r.pdfFileName} style={{ color: "var(--text-muted)" }}>
                                     {r.pdfFileName}
                                   </p>
                                 )}
                                 <button
                                   onClick={() => quitarPdf(r.id)}
-                                  className="px-3 py-1.5 bg-red-900/40 hover:bg-red-900/60 border border-red-800 rounded-md text-xs"
+                                  className="btn-destructive text-xs"
+                                  style={{ padding: "0.375rem 0.75rem" }}
                                 >
                                   Quitar PDF
                                 </button>
                               </>
                             ) : (
-                              <label className="px-3 py-2 bg-orange-700 hover:bg-orange-600 rounded-md text-xs text-center font-semibold cursor-pointer transition">
+                              <label
+                                className="px-3 py-2 rounded-md text-xs text-center font-semibold cursor-pointer transition"
+                                style={{ background: "var(--accent-500)", color: "#0B1733" }}
+                              >
                                 {uploadingId === r.id ? "Subiendo…" : "📤 Subir PDF"}
                                 <input
                                   type="file"
@@ -232,11 +242,8 @@ export default function AdminBibliotecaPage() {
                             <button
                               onClick={() => guardar(r.id)}
                               disabled={!dirty || savingId === r.id}
-                              className={`px-3 py-2 rounded-md text-xs font-semibold transition ${
-                                dirty
-                                  ? "bg-orange-600 hover:bg-orange-700 text-white"
-                                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
-                              }`}
+                              className={dirty ? "btn-primary text-xs" : "btn-secondary text-xs"}
+                              style={dirty ? { padding: "0.5rem 0.75rem" } : { padding: "0.5rem 0.75rem", opacity: 0.6, cursor: "not-allowed" }}
                             >
                               {savingId === r.id ? "…" : dirty ? "Guardar cambios" : "Sin cambios"}
                             </button>

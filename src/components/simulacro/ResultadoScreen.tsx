@@ -48,7 +48,7 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
   return (
     <div className="space-y-6 pb-8">
       {/* Puntaje total */}
-      <div className="rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg,rgba(255, 255, 255, 0.50),rgba(37,99,235,0.25))', border: '1px solid var(--border-default)' }}>
+      <div className="rounded-2xl p-6 text-center" style={{ background: 'linear-gradient(135deg, var(--bg-card), var(--bg-elevated))', border: '1px solid var(--border-default)' }}>
         <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Puntaje total</p>
         <p className="text-6xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)', ...colorPuntaje(r.puntajeTotal) }}>
           {r.puntajeTotal}%
@@ -79,7 +79,7 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
           <div
             key={item.label}
             className="rounded-xl p-3 text-center"
-            style={{ background: 'rgba(255, 255, 255, 0.40)', border: '1px solid var(--border-default)' }}
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}
           >
             <p className="text-2xl font-bold" style={item.value !== null ? colorPuntaje(item.value) : { color: 'var(--text-muted)' }}>
               {item.value !== null ? `${item.value}%` : "N/A"}
@@ -157,8 +157,8 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
                 </div>
 
                 {/* Explicación de la IA */}
-                <div className="rounded-xl p-4" style={{ background: 'rgba(255, 255, 255, 0.40)', border: '1px solid var(--border-default)' }}>
-                  <p className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: '#4A90D9' }}>
+                <div className="rounded-xl p-4" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
+                  <p className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: 'var(--gold-300)' }}>
                     Explicación
                   </p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{retro.explicacion}</p>

@@ -38,12 +38,12 @@ const TYPE_LABEL: Record<DocumentType, string> = {
   OTHER: "Otro",
 };
 
-const TYPE_COLOR: Record<DocumentType, string> = {
-  MANUAL_FUNCIONES: "bg-blue-900 text-blue-200",
-  GUIA_ORIENTACION: "bg-purple-900 text-purple-200",
-  EJES_TEMATICOS: "bg-green-900 text-green-200",
-  DOCUMENTO_ENTIDAD: "bg-amber-900 text-amber-200",
-  OTHER: "bg-gray-700 text-gray-200",
+const TYPE_COLOR: Record<DocumentType, React.CSSProperties> = {
+  MANUAL_FUNCIONES: { background: "rgba(59,130,246,0.18)", color: "#93C5FD" },
+  GUIA_ORIENTACION: { background: "rgba(168,85,247,0.18)", color: "#D8B4FE" },
+  EJES_TEMATICOS: { background: "rgba(74,222,128,0.18)", color: "var(--success)" },
+  DOCUMENTO_ENTIDAD: { background: "rgba(212,175,55,0.18)", color: "var(--accent-500)" },
+  OTHER: { background: "var(--bg-elevated)", color: "var(--text-secondary)" },
 };
 
 function formatBytes(bytes: number): string {
@@ -189,31 +189,35 @@ export default function AdminDocumentosPage() {
     }
   }
 
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border-subtle)" };
+  const inputStyle = { background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" };
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
-      <div className="flex items-center gap-2 text-gray-500 text-sm mb-6">
-        <a href="/admin" className="hover:text-gray-300 transition">🛠️ Admin</a>
+    <div className="min-h-screen p-8" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
+      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: "var(--text-muted)" }}>
+        <a href="/admin" className="transition hover:opacity-80">🛠️ Admin</a>
         <span>›</span>
-        <span className="text-white">Documentos por OPEC</span>
+        <span style={{ color: "var(--text-primary)" }}>Documentos por OPEC</span>
       </div>
 
-      <h1 className="text-3xl font-bold mb-1">📚 Documentos por OPEC</h1>
-      <p className="text-gray-400 mb-8">
+      <h1 className="text-3xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>📚 Documentos por OPEC</h1>
+      <p className="mb-8" style={{ color: "var(--text-muted)" }}>
         Sube manuales y guías oficiales. La IA los usará como contexto al generar preguntas.
       </p>
 
       {/* Buscador OPEC */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">Buscar OPEC</label>
+      <div className="rounded-xl p-5 mb-6" style={cardStyle}>
+        <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>Buscar OPEC</label>
         <input
           type="text"
           placeholder="Cargo, entidad, simoId o convocatoria (mín. 3 caracteres)"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+          className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+          style={inputStyle}
         />
 
-        {buscando && <p className="text-gray-500 text-xs mt-2">Buscando...</p>}
+        {buscando && <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>Buscando...</p>}
 
         {resultados.length > 0 && !opec && (
           <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
@@ -225,14 +229,15 @@ export default function AdminDocumentosPage() {
                   setQuery("");
                   setResultados([]);
                 }}
-                className="w-full text-left bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg p-3 transition"
+                className="w-full text-left rounded-lg p-3 transition hover:bg-white/5"
+                style={inputStyle}
               >
-                <p className="font-semibold text-sm">{o.nombreCargo}</p>
-                <p className="text-xs text-gray-400">
+                <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{o.nombreCargo}</p>
+                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
                   {o.entidad} · simoId: {o.simoId}
                   {o.numerConvocatoria ? ` · conv. ${o.numerConvocatoria}` : ""}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
                   {o._count.preguntas} preguntas · {o._count.inscripciones} inscritos
                 </p>
               </button>
@@ -244,13 +249,13 @@ export default function AdminDocumentosPage() {
       {/* OPEC seleccionada + gestión */}
       {opec && (
         <>
-          <div className="bg-gray-900 border border-blue-700 rounded-xl p-5 mb-6">
+          <div className="rounded-xl p-5 mb-6" style={{ background: "var(--bg-card)", border: "1px solid var(--btn-blue)" }}>
             <div className="flex justify-between items-start gap-4">
               <div>
-                <p className="text-xs text-gray-500 mb-1">OPEC seleccionada</p>
-                <h2 className="font-bold text-lg">{opec.nombreCargo}</h2>
-                <p className="text-sm text-gray-400">{opec.entidad}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>OPEC seleccionada</p>
+                <h2 className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>{opec.nombreCargo}</h2>
+                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{opec.entidad}</p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
                   simoId: <span className="font-mono">{opec.simoId}</span> ·{" "}
                   {opec._count.preguntas} preguntas existentes
                 </p>
@@ -261,7 +266,8 @@ export default function AdminDocumentosPage() {
                   setDocs([]);
                   setMensaje(null);
                 }}
-                className="text-gray-500 hover:text-white text-xs"
+                className="text-xs transition hover:opacity-80"
+                style={{ color: "var(--text-muted)" }}
               >
                 Cambiar
               </button>
@@ -271,11 +277,12 @@ export default function AdminDocumentosPage() {
           {/* Mensaje global */}
           {mensaje && (
             <div
-              className={`rounded-lg p-3 mb-6 text-sm border ${
+              className="rounded-lg p-3 mb-6 text-sm"
+              style={
                 mensaje.tipo === "ok"
-                  ? "bg-green-950 border-green-800 text-green-300"
-                  : "bg-red-950 border-red-800 text-red-300"
-              }`}
+                  ? { background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.35)", color: "var(--success)" }
+                  : { background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", color: "var(--error)" }
+              }
             >
               {mensaje.tipo === "ok" ? "✅ " : "❌ "}
               {mensaje.texto}
@@ -283,16 +290,17 @@ export default function AdminDocumentosPage() {
           )}
 
           {/* Subir documento */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
-            <h3 className="font-semibold mb-3">📤 Subir documento</h3>
+          <div className="rounded-xl p-5 mb-6" style={cardStyle}>
+            <h3 className="font-semibold mb-3" style={{ color: "var(--text-primary)" }}>📤 Subir documento</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Tipo</label>
+                <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>Tipo</label>
                 <select
                   value={tipoDoc}
                   onChange={(e) => setTipoDoc(e.target.value as DocumentType)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                  className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+                  style={inputStyle}
                 >
                   {(Object.keys(TYPE_LABEL) as DocumentType[]).map((t) => (
                     <option key={t} value={t}>
@@ -303,13 +311,14 @@ export default function AdminDocumentosPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Archivo (PDF, DOCX, TXT, PNG, JPG, WEBP — máx. 15MB)</label>
+                <label className="block text-xs mb-1" style={{ color: "var(--text-muted)" }}>Archivo (PDF, DOCX, TXT, PNG, JPG, WEBP — máx. 15MB)</label>
                 <input
                   id="doc-file"
                   type="file"
                   accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp"
                   onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
-                  className="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
+                  className="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:cursor-pointer"
+                  style={{ color: "var(--text-secondary)" }}
                 />
               </div>
             </div>
@@ -317,56 +326,58 @@ export default function AdminDocumentosPage() {
             <button
               onClick={handleSubir}
               disabled={!archivo || subiendo}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2 rounded-lg text-sm font-semibold transition"
+              className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {subiendo ? "⏳ Procesando (puede tomar 1-2 min con OCR)..." : "📤 Subir y procesar"}
             </button>
           </div>
 
           {/* Lista de documentos */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
-            <h3 className="font-semibold mb-3">📁 Documentos cargados ({docs.length})</h3>
+          <div className="rounded-xl p-5 mb-6" style={cardStyle}>
+            <h3 className="font-semibold mb-3" style={{ color: "var(--text-primary)" }}>📁 Documentos cargados ({docs.length})</h3>
 
             {cargandoDocs ? (
-              <p className="text-gray-500 text-sm">Cargando...</p>
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>Cargando...</p>
             ) : docs.length === 0 ? (
-              <p className="text-gray-500 text-sm">Aún no hay documentos para esta OPEC.</p>
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>Aún no hay documentos para esta OPEC.</p>
             ) : (
               <div className="space-y-2">
                 {docs.map((d) => (
                   <div
                     key={d.id}
-                    className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex justify-between items-start gap-3"
+                    className="rounded-lg p-3 flex justify-between items-start gap-3"
+                    style={inputStyle}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className={`text-xs px-2 py-0.5 rounded ${TYPE_COLOR[d.type]}`}>
+                        <span className="text-xs px-2 py-0.5 rounded" style={TYPE_COLOR[d.type]}>
                           {TYPE_LABEL[d.type]}
                         </span>
                         {d.ocrUsed && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-orange-900 text-orange-200">
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(251,191,36,0.18)", color: "var(--warning)" }}>
                             OCR
                           </span>
                         )}
                         {!d.isParsed && (
-                          <span className="text-xs px-2 py-0.5 rounded bg-red-900 text-red-200">
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ background: "rgba(248,113,113,0.18)", color: "var(--error)" }}>
                             sin parsear
                           </span>
                         )}
                       </div>
-                      <p className="font-mono text-sm truncate">{d.fileName}</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="font-mono text-sm truncate" style={{ color: "var(--text-primary)" }}>{d.fileName}</p>
+                      <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
                         {formatBytes(d.fileSize)} · {d.parsedChars.toLocaleString()} chars ·{" "}
                         {new Date(d.uploadedAt).toLocaleDateString("es-CO")}
                       </p>
                       {d.parseError && (
-                        <p className="text-xs text-red-400 mt-1 truncate">⚠️ {d.parseError}</p>
+                        <p className="text-xs mt-1 truncate" style={{ color: "var(--error)" }}>⚠️ {d.parseError}</p>
                       )}
                     </div>
 
                     <button
                       onClick={() => handleEliminar(d.id, d.fileName)}
-                      className="text-red-400 hover:text-red-300 text-xs whitespace-nowrap"
+                      className="text-xs whitespace-nowrap transition hover:opacity-80"
+                      style={{ color: "var(--error)" }}
                     >
                       🗑️ Eliminar
                     </button>
@@ -377,15 +388,15 @@ export default function AdminDocumentosPage() {
           </div>
 
           {/* Generar/Regenerar banco */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-            <h3 className="font-semibold mb-2">🤖 Generar banco de preguntas</h3>
-            <p className="text-gray-400 text-sm mb-4">
+          <div className="rounded-xl p-5" style={cardStyle}>
+            <h3 className="font-semibold mb-2" style={{ color: "var(--text-primary)" }}>🤖 Generar banco de preguntas</h3>
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
               {docs.filter((d) => d.isParsed).length > 0
                 ? `La IA usará los ${docs.filter((d) => d.isParsed).length} documento(s) cargado(s) como contexto al generar las preguntas.`
                 : "No hay documentos parseados; la IA generará a partir de las competencias y datos de la OPEC."}
             </p>
 
-            <label className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+            <label className="flex items-center gap-2 mb-4 text-sm" style={{ color: "var(--text-secondary)" }}>
               <input
                 type="checkbox"
                 checked={limpiarPrevias}
@@ -393,13 +404,14 @@ export default function AdminDocumentosPage() {
                 className="w-4 h-4"
               />
               Borrar las {opec._count.preguntas} preguntas previas antes de generar
-              <span className="text-xs text-gray-500">(falla si hay respuestas de usuarios)</span>
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>(falla si hay respuestas de usuarios)</span>
             </label>
 
             <button
               onClick={handleGenerar}
               disabled={generando}
-              className="bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-lg text-sm font-semibold transition"
+              className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: "var(--success)", color: "#0B1733" }}
             >
               {generando ? "⏳ Generando (~30-60s)..." : "🚀 Generar banco completo"}
             </button>

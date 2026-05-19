@@ -102,26 +102,32 @@ export default function ConfiguracionPage() {
     (k) => configs[k]?.hasValue
   );
 
+  const cardStyle = { background: "var(--bg-card)", border: "1px solid var(--border-subtle)" };
+  const inputStyle = { background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" };
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
+    <div className="min-h-screen p-8" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-gray-500 text-sm mb-6">
-        <a href="/admin" className="hover:text-gray-300 transition">🛠️ Admin</a>
+      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: "var(--text-muted)" }}>
+        <a href="/admin" className="transition hover:opacity-80">🛠️ Admin</a>
         <span>›</span>
-        <span className="text-white">Configuración de Email</span>
+        <span style={{ color: "var(--text-primary)" }}>Configuración de Email</span>
       </div>
 
-      <h1 className="text-3xl font-bold mb-1">✉️ Configuración de Email</h1>
-      <p className="text-gray-400 mb-8">
+      <h1 className="text-3xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>✉️ Configuración de Email</h1>
+      <p className="mb-8" style={{ color: "var(--text-muted)" }}>
         Configura el servidor SMTP desde donde se enviarán los recordatorios y notificaciones a los usuarios.
       </p>
 
       {/* Estado actual */}
-      <div className={`rounded-xl p-4 mb-8 flex items-center gap-3 border ${
-        allConfigured
-          ? "bg-green-950 border-green-800 text-green-300"
-          : "bg-yellow-950 border-yellow-800 text-yellow-300"
-      }`}>
+      <div
+        className="rounded-xl p-4 mb-8 flex items-center gap-3"
+        style={
+          allConfigured
+            ? { background: "rgba(74,222,128,0.10)", border: "1px solid rgba(74,222,128,0.35)", color: "var(--success)" }
+            : { background: "rgba(251,191,36,0.10)", border: "1px solid rgba(251,191,36,0.35)", color: "var(--warning)" }
+        }
+      >
         <span className="text-xl">{allConfigured ? "✅" : "⚠️"}</span>
         <div>
           <p className="font-semibold">
@@ -142,19 +148,19 @@ export default function ConfiguracionPage() {
           const isDirty = form[field.key] !== undefined && form[field.key] !== "";
 
           return (
-            <div key={field.key} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <div key={field.key} className="rounded-xl p-5" style={cardStyle}>
               <div className="flex items-center justify-between mb-1">
-                <label className="font-semibold text-sm text-gray-200">{field.label}</label>
-                <span className="text-xs font-mono text-gray-500">{field.key}</span>
+                <label className="font-semibold text-sm" style={{ color: "var(--text-secondary)" }}>{field.label}</label>
+                <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>{field.key}</span>
               </div>
 
               {saved?.hasValue && !isDirty && (
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-green-400 text-xs">✅ Guardado</span>
+                  <span className="text-xs" style={{ color: "var(--success)" }}>✅ Guardado</span>
                   {field.key !== "SMTP_PASS" && (
-                    <span className="text-gray-400 text-xs font-mono">{saved.value}</span>
+                    <span className="text-xs font-mono" style={{ color: "var(--text-secondary)" }}>{saved.value}</span>
                   )}
-                  <span className="text-gray-600 text-xs ml-auto">
+                  <span className="text-xs ml-auto" style={{ color: "var(--text-muted)" }}>
                     {new Date(saved.updatedAt).toLocaleDateString("es-CO")}
                   </span>
                 </div>
@@ -166,45 +172,50 @@ export default function ConfiguracionPage() {
                   placeholder={field.placeholder}
                   value={form[field.key] ?? ""}
                   onChange={(e) => setForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition"
+                  className="flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none transition"
+                  style={inputStyle}
                   onKeyDown={(e) => e.key === "Enter" && isDirty && handleSave(field.key)}
                 />
                 <button
                   onClick={() => handleSave(field.key)}
                   disabled={!isDirty || saving === field.key}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 rounded-lg text-sm font-semibold transition"
+                  className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {saving === field.key ? "⏳" : "Guardar"}
                 </button>
               </div>
 
-              <p className="text-gray-500 text-xs mt-2">{field.hint}</p>
+              <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>{field.hint}</p>
             </div>
           );
         })}
       </div>
 
       {/* Sección de prueba */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="font-semibold mb-1">Probar configuración</h2>
-        <p className="text-gray-400 text-sm mb-4">
-          Envía un email de prueba a <strong>{configs["SMTP_USER"]?.value ?? "tu correo"}</strong> para verificar que todo funciona.
+      <div className="rounded-xl p-5" style={cardStyle}>
+        <h2 className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>Probar configuración</h2>
+        <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
+          Envía un email de prueba a <strong style={{ color: "var(--text-primary)" }}>{configs["SMTP_USER"]?.value ?? "tu correo"}</strong> para verificar que todo funciona.
         </p>
 
         <button
           onClick={handleTest}
           disabled={testing || !allConfigured}
-          className="bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg font-semibold text-sm transition"
+          className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ background: "var(--success)", color: "#0B1733" }}
         >
           {testing ? "⏳ Enviando..." : "📧 Enviar email de prueba"}
         </button>
 
         {testResult && (
-          <div className={`mt-4 p-4 rounded-lg border text-sm ${
-            testResult.ok
-              ? "bg-green-950 border-green-700 text-green-300"
-              : "bg-red-950 border-red-700 text-red-300"
-          }`}>
+          <div
+            className="mt-4 p-4 rounded-lg text-sm"
+            style={
+              testResult.ok
+                ? { background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.35)", color: "var(--success)" }
+                : { background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", color: "var(--error)" }
+            }
+          >
             {testResult.ok ? (
               <p>✅ {testResult.mensaje}</p>
             ) : (
@@ -218,22 +229,22 @@ export default function ConfiguracionPage() {
       </div>
 
       {/* Guía rápida */}
-      <div className="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="font-semibold mb-3 text-gray-300">📖 Guía rápida</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-400">
-          <div className="bg-gray-800 rounded-lg p-3">
-            <p className="font-semibold text-white mb-1">Gmail</p>
+      <div className="mt-8 rounded-xl p-5" style={cardStyle}>
+        <h2 className="font-semibold mb-3" style={{ color: "var(--text-secondary)" }}>📖 Guía rápida</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm" style={{ color: "var(--text-muted)" }}>
+          <div className="rounded-lg p-3" style={{ background: "var(--bg-elevated)" }}>
+            <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>Gmail</p>
             <p className="font-mono text-xs">Host: smtp.gmail.com</p>
             <p className="font-mono text-xs">Puerto: 587</p>
-            <p className="text-xs mt-1 text-yellow-400">
+            <p className="text-xs mt-1" style={{ color: "var(--warning)" }}>
               ⚠️ Requiere <a href="https://myaccount.google.com/apppasswords" target="_blank" className="underline">contraseña de aplicación</a> (no la contraseña normal)
             </p>
           </div>
-          <div className="bg-gray-800 rounded-lg p-3">
-            <p className="font-semibold text-white mb-1">Hotmail / Outlook</p>
+          <div className="rounded-lg p-3" style={{ background: "var(--bg-elevated)" }}>
+            <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>Hotmail / Outlook</p>
             <p className="font-mono text-xs">Host: smtp-mail.outlook.com</p>
             <p className="font-mono text-xs">Puerto: 587</p>
-            <p className="text-xs mt-1 text-blue-400">
+            <p className="text-xs mt-1" style={{ color: "var(--accent-500)" }}>
               ✅ Usa tu contraseña normal de Microsoft
             </p>
           </div>

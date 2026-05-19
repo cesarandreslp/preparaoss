@@ -120,7 +120,7 @@ export default function OpecsPage() {
                   {opec.entidad}
                 </p>
                 <h3
-                  className="text-lg font-bold leading-snug mt-0.5 transition-colors group-hover:text-[#D04A1C]"
+                  className="text-lg font-bold leading-snug mt-0.5 transition-colors group-hover:text-[var(--gold-300)]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {opec.nombreCargo}

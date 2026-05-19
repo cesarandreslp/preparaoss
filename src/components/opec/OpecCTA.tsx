@@ -56,7 +56,7 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
       <Link
         href={`/ranking?opecId=${opecId}`}
         className="block w-full text-center px-6 py-3 rounded-2xl text-sm font-medium transition-all"
-        style={{ background: 'rgba(255, 255, 255, 0.40)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}
+        style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}
       >
         🏆 Ver ranking de aspirantes
       </Link>

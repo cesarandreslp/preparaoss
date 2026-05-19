@@ -26,9 +26,9 @@ const LIKERT_STYLES_ACTIVOS = [
 
 export function LikertCard({ numero, pregunta, respuesta, onRespuesta }: Props) {
   return (
-    <div className="rounded-2xl p-5" style={{ background: 'rgba(255, 255, 255, 0.40)', border: '1px solid var(--border-default)' }}>
+    <div className="rounded-2xl p-5" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(44, 84, 122, 0.20)', color: '#4A90D9', fontFamily: 'var(--font-display)' }}>
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,175,55,0.18)', color: 'var(--gold-300)', fontFamily: 'var(--font-display)' }}>
           #{numero} COMPORTAMENTAL
         </span>
         <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{pregunta.categoria}</span>

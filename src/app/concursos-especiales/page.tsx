@@ -49,7 +49,7 @@ export default async function ConcursosEspecialesIndex() {
             {entidades.map((e) => (
               <Link key={e.id} href={`/concursos-especiales/${e.slug}`} className="card group">
                 <span className="tag tag-blue self-start">{e._count.opecs} convocatorias activas</span>
-                <h3 className="mt-4 text-xl font-bold leading-snug transition-colors group-hover:text-[#003893]" style={{ fontFamily: "var(--font-display)" }}>
+                <h3 className="mt-4 text-xl font-bold leading-snug transition-colors group-hover:text-[var(--gold-300)]" style={{ fontFamily: "var(--font-display)" }}>
                   {e.nombre}
                 </h3>
                 {e.descripcion && (

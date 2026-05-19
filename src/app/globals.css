@@ -1,68 +1,96 @@
 /* ═══════════════════════════════════════════════════════════════
-   PreparaOSS Design System — Light Editorial
-   Inspired by simplychocolate.dk: cream paper bg, black text,
-   single burnt-orange accent. Big typography, generous whitespace.
+   PreparaOSS Design System — Azul Noche Colombiano
+   Fondo azul noche, texto blanco, botones dorado/plateado.
+   Bordes tricolor (#FCD116 / #003893 / #CE1126) conservados en
+   header, footer, cards, modales.
    ═══════════════════════════════════════════════════════════════ */
 
 @import "tailwindcss";
 
 /* ─── Design Tokens ──────────────────────────────────────────── */
 :root {
-  /* Surfaces — todo blanco; cards se distinguen por sombra amarilla */
-  --bg-base:        #FFFFFF;
-  --bg-primary:     #FFFFFF;
-  --bg-elevated:    #FFFFFF;
-  --bg-card:        #FFFFFF;
-  --bg-card-hover:  #FFFCEF;
+  /* Surfaces — azul noche */
+  --bg-base:        #0B1733;   /* fondo principal de la app */
+  --bg-primary:     #0B1733;
+  --bg-elevated:    #13224A;   /* superficies elevadas (cards, modales) */
+  --bg-card:        #13224A;
+  --bg-card-hover:  #1A2C5C;
+  --bg-overlay:     rgba(5, 11, 26, 0.72); /* backdrop de modales */
 
-  /* Botones — colores bandera Colombia */
-  --btn-blue:        #003893;
-  --btn-blue-hover:  #002B73;
-  --btn-red:         #CE1126;
-  --btn-red-hover:   #A50E1F;
-  --btn-yellow:      #FCD116;
+  /* Bandera Colombia — conservados para bordes/acentos tricolor */
+  --flag-yellow: #FCD116;
+  --flag-blue:   #003893;
+  --flag-red:    #CE1126;
+
+  /* Botones — dorado primario, plateado secundario */
+  --btn-gold:           #D4AF37;
+  --btn-gold-hover:     #C49A2A;
+  --btn-gold-deep:      #9B7B1A;
+  --btn-gold-glow:      rgba(212, 175, 55, 0.35);
+  --btn-gold-text:      #1A1206; /* texto oscuro sobre dorado para contraste */
+
+  --btn-silver:         #C7CCD4;
+  --btn-silver-hover:   #E2E6EC;
+  --btn-silver-deep:    #8A93A3;
+  --btn-silver-text:    #0B1733; /* azul noche sobre plateado relleno */
+
+  /* Destructivo — sólo para panel admin (eliminar, descartar, salir) */
+  --btn-red:        #CE1126;
+  --btn-red-hover:  #A50E1F;
+  --btn-red-glow:   rgba(206, 17, 38, 0.32);
+
+  /* Alias de compatibilidad con código que aún referencia btn-blue/btn-red.
+     btn-blue ahora apunta a dorado para que las llamadas viejas no rompan. */
+  --btn-blue:        var(--btn-gold);
+  --btn-blue-hover:  var(--btn-gold-hover);
+  --btn-yellow:      var(--flag-yellow);
   --btn-yellow-hover:#E5BD00;
 
-  /* Borders & dividers */
-  --border-subtle:   rgba(10, 10, 10, 0.06);
-  --border-default:  rgba(10, 10, 10, 0.10);
-  --border-strong:   rgba(10, 10, 10, 0.20);
+  /* Borders & dividers — blanco a baja opacidad sobre fondo oscuro */
+  --border-subtle:   rgba(255, 255, 255, 0.08);
+  --border-default:  rgba(255, 255, 255, 0.14);
+  --border-strong:   rgba(255, 255, 255, 0.24);
 
-  /* Text */
-  --text-primary:   #0A0A0A;
-  --text-secondary: #3F3A35;
-  --text-muted:     #7A736B;
-  --text-disabled:  #A8A39B;
+  /* Text — blanco puro + secundarios fríos */
+  --text-primary:   #FFFFFF;
+  --text-secondary: #D6DEF0;
+  --text-muted:     #8997B8;
+  --text-disabled:  #5E6B86;
+  --text-on-light:  #0B1733; /* para texto sobre dorado/plateado relleno */
 
-  /* Accents — burnt orange primary */
-  --accent-100: #FCEEE5;
-  --accent-300: #F08C5C;
-  --accent-500: #D04A1C;  /* primary accent */
-  --accent-700: #A8390F;
-  --accent-glow: rgba(208, 74, 28, 0.18);
+  /* Accents — dorado como acento global (selección, focus, eyebrow) */
+  --accent-100: rgba(212, 175, 55, 0.12);
+  --accent-300: #E6C75F;
+  --accent-500: #D4AF37;
+  --accent-700: #9B7B1A;
+  --accent-glow: rgba(212, 175, 55, 0.30);
 
-  /* Aliases for backward-compat with existing classes */
-  --gold-100: #FCEEE5;
-  --gold-300: #F08C5C;
-  --gold-500: #D04A1C;
-  --gold-700: #A8390F;
-  --gold-glow: rgba(208, 74, 28, 0.18);
+  /* Aliases gold-* que ya estaban en uso por componentes existentes —
+     redirigidos a la rampa dorada real (antes eran burnt-orange disfrazado). */
+  --gold-100: rgba(212, 175, 55, 0.12);
+  --gold-300: #E6C75F;
+  --gold-500: #D4AF37;
+  --gold-700: #9B7B1A;
+  --gold-glow: rgba(212, 175, 55, 0.30);
 
+  /* Azules de marca — referencias secundarias para tags y gradientes */
   --blue-300: #6B8FB0;
   --blue-400: #4A6F92;
   --blue-500: #2C547A;
   --blue-700: #1B3A56;
 
-  --success: #1F7A3D;
-  --error:   #B91C1C;
-  --warning: #A65D00;
+  /* Estado semántico — ajustado para legibilidad sobre fondo oscuro */
+  --success: #4ADE80;
+  --error:   #F87171;
+  --warning: #FBBF24;
 
   /* Gradients */
-  /* hero: cream plano, sin degrade */
-  --gradient-hero: var(--bg-base);
-  --gradient-gold: linear-gradient(135deg, #E66932 0%, #D04A1C 60%, #A8390F 100%);
-  --gradient-text-gold: linear-gradient(135deg, #E66932 0%, #D04A1C 60%, #A8390F 100%);
-  --gradient-text-blue: linear-gradient(135deg, #4A6F92 0%, #2C547A 100%);
+  --gradient-hero: linear-gradient(180deg, #0B1733 0%, #0E1C40 100%);
+  --gradient-gold: linear-gradient(135deg, #E6C75F 0%, #D4AF37 55%, #9B7B1A 100%);
+  --gradient-silver: linear-gradient(135deg, #E2E6EC 0%, #C7CCD4 55%, #8A93A3 100%);
+  --gradient-text-gold: linear-gradient(135deg, #F0D880 0%, #D4AF37 55%, #B89124 100%);
+  --gradient-text-silver: linear-gradient(135deg, #F1F4F9 0%, #C7CCD4 100%);
+  --gradient-text-blue: linear-gradient(135deg, #93B5D9 0%, #6B8FB0 100%);
 
   /* Typography */
   --font-display: var(--font-sora, 'Sora', sans-serif);
@@ -80,10 +108,11 @@
   --radius-2xl:  40px;
   --radius-full: 9999px;
 
-  /* Shadows — sombra amarilla (bandera Colombia #FCD116) */
-  --shadow-glow-gold: 0 8px 32px rgba(252, 209, 22, 0.32), 0 2px 8px rgba(252, 209, 22, 0.20);
-  --shadow-elevated:  0 12px 32px -8px rgba(252, 209, 22, 0.30), 0 4px 12px -2px rgba(252, 209, 22, 0.18), 0 1px 3px rgba(10, 10, 10, 0.06);
-  --shadow-card:      0 2px 8px rgba(252, 209, 22, 0.18), 0 6px 20px rgba(252, 209, 22, 0.10), 0 1px 2px rgba(10, 10, 10, 0.05);
+  /* Shadows — dorado sobre azul noche */
+  --shadow-glow-gold: 0 8px 32px var(--btn-gold-glow), 0 2px 8px rgba(212, 175, 55, 0.18);
+  --shadow-elevated:  0 12px 32px -8px rgba(0, 0, 0, 0.55), 0 4px 12px -2px rgba(212, 175, 55, 0.18), 0 1px 3px rgba(0, 0, 0, 0.40);
+  --shadow-card:      0 2px 8px rgba(0, 0, 0, 0.32), 0 6px 20px rgba(0, 0, 0, 0.22), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-modal:     0 24px 64px rgba(0, 0, 0, 0.55), 0 8px 24px rgba(0, 0, 0, 0.35);
 
   /* Transitions */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -94,25 +123,29 @@
 }
 
 @theme inline {
-  --color-base:         #F5F0E6;
-  --color-primary-bg:   #F5F0E6;
-  --color-elevated:     #FFFFFF;
-  --color-card:         #FFFFFF;
-  --color-card-hover:   #FBF7EE;
+  --color-base:         #0B1733;
+  --color-primary-bg:   #0B1733;
+  --color-elevated:     #13224A;
+  --color-card:         #13224A;
+  --color-card-hover:   #1A2C5C;
 
-  --color-gold-100:  #FCEEE5;
-  --color-gold-300:  #F08C5C;
-  --color-gold-500:  #D04A1C;
-  --color-gold-700:  #A8390F;
+  --color-gold-100:  rgba(212, 175, 55, 0.12);
+  --color-gold-300:  #E6C75F;
+  --color-gold-500:  #D4AF37;
+  --color-gold-700:  #9B7B1A;
+
+  --color-silver-300: #E2E6EC;
+  --color-silver-500: #C7CCD4;
+  --color-silver-700: #8A93A3;
 
   --color-brand-300: #6B8FB0;
   --color-brand-400: #4A6F92;
   --color-brand-500: #2C547A;
   --color-brand-700: #1B3A56;
 
-  --color-text-primary:   #0A0A0A;
-  --color-text-secondary: #3F3A35;
-  --color-text-muted:     #7A736B;
+  --color-text-primary:   #FFFFFF;
+  --color-text-secondary: #D6DEF0;
+  --color-text-muted:     #8997B8;
 
   --font-display: var(--font-sora, 'Sora', sans-serif);
   --font-body:    var(--font-dm-sans, 'DM Sans', sans-serif);
@@ -125,6 +158,7 @@
 html {
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
+  background-color: var(--bg-base);
 }
 
 body {
@@ -149,13 +183,13 @@ p { color: var(--text-secondary); }
 
 ::selection {
   background: var(--accent-500);
-  color: #FFFFFF;
+  color: var(--text-on-light);
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
 ::-webkit-scrollbar-thumb {
-  background: rgba(10, 10, 10, 0.18);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 5px;
   border: 2px solid var(--bg-base);
 }
@@ -235,6 +269,14 @@ p { color: var(--text-secondary); }
   color: transparent;
 }
 
+.text-gradient-silver {
+  background: var(--gradient-text-silver);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 .text-gradient-blue {
   background: var(--gradient-text-blue);
   -webkit-background-clip: text;
@@ -243,7 +285,10 @@ p { color: var(--text-secondary); }
   color: transparent;
 }
 
-/* ─── Buttons (refined) ──────────────────────────────────────── */
+/* ─── Buttons ────────────────────────────────────────────────── */
+
+/* Primario: DORADO. CTA principal: Inscribirse, Iniciar simulacro,
+   Continuar, Guardar. Texto oscuro para contraste sobre el dorado. */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -251,40 +296,51 @@ p { color: var(--text-secondary); }
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   border-radius: var(--radius-full);
-  background: var(--btn-blue);
-  color: #FFFFFF;
+  background: var(--gradient-gold);
+  color: var(--btn-gold-text);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9375rem;
   letter-spacing: -0.01em;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 56, 147, 0.25), 0 2px 8px rgba(0, 56, 147, 0.15);
-  transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  box-shadow: 0 8px 24px var(--btn-gold-glow), 0 2px 8px rgba(212, 175, 55, 0.18);
+  transition: transform var(--t-fast), box-shadow var(--t-fast), filter var(--t-fast);
   white-space: nowrap;
 }
 
 .btn-primary:hover {
-  background: var(--btn-blue-hover);
+  filter: brightness(1.06);
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0, 56, 147, 0.35), 0 4px 12px rgba(0, 56, 147, 0.20);
+  box-shadow: 0 12px 32px var(--btn-gold-glow), 0 4px 12px rgba(212, 175, 55, 0.28);
 }
 
 .btn-primary:active {
   transform: translateY(0);
+  filter: brightness(0.96);
 }
 
-/* Variante roja (bandera) — alterna con la azul en distintas secciones */
-.btn-primary.is-red {
+/* Compat: la variante .is-red histórica ya NO se debe usar en UI pública.
+   Se mantiene como alias del nuevo .btn-destructive para no romper páginas
+   públicas que aún tengan la clase aplicada. */
+.btn-primary.is-red,
+.btn-destructive {
   background: var(--btn-red);
-  box-shadow: 0 8px 24px rgba(206, 17, 38, 0.25), 0 2px 8px rgba(206, 17, 38, 0.15);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px var(--btn-red-glow), 0 2px 8px rgba(206, 17, 38, 0.18);
 }
 
-.btn-primary.is-red:hover {
+.btn-primary.is-red:hover,
+.btn-destructive:hover {
   background: var(--btn-red-hover);
-  box-shadow: 0 12px 32px rgba(206, 17, 38, 0.35), 0 4px 12px rgba(206, 17, 38, 0.20);
+  filter: none;
+  box-shadow: 0 12px 32px rgba(206, 17, 38, 0.42), 0 4px 12px rgba(206, 17, 38, 0.22);
 }
 
+/* Secundario: PLATEADO. Acciones secundarias: Cancelar, Volver,
+   Cerrar modal, Ver detalle. Outline traslúcido por defecto;
+   se rellena al hover. */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -292,21 +348,27 @@ p { color: var(--text-secondary); }
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   border-radius: var(--radius-full);
-  background: transparent;
-  color: var(--text-primary);
+  background: rgba(199, 204, 212, 0.06);
+  color: var(--btn-silver);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.9375rem;
-  border: 1.5px solid var(--text-primary);
+  border: 1.5px solid var(--btn-silver);
   cursor: pointer;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
   white-space: nowrap;
 }
 
 .btn-secondary:hover {
-  background: var(--text-primary);
-  color: #FFFFFF;
+  background: var(--gradient-silver);
+  color: var(--btn-silver-text);
+  border-color: var(--btn-silver-hover);
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(199, 204, 212, 0.18);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
 .btn-ghost {
@@ -318,11 +380,14 @@ p { color: var(--text-secondary); }
   font-weight: 500;
   font-size: 0.9375rem;
   transition: color var(--t-fast);
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .btn-ghost:hover { color: var(--accent-500); }
 
-/* ─── Cards (refined) ────────────────────────────────────────── */
+/* ─── Cards ──────────────────────────────────────────────────── */
 .card {
   position: relative;
   background: var(--bg-card);
@@ -330,14 +395,16 @@ p { color: var(--text-secondary); }
   border-radius: var(--radius-lg);
   padding: 1.75rem;
   box-shadow: var(--shadow-card);
-  transition: transform var(--t-normal), border-color var(--t-normal), box-shadow var(--t-normal);
+  transition: transform var(--t-normal), border-color var(--t-normal), box-shadow var(--t-normal), background var(--t-normal);
   overflow: hidden;
+  color: var(--text-primary);
 }
 
 .card:hover {
   transform: translateY(-4px);
   border-color: var(--border-default);
-  box-shadow: 0 16px 40px rgba(252, 209, 22, 0.40), 0 8px 16px rgba(252, 209, 22, 0.20), 0 2px 4px rgba(10, 10, 10, 0.06);
+  background: var(--bg-card-hover);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 8px 16px rgba(212, 175, 55, 0.18), 0 2px 4px rgba(0, 0, 0, 0.40);
 }
 
 .card-elevated {
@@ -348,6 +415,7 @@ p { color: var(--text-secondary); }
   padding: 1.75rem;
   box-shadow: var(--shadow-elevated);
   overflow: hidden;
+  color: var(--text-primary);
 }
 
 .card-glow {
@@ -358,16 +426,18 @@ p { color: var(--text-secondary); }
   padding: 1.75rem;
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  color: var(--text-primary);
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Tricolor (bandera Colombia) en TODAS las cards.
-   Pseudo-elemento ::before fijado al borde superior,
-   ancho completo, 3px. Proporciones reales de la bandera.
+   Tricolor (bandera Colombia) en TODAS las cards y en modales.
+   Pseudo-elemento ::before fijado al borde superior. Proporciones
+   reales de la bandera: amarillo 50%, azul 25%, rojo 25%.
    ────────────────────────────────────────────────────────────── */
 .card::before,
 .card-elevated::before,
-.card-glow::before {
+.card-glow::before,
+.flag-top::before {
   content: "";
   position: absolute;
   top: 0;
@@ -376,15 +446,20 @@ p { color: var(--text-secondary); }
   height: 3px;
   background: linear-gradient(
     90deg,
-    #FCD116 0%,
-    #FCD116 50%,
-    #003893 50%,
-    #003893 75%,
-    #CE1126 75%,
-    #CE1126 100%
+    var(--flag-yellow) 0%,
+    var(--flag-yellow) 50%,
+    var(--flag-blue) 50%,
+    var(--flag-blue) 75%,
+    var(--flag-red) 75%,
+    var(--flag-red) 100%
   );
   z-index: 2;
   pointer-events: none;
+}
+
+/* Helper opcional: cualquier elemento con .flag-top recibe el borde tricolor */
+.flag-top {
+  position: relative;
 }
 
 /* Glow border de card-glow ahora va en ::after para no chocar con el ::before tricolor */
@@ -405,16 +480,64 @@ p { color: var(--text-secondary); }
 @media (max-width: 480px) {
   .card::before,
   .card-elevated::before,
-  .card-glow::before {
+  .card-glow::before,
+  .flag-top::before {
     height: 2px;
   }
+}
+
+/* ─── Modales ────────────────────────────────────────────────── */
+/* Backdrop oscuro semitransparente sobre el azul noche */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 90;
+  animation: fadeIn var(--t-normal) both;
+}
+
+/* Contenedor del modal: azul noche elevado, borde tricolor arriba */
+.modal {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  box-shadow: var(--shadow-modal);
+  color: var(--text-primary);
+  overflow: hidden;
+  max-width: min(560px, 92vw);
+  width: 100%;
+  z-index: 100;
+}
+
+.modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--flag-yellow) 0%,
+    var(--flag-yellow) 50%,
+    var(--flag-blue) 50%,
+    var(--flag-blue) 75%,
+    var(--flag-red) 75%,
+    var(--flag-red) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* ─── Inputs ─────────────────────────────────────────────────── */
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -426,6 +549,7 @@ p { color: var(--text-secondary); }
 .input:focus {
   outline: none;
   border-color: var(--accent-500);
+  background: rgba(255, 255, 255, 0.07);
   box-shadow: 0 0 0 3px var(--accent-100);
 }
 
@@ -445,34 +569,40 @@ p { color: var(--text-secondary); }
 }
 
 .tag-gold {
-  background: rgba(208, 74, 28, 0.08);
-  color: var(--accent-700);
-  border: 1px solid rgba(208, 74, 28, 0.20);
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--accent-300);
+  border: 1px solid rgba(212, 175, 55, 0.30);
+}
+
+.tag-silver {
+  background: rgba(199, 204, 212, 0.10);
+  color: var(--btn-silver-hover);
+  border: 1px solid rgba(199, 204, 212, 0.28);
 }
 
 .tag-blue {
-  background: rgba(44, 84, 122, 0.08);
-  color: var(--blue-500);
-  border: 1px solid rgba(44, 84, 122, 0.20);
+  background: rgba(107, 143, 176, 0.14);
+  color: var(--blue-300);
+  border: 1px solid rgba(107, 143, 176, 0.32);
 }
 
 .tag-success {
-  background: rgba(31, 122, 61, 0.08);
+  background: rgba(74, 222, 128, 0.12);
   color: var(--success);
-  border: 1px solid rgba(31, 122, 61, 0.20);
+  border: 1px solid rgba(74, 222, 128, 0.28);
 }
 
 .tag-muted {
-  background: rgba(10, 10, 10, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--border-subtle);
 }
 
 /* ─── Progress ───────────────────────────────────────────────── */
 .progress {
   height: 6px;
   width: 100%;
-  background: rgba(10, 10, 10, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
@@ -489,8 +619,12 @@ p { color: var(--text-secondary); }
   background: linear-gradient(90deg, var(--blue-500), var(--blue-300));
 }
 
+.progress-fill.silver {
+  background: var(--gradient-silver);
+}
+
 /* ─── Bandera Colombia (acentos tricolor) ──────────────────────
-   Amarillo · Azul · Rojo. Yellow ocupa 50%, blue y red 25% c/u
+   Helpers reutilizables. Amarillo 50%, azul 25%, rojo 25%
    (proporciones reales de la bandera).
    ───────────────────────────────────────────────────────────── */
 .flag-stripe {
@@ -499,12 +633,12 @@ p { color: var(--text-secondary); }
   height: 4px;
   background: linear-gradient(
     90deg,
-    #FCD116 0%,
-    #FCD116 50%,
-    #003893 50%,
-    #003893 75%,
-    #CE1126 75%,
-    #CE1126 100%
+    var(--flag-yellow) 0%,
+    var(--flag-yellow) 50%,
+    var(--flag-blue) 50%,
+    var(--flag-blue) 75%,
+    var(--flag-red) 75%,
+    var(--flag-red) 100%
   );
 }
 
@@ -518,16 +652,17 @@ p { color: var(--text-secondary); }
   width: 4px;
   background: linear-gradient(
     180deg,
-    #FCD116 0%,
-    #FCD116 50%,
-    #003893 50%,
-    #003893 75%,
-    #CE1126 75%,
-    #CE1126 100%
+    var(--flag-yellow) 0%,
+    var(--flag-yellow) 50%,
+    var(--flag-blue) 50%,
+    var(--flag-blue) 75%,
+    var(--flag-red) 75%,
+    var(--flag-red) 100%
   );
 }
 
-/* Versión sutil con opacidad reducida para usar sobre fondos claros */
+/* Versión sutil con opacidad reducida — apta para fondos claros (no usado
+   en el tema oscuro actual, pero conservado por compatibilidad). */
 .flag-stripe-soft {
   background: linear-gradient(
     90deg,
@@ -585,7 +720,7 @@ p { color: var(--text-secondary); }
 
 @keyframes pulseGold {
   0%, 100% { box-shadow: 0 0 0 0 var(--gold-glow); }
-  50%       { box-shadow: 0 0 0 16px rgba(208, 74, 28, 0); }
+  50%       { box-shadow: 0 0 0 16px rgba(212, 175, 55, 0); }
 }
 
 @keyframes shimmer {

@@ -130,7 +130,7 @@ export default function SimulacroPage() {
   if (estado === "cargando") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#4A90D9', borderTopColor: 'transparent' }} />
+        <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--gold-500)', borderTopColor: 'transparent' }} />
         <p style={{ color: 'var(--text-secondary)' }}>Preparando tu simulacro...</p>
       </div>
     );
@@ -176,14 +176,14 @@ export default function SimulacroPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Barra de progreso */}
-      <div className="sticky top-0 backdrop-blur pt-2 pb-3 z-10" style={{ background: 'rgba(250, 247, 242, 0.95)' }}>
-        <div className="flex justify-between text-xs text-slate-400 mb-1">
+      <div className="sticky top-0 backdrop-blur pt-2 pb-3 z-10" style={{ background: 'rgba(11, 23, 51, 0.92)' }}>
+        <div className="flex justify-between text-xs mb-1">
           <span style={{ color: 'var(--text-secondary)' }}>{respondidas} / {totalPreguntas} respondidas</span>
           <span style={{ color: 'var(--text-secondary)' }}>{Math.round((respondidas / totalPreguntas) * 100)}%</span>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
           <div
-            className="h-full rounded-full transition-all duration-300" style={{ background: 'linear-gradient(90deg,#2563EB,#4A90D9)', width: `${(respondidas / totalPreguntas) * 100}%` }}
+            className="h-full rounded-full transition-all duration-300" style={{ background: 'var(--gradient-gold)', width: `${(respondidas / totalPreguntas) * 100}%` }}
           />
         </div>
       </div>

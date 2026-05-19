@@ -18,7 +18,7 @@ export function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl border-t"
       style={{
-        background: "rgba(250, 247, 242, 0.85)",
+        background: "rgba(11, 23, 51, 0.85)",
         borderColor: "var(--border-subtle)",
       }}
     >

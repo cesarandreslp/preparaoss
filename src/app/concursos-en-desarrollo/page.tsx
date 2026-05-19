@@ -104,7 +104,7 @@ export default async function ConcursosEnDesarrolloPage() {
                       {nombre}
                     </h3>
                     <span
-                      className="mt-auto pt-3 text-xs inline-flex items-center gap-1 transition-colors group-hover:text-[#D04A1C]"
+                      className="mt-auto pt-3 text-xs inline-flex items-center gap-1 transition-colors group-hover:text-[var(--gold-300)]"
                       style={{ color: "var(--text-muted)" }}
                     >
                       Ver en CNSC ↗

@@ -51,7 +51,7 @@ function RankingContent() {
       {cargando ? (
         <div className="space-y-3">
           {[...Array(10)].map((_, i) => (
-            <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'rgba(255, 255, 255, 0.40)' }} />
+            <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--bg-card)' }} />
           ))}
         </div>
       ) : ranking.length === 0 ? (
@@ -72,7 +72,7 @@ function RankingContent() {
                 className="flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all"
               style={entry.esTuyo
                 ? { background: 'rgba(37,99,235,0.18)', borderColor: 'rgba(44, 84, 122, 0.50)' }
-                : { background: 'rgba(255, 255, 255, 0.30)', borderColor: 'var(--border-default)' }}
+                : { background: 'var(--bg-card)', borderColor: 'var(--border-default)' }}
               >
                 <div className="w-8 text-center font-bold text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {medallaIcon ?? `#${entry.posicion}`}
@@ -101,7 +101,7 @@ function RankingContent() {
 
 export default function RankingPage() {
   return (
-    <Suspense fallback={<div className="text-center py-16 text-slate-400">Cargando...</div>}>
+    <Suspense fallback={<div className="text-center py-16" style={{ color: 'var(--text-muted)' }}>Cargando...</div>}>
       <RankingContent />
     </Suspense>
   );

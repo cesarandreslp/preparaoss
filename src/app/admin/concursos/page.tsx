@@ -75,29 +75,29 @@ export default function AdminConcursosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-8">
+    <div className="min-h-screen p-8" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-end justify-between mb-2 flex-wrap gap-4">
           <div>
-            <p className="text-xs uppercase tracking-widest text-gray-500">
+            <p className="text-xs uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
               Admin · CMS
             </p>
-            <h1 className="text-3xl font-bold mt-1">Concursos en desarrollo</h1>
-            <p className="text-gray-400 mt-1 text-sm">
+            <h1 className="text-3xl font-bold mt-1" style={{ color: "var(--text-primary)" }}>Concursos en desarrollo</h1>
+            <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
               {items.length} en DB. Sincronizado desde cnsc.gov.co.
             </p>
           </div>
           <div className="flex gap-3">
             <a
               href="/admin"
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition"
+              className="btn-secondary text-sm"
             >
               ← Admin
             </a>
             <button
               onClick={scrapeManual}
               disabled={scraping}
-              className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 rounded-lg text-sm font-semibold transition"
+              className="btn-primary disabled:opacity-50"
             >
               {scraping ? "Scrapeando…" : "🔄 Scrape ahora"}
             </button>
@@ -110,13 +110,13 @@ export default function AdminConcursosPage() {
           style={{
             background: "rgba(245, 166, 35, 0.10)",
             border: "1px solid rgba(245, 166, 35, 0.35)",
-            color: "#FBBF24",
+            color: "var(--warning)",
           }}
         >
           <span className="text-lg leading-none">💡</span>
           <p>
-            <strong className="text-white">Al subir una imagen custom:</strong> usa una
-            imagen de <strong className="text-white">1200×630 px (ratio 1.91:1)</strong>
+            <strong style={{ color: "var(--text-primary)" }}>Al subir una imagen custom:</strong> usa una
+            imagen de <strong style={{ color: "var(--text-primary)" }}>1200×630 px (ratio 1.91:1)</strong>
             {" "}para que calce perfecto con la grid del slider y la página de listado.
             Si la dejas vacía, se usa la auto-generada con next/og.
           </p>
@@ -125,14 +125,14 @@ export default function AdminConcursosPage() {
         {loading ? (
           <div className="space-y-3 mt-8">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-20 bg-gray-900 rounded-xl animate-pulse" />
+              <div key={i} className="h-20 rounded-xl animate-pulse" style={{ background: "var(--bg-card)" }} />
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="mt-12 text-center py-16 border border-dashed border-gray-800 rounded-2xl">
+          <div className="mt-12 text-center py-16 rounded-2xl" style={{ border: "1px dashed var(--border-default)" }}>
             <p className="text-5xl mb-3">🎯</p>
-            <p className="font-semibold">Aún no hay concursos en DB</p>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="font-semibold" style={{ color: "var(--text-primary)" }}>Aún no hay concursos en DB</p>
+            <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>
               Click en "Scrape ahora" para traerlos desde cnsc.gov.co.
             </p>
           </div>
@@ -151,10 +151,12 @@ export default function AdminConcursosPage() {
               const ordenActual =
                 e.orden !== undefined ? e.orden : c.orden;
 
+              const inputStyle = { background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" };
               return (
                 <div
                   key={c.id}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-4 grid lg:grid-cols-[120px_1fr_auto] gap-4"
+                  className="rounded-xl p-4 grid lg:grid-cols-[120px_1fr_auto] gap-4"
+                  style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
                 >
                   {/* Preview imagen */}
                   <a
@@ -166,10 +168,10 @@ export default function AdminConcursosPage() {
                     <img
                       src={imagenActual || `/api/concurso-poster/${c.slug}`}
                       alt={nombreActual}
-                      className="w-full rounded-lg border border-gray-800"
-                      style={{ aspectRatio: "1200 / 630", objectFit: "cover" }}
+                      className="w-full rounded-lg"
+                      style={{ aspectRatio: "1200 / 630", objectFit: "cover", border: "1px solid var(--border-subtle)" }}
                     />
-                    <p className="text-[10px] mt-1 text-gray-500 text-center">
+                    <p className="text-[10px] mt-1 text-center" style={{ color: "var(--text-muted)" }}>
                       {imagenActual ? "Custom" : "Auto-generada"}
                     </p>
                   </a>
@@ -177,7 +179,7 @@ export default function AdminConcursosPage() {
                   {/* Campos */}
                   <div className="space-y-2 min-w-0">
                     <div>
-                      <label className="text-[10px] uppercase tracking-wider text-gray-500">
+                      <label className="text-[10px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
                         Nombre {e.nombreOverride !== undefined || c.nombreOverride ? "(override)" : "(scraped, sin override)"}
                       </label>
                       <input
@@ -185,11 +187,12 @@ export default function AdminConcursosPage() {
                         onChange={(ev) =>
                           setField(c.id, "nombreOverride", ev.target.value || null)
                         }
-                        className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-orange-600"
+                        className="w-full rounded-md px-3 py-1.5 text-sm focus:outline-none"
+                        style={inputStyle}
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase tracking-wider text-gray-500">
+                      <label className="text-[10px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
                         URL imagen custom (vacío = auto-generada)
                       </label>
                       <input
@@ -198,10 +201,11 @@ export default function AdminConcursosPage() {
                         onChange={(ev) =>
                           setField(c.id, "imagenCustomUrl", ev.target.value || null)
                         }
-                        className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-orange-600"
+                        className="w-full rounded-md px-3 py-1.5 text-sm focus:outline-none"
+                        style={inputStyle}
                       />
                     </div>
-                    <div className="flex items-center gap-3 text-xs flex-wrap">
+                    <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: "var(--text-secondary)" }}>
                       <label className="flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="checkbox"
@@ -218,16 +222,18 @@ export default function AdminConcursosPage() {
                           onChange={(ev) =>
                             setField(c.id, "orden", parseInt(ev.target.value) || 0)
                           }
-                          className="bg-gray-800 border border-gray-700 rounded px-2 py-0.5 w-16"
+                          className="rounded px-2 py-0.5 w-16"
+                          style={inputStyle}
                         />
                       </label>
-                      <span className="text-gray-600 truncate">
+                      <span className="truncate" style={{ color: "var(--text-muted)" }}>
                         {c.slug} ·{" "}
                         <a
                           href={c.linkCnsc}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-400 hover:underline"
+                          className="hover:underline"
+                          style={{ color: "var(--accent-500)" }}
                         >
                           CNSC ↗
                         </a>
@@ -240,11 +246,8 @@ export default function AdminConcursosPage() {
                     <button
                       onClick={() => guardar(c.id)}
                       disabled={!dirty || savingId === c.id}
-                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
-                        dirty
-                          ? "bg-orange-600 hover:bg-orange-700 text-white"
-                          : "bg-gray-800 text-gray-500 cursor-not-allowed"
-                      }`}
+                      className={dirty ? "btn-primary" : "btn-secondary"}
+                      style={dirty ? undefined : { opacity: 0.6, cursor: "not-allowed" }}
                     >
                       {savingId === c.id ? "…" : dirty ? "Guardar" : "Sin cambios"}
                     </button>

@@ -60,7 +60,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
             <span
               className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-              style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
+              style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
             >
               P
             </span>
@@ -160,12 +160,12 @@ export default function LandingPage() {
           <Reveal delay={240}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               {isAuthed ? (
-                <Link href="/dashboard" className="btn-primary is-red text-base px-8 py-4">
+                <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
                   Ir al dashboard →
                 </Link>
               ) : (
                 <>
-                  <Link href="/registro" className="btn-primary is-red text-base px-8 py-4">
+                  <Link href="/registro" className="btn-primary text-base px-8 py-4">
                     Empezar gratis · 3 simulacros/mes
                   </Link>
                   <Link href="/login" className="btn-secondary text-base px-8 py-4">
@@ -355,7 +355,7 @@ export default function LandingPage() {
                 <li key={li} className="flex items-start gap-3" style={{ color: "var(--text-secondary)" }}>
                   <span
                     className="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0"
-                    style={{ background: "rgba(208, 74, 28, 0.15)", color: "var(--gold-500)" }}
+                    style={{ background: "rgba(212, 175, 55, 0.15)", color: "var(--gold-500)" }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
                       <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -653,7 +653,7 @@ export default function LandingPage() {
               <Reveal key={p.name} delay={i * 80}>
                 <div
                   className={p.highlight ? "card-glow h-full flex flex-col" : "card h-full flex flex-col"}
-                  style={p.highlight ? { background: "linear-gradient(180deg, rgba(208, 74, 28, 0.06), var(--bg-card))" } : {}}
+                  style={p.highlight ? { background: "linear-gradient(180deg, rgba(212, 175, 55, 0.06), var(--bg-card))" } : {}}
                 >
                   {p.highlight && (
                     <span className="tag tag-gold mb-4 self-start animate-pulse">✨ Más elegido</span>
@@ -756,7 +756,7 @@ export default function LandingPage() {
               className="rounded-3xl p-12 text-center relative overflow-hidden"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 0%, rgba(208, 74, 28, 0.20) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
+                  "radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.20) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
                 border: "1px solid var(--border-default)",
               }}
             >
@@ -769,11 +769,11 @@ export default function LandingPage() {
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 {isAuthed ? (
-                  <Link href="/dashboard" className="btn-primary is-red text-base px-8 py-4">
+                  <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
                     Ir al dashboard →
                   </Link>
                 ) : (
-                  <Link href="/registro" className="btn-primary is-red text-base px-8 py-4">
+                  <Link href="/registro" className="btn-primary text-base px-8 py-4">
                     Crear cuenta gratis →
                   </Link>
                 )}
@@ -787,7 +787,7 @@ export default function LandingPage() {
       <footer
         className="relative"
         style={{
-          background: "rgba(206, 17, 38, 0.10)",
+          background: "rgba(11, 23, 51, 0.55)",
           borderColor: "var(--border-subtle)",
         }}
       >
@@ -798,7 +798,7 @@ export default function LandingPage() {
             <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
               <span
                 className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-                style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
+                style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
               >
                 P
               </span>
@@ -811,25 +811,25 @@ export default function LandingPage() {
           <div>
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Producto</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
-              <li><a href="#como-funciona" className="hover:text-[#D04A1C] transition-colors">Cómo funciona</a></li>
-              <li><a href="#opecs" className="hover:text-[#D04A1C] transition-colors">OPECs activas</a></li>
-              <li><a href="#planes" className="hover:text-[#D04A1C] transition-colors">Planes</a></li>
-              <li><a href="#faq" className="hover:text-[#D04A1C] transition-colors">FAQ</a></li>
+              <li><a href="#como-funciona" className="hover:text-[#D4AF37] transition-colors">Cómo funciona</a></li>
+              <li><a href="#opecs" className="hover:text-[#D4AF37] transition-colors">OPECs activas</a></li>
+              <li><a href="#planes" className="hover:text-[#D4AF37] transition-colors">Planes</a></li>
+              <li><a href="#faq" className="hover:text-[#D4AF37] transition-colors">FAQ</a></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Cuenta</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
-              <li><Link href="/login" className="hover:text-[#D04A1C] transition-colors">Iniciar sesión</Link></li>
-              <li><Link href="/registro" className="hover:text-[#D04A1C] transition-colors">Crear cuenta</Link></li>
-              <li><Link href="/dashboard" className="hover:text-[#D04A1C] transition-colors">Mi dashboard</Link></li>
+              <li><Link href="/login" className="hover:text-[#D4AF37] transition-colors">Iniciar sesión</Link></li>
+              <li><Link href="/registro" className="hover:text-[#D4AF37] transition-colors">Crear cuenta</Link></li>
+              <li><Link href="/dashboard" className="hover:text-[#D4AF37] transition-colors">Mi dashboard</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Recursos</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
-              <li><a href="https://www.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-[#D04A1C] transition-colors">CNSC oficial ↗</a></li>
-              <li><a href="https://simo.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-[#D04A1C] transition-colors">SIMO ↗</a></li>
+              <li><a href="https://www.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">CNSC oficial ↗</a></li>
+              <li><a href="https://simo.cnsc.gov.co" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">SIMO ↗</a></li>
             </ul>
           </div>
         </div>

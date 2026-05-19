@@ -104,7 +104,7 @@ export default async function BibliotecaPage() {
                         <span className="tag tag-gold mb-3 self-start">{r.numeroNorma}</span>
                       )}
                       <h3
-                        className="font-bold leading-snug transition-colors group-hover:text-[#D04A1C]"
+                        className="font-bold leading-snug transition-colors group-hover:text-[var(--gold-300)]"
                         style={{ fontFamily: "var(--font-display)" }}
                       >
                         {r.titulo}

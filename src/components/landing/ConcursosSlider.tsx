@@ -100,7 +100,7 @@ export function ConcursosSlider() {
               />
             </div>
             <h3
-              className="mt-4 px-1 text-sm font-bold leading-snug line-clamp-2 transition-colors group-hover:text-[#D04A1C]"
+              className="mt-4 px-1 text-sm font-bold leading-snug line-clamp-2 transition-colors group-hover:text-[var(--gold-300)]"
               style={{ fontFamily: "var(--font-display)", color: "var(--text-primary)" }}
             >
               {c.nombre}

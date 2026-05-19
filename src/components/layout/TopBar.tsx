@@ -30,8 +30,8 @@ export function TopBar() {
     <header
       className="sticky top-0 z-40 backdrop-blur-xl border-b"
       style={{
-        background: "rgba(135, 206, 235, 0.65)",
-        borderColor: "rgba(0, 56, 147, 0.15)",
+        background: "rgba(11, 23, 51, 0.72)",
+        borderColor: "var(--border-subtle)",
       }}
     >
       <div className="container-app max-w-3xl flex items-center justify-between py-4">
@@ -42,7 +42,7 @@ export function TopBar() {
         >
           <span
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-            style={{ background: "var(--gradient-gold)", color: "#FFFFFF" }}
+            style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
           >
             P
           </span>
@@ -55,7 +55,7 @@ export function TopBar() {
             className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-transform hover:scale-105"
             style={{
               background: "var(--gradient-gold)",
-              color: "#FFFFFF",
+              color: "var(--btn-gold-text)",
               fontFamily: "var(--font-display)",
             }}
             aria-label="Menú de usuario"
