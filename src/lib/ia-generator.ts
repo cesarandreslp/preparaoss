@@ -148,73 +148,82 @@ export async function generarPreguntasFuncionalEspecifica(
 
   const contexto = await obtenerContextoDocumentos(opecId);
 
-  const promptBase = (i: number) => `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
+  // UN solo request al LLM devuelve los `cantidad` escenarios completos en un
+  // array. Antes hacíamos 1 request por escenario en paralelo (Promise.all),
+  // lo que saturaba el rate-limit de Gemini Flash (30 RPM). Con este patrón:
+  // 1 OPEC = 1 request, así con 1500 RPD/free-tier cabe muy fácil.
+  const prompt = `Eres un experto en diseño de pruebas para concursos de méritos del Estado colombiano (CNSC).
 
-Genera UN escenario de juicio situacional (variante #${i + 1}) para el cargo: "${opec.nombreCargo}" en "${opec.entidad}" (nivel: ${opec.nivelJerarquico}).
+Genera EXACTAMENTE ${cantidad} escenarios DISTINTOS de juicio situacional para el cargo: "${opec.nombreCargo}" en "${opec.entidad}" (nivel: ${opec.nivelJerarquico}).
 Competencias evaluadas: ${opec.competencias.join(", ")}.${bloqueContexto(contexto)}
 
-REGLAS ESTRICTAS para el escenario:
-- El escenario (párrafo situacional) debe tener MÍNIMO 10 líneas de texto, describiendo una situación laboral compleja y realista.
-- Del escenario deben desprenderse EXACTAMENTE 3 preguntas de juicio situacional.
-- Cada pregunta tiene EXACTAMENTE 3 opciones de respuesta (A, B, C).
-- Solo UNA opción es la más adecuada/correcta.
-- La explicación debe justificar PORQUÉ cada opción es correcta o incorrecta.
-- Usa lenguaje formal colombiano de entidades públicas.
+REGLAS ESTRICTAS:
+- Genera ${cantidad} escenarios cubriendo SITUACIONES y COMPETENCIAS DISTINTAS entre sí (no repetir el mismo tipo de conflicto/decisión).
+- Cada escenario (párrafo situacional) debe tener MÍNIMO 10 líneas describiendo una situación laboral compleja y realista.
+- De cada escenario deben desprenderse EXACTAMENTE 3 preguntas de juicio situacional.
+- Cada pregunta tiene EXACTAMENTE 3 opciones (A, B, C). Solo UNA es la más adecuada.
+- La explicación justifica POR QUÉ cada opción es correcta o incorrecta (mín. 50 chars).
+- Lenguaje formal colombiano de entidades públicas.
 
-Responde ÚNICAMENTE con JSON válido con esta estructura exacta:
+Responde ÚNICAMENTE con JSON válido con esta estructura exacta — un objeto con la clave "escenarios" que contiene un array de ${cantidad} elementos:
 {
-  "escenario": "texto del escenario de al menos 10 líneas...",
-  "preguntas": [
+  "escenarios": [
     {
-      "texto": "pregunta 1...",
-      "opciones": [
-        {"letra": "A", "texto": "...", "esCorrecta": false},
-        {"letra": "B", "texto": "...", "esCorrecta": true},
-        {"letra": "C", "texto": "...", "esCorrecta": false}
+      "escenario": "texto del escenario de al menos 10 líneas...",
+      "preguntas": [
+        {
+          "texto": "pregunta 1...",
+          "opciones": [
+            {"letra": "A", "texto": "...", "esCorrecta": false},
+            {"letra": "B", "texto": "...", "esCorrecta": true},
+            {"letra": "C", "texto": "...", "esCorrecta": false}
+          ],
+          "respuestaCorrecta": "B",
+          "explicacion": "La opción B es correcta porque... La A es incorrecta porque... La C es incorrecta porque..."
+        },
+        { "texto": "pregunta 2...", "opciones": [...], "respuestaCorrecta": "...", "explicacion": "..." },
+        { "texto": "pregunta 3...", "opciones": [...], "respuestaCorrecta": "...", "explicacion": "..." }
       ],
-      "respuestaCorrecta": "B",
-      "explicacion": "La opción B es correcta porque... La A es incorrecta porque... La C es incorrecta porque..."
-    },
-    { "texto": "pregunta 2...", "opciones": [...], "respuestaCorrecta": "...", "explicacion": "..." },
-    { "texto": "pregunta 3...", "opciones": [...], "respuestaCorrecta": "...", "explicacion": "..." }
-  ],
-  "categoria": "Gestión Pública",
-  "dificultad": "INTERMEDIO"
+      "categoria": "Gestión Pública",
+      "dificultad": "INTERMEDIO"
+    }
+    // ... ${cantidad - 1} más
+  ]
 }`;
 
-  // Las N iteraciones son independientes — escenarios distintos, sin
-  // referencias cruzadas. Las disparamos en paralelo.
-  await Promise.all(
-    Array.from({ length: cantidad }, async (_, i) => {
-      const { data: raw } = await llmJson<unknown>(promptBase(i), { temperature: 0.7 });
-      const parsed = PreguntaFuncEspSchema.parse(raw);
+  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7 });
+  const items = Array.isArray(raw)
+    ? raw
+    : (raw as { escenarios?: unknown[] })?.escenarios ?? [];
+  const escenarios = z.array(PreguntaFuncEspSchema).parse(items);
 
-      const escenario = await prisma.escenarioSituacional.create({
-        data: { contenido: parsed.escenario, opecId },
-      });
+  for (const parsed of escenarios) {
+    const escenario = await prisma.escenarioSituacional.create({
+      data: { contenido: parsed.escenario, opecId },
+    });
 
-      for (const p of parsed.preguntas) {
-        await prisma.pregunta.create({
-          data: {
-            tipo: "FUNCIONAL_ESPECIFICA",
-            texto: p.texto,
-            escenarioId: escenario.id,
-            opecId,
-            categoria: parsed.categoria,
-            dificultad: parsed.dificultad,
-            explicacion: p.explicacion,
-            opciones: {
-              create: p.opciones.map((o) => ({
-                letra: o.letra,
-                texto: o.texto,
-                esCorrecta: o.esCorrecta,
-              })),
-            },
+    for (const p of parsed.preguntas) {
+      await prisma.pregunta.create({
+        data: {
+          tipo: "FUNCIONAL_ESPECIFICA",
+          texto: p.texto,
+          escenarioId: escenario.id,
+          opecId,
+          validada: true,
+          categoria: parsed.categoria,
+          dificultad: parsed.dificultad,
+          explicacion: p.explicacion,
+          opciones: {
+            create: p.opciones.map((o) => ({
+              letra: o.letra,
+              texto: o.texto,
+              esCorrecta: o.esCorrecta,
+            })),
           },
-        });
-      }
-    })
-  );
+        },
+      });
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -392,22 +401,32 @@ export interface ResultadoBanco {
   comportamentales: number;
 }
 
+// Umbral de específicas validadas por OPEC para que el simulacro quede habilitado.
+export const ESPECIFICAS_OBJETIVO = 30;
+const PREGUNTAS_POR_ESCENARIO = 3;
+
 export async function generarBancoCompleto(opecId: string): Promise<ResultadoBanco> {
-  console.log(`[IA] Generando escenarios situacionales para OPEC: ${opecId}`);
+  // Calcula el déficit: cuántos escenarios faltan para llegar al objetivo.
+  // Los pools transversal y comportamental son globales — se generan una vez
+  // vía /api/admin/pools/generar y se reusan en TODAS las OPECs.
+  const validadas = await prisma.pregunta.count({
+    where: { opecId, tipo: "FUNCIONAL_ESPECIFICA", validada: true },
+  });
+
+  const faltan = Math.max(0, ESPECIFICAS_OBJETIVO - validadas);
+  if (faltan === 0) {
+    console.log(`[IA] OPEC ${opecId} ya tiene ${validadas} específicas (objetivo ${ESPECIFICAS_OBJETIVO}). Skip.`);
+    return { total: 0, escenarios: 0, transversales: 0, comportamentales: 0 };
+  }
+
+  const escenariosFaltantes = Math.ceil(faltan / PREGUNTAS_POR_ESCENARIO);
+  console.log(`[IA] OPEC ${opecId}: ${validadas} validadas, generando ${escenariosFaltantes} escenarios (un solo request al LLM)`);
 
   try {
-    // SOLO escenarios específicos del cargo. Las preguntas funcionales
-    // transversales (normatividad genérica) y las comportamentales (Likert
-    // por nivel) viven en pools globales — se generan UNA VEZ por
-    // /api/admin/pools/generar y se reusan en TODOS los simulacros.
-    // Eso reduce ~50% el costo de la generación masiva.
-    await generarPreguntasFuncionalEspecifica(opecId, 2);
-
-    const escenarios = 2;
-    const total = escenarios * 3;
-
-    console.log(`[IA] 🎉 Banco específico generado para OPEC: ${opecId} (${total} preguntas)`);
-    return { total, escenarios, transversales: 0, comportamentales: 0 };
+    await generarPreguntasFuncionalEspecifica(opecId, escenariosFaltantes);
+    const total = escenariosFaltantes * PREGUNTAS_POR_ESCENARIO;
+    console.log(`[IA] 🎉 Banco específico generado para OPEC ${opecId} (+${total} preguntas)`);
+    return { total, escenarios: escenariosFaltantes, transversales: 0, comportamentales: 0 };
   } catch (error) {
     console.error("[IA] ❌ Error generando banco:", error);
     throw error;

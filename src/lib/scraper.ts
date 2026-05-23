@@ -267,20 +267,32 @@ export async function sincronizarOpecs(): Promise<{
 // OBTENER OPECs NUEVAS QUE AÚN NO TIENEN PREGUNTAS
 // ─────────────────────────────────────────────────
 
+// Umbral de específicas validadas para considerar una OPEC "completa".
+// Debe coincidir con ESPECIFICAS_OBJETIVO en ia-generator.ts.
+const OBJETIVO_ESPECIFICAS = 30;
+
 export async function getOpecssinPreguntas(limit = 50): Promise<string[]> {
-  // Generamos preguntas para OPECs vigentes (ACTIVA o EN_PRUEBAS): los
-  // usuarios pueden estar preparándose tanto si la inscripción sigue abierta
-  // como si ya cerró pero aún no se presenta el examen.
-  const opecs = await prisma.opec.findMany({
-    where: {
-      estado: { in: ["ACTIVA", "EN_PRUEBAS"] },
-      preguntas: { none: {} },
+  // OPECs vigentes (ACTIVA o EN_PRUEBAS) con MENOS de OBJETIVO_ESPECIFICAS
+  // preguntas FUNCIONAL_ESPECIFICA validadas. Prioriza las que tienen más
+  // inscripciones activas — son las que más usuarios están esperando.
+  const candidatas = await prisma.opec.findMany({
+    where: { estado: { in: ["ACTIVA", "EN_PRUEBAS"] } },
+    select: {
+      id: true,
+      _count: {
+        select: {
+          inscripciones: true,
+          preguntas: { where: { tipo: "FUNCIONAL_ESPECIFICA", validada: true } },
+        },
+      },
     },
-    select: { id: true },
-    take: limit,
   });
 
-  return opecs.map((o) => o.id);
+  return candidatas
+    .filter((o) => o._count.preguntas < OBJETIVO_ESPECIFICAS)
+    .sort((a, b) => b._count.inscripciones - a._count.inscripciones)
+    .slice(0, limit)
+    .map((o) => o.id);
 }
 
 // ─────────────────────────────────────────────────

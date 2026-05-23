@@ -25,6 +25,28 @@ export default async function OpecDetailPage({
 
   if (!opec) notFound();
 
+  // Gate estricto: la OPEC solo expone simulacro si cumple los 3 mínimos:
+  //   - 30 funcionales específicas validadas (banco propio del cargo)
+  //   - 30 funcionales transversales validadas (pool global)
+  //   - 40 comportamentales validadas del nivel de responsabilidad correcto
+  const [especificaCount, transversalCount, comportCount] = await Promise.all([
+    prisma.pregunta.count({
+      where: { opecId: id, tipo: "FUNCIONAL_ESPECIFICA", validada: true },
+    }),
+    prisma.pregunta.count({
+      where: { poolKey: "TRANSVERSAL_GLOBAL", tipo: "FUNCIONAL_TRANSVERSAL", validada: true },
+    }),
+    prisma.pregunta.count({
+      where: {
+        poolKey: `COMPORT_NIVEL_${opec.nivelResponsabilidad ?? 3}`,
+        tipo: "COMPORTAMENTAL",
+        validada: true,
+      },
+    }),
+  ]);
+  const simulacroDisponible =
+    especificaCount >= 30 && transversalCount >= 30 && comportCount >= 40;
+
   const inscripcion = await prisma.userOpec.findUnique({
     where: { userId_opecId: { userId, opecId: id } },
   });
@@ -204,7 +226,7 @@ export default async function OpecDetailPage({
       {/* CTA sticky */}
       <OpecCTA
         opecId={id}
-        tienePreguntas={opec._count.preguntas >= 10}
+        tienePreguntas={simulacroDisponible}
         inscrito={inscrito}
       />
     </div>

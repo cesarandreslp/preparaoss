@@ -51,21 +51,23 @@ export async function armarSimulacro(
   });
   const nivelOpec = opec?.nivelResponsabilidad ?? 3;
 
-  // ── Composición para MIXTO: 60% conocimiento (transversal + específica) /
-  //    40% comportamental (Likert por nivel del cargo) ──
-  // Distribuye así para maxPreguntas: comp = 40%, escenarios ≈ 20% (en chunks
-  // de 3 preguntas), transversal = lo que queda para completar el 60%.
-  const cuotaComport = tipoSimulacro === "MIXTO" ? Math.round(maxPreguntas * 0.4) : 0;
-  const cuotaEscenarios = tipoSimulacro === "MIXTO"
-    ? Math.max(1, Math.floor((maxPreguntas * 0.2) / 3))
-    : 0; // ya se calcula abajo para tipoSimulacro != MIXTO
+  // ── Composición MIXTO: 30% específica + 30% transversal + 40% comportamental ──
+  // Si la OPEC no tiene banco de específicas validadas, ese 30% se reasigna a
+  // transversales (queda 60% transversal + 40% comportamental).
+  let cuotaEspecifica = 0;
+  let cuotaTransversal = 0;
+  let cuotaComport = 0;
+  if (tipoSimulacro === "MIXTO") {
+    cuotaEspecifica = Math.round(maxPreguntas * 0.3);
+    cuotaTransversal = Math.round(maxPreguntas * 0.3);
+    cuotaComport = maxPreguntas - cuotaEspecifica - cuotaTransversal;
+  }
 
   // ── FUNCIONAL ESPECÍFICA (por escenarios, 3 preguntas c/u) ──
   // Únicas atadas al cargo concreto — generadas por OPEC.
   if (tiposAIncluir.includes("FUNCIONAL_ESPECIFICA") && preguntasRestantes > 0) {
-    const numEscenarios = tipoSimulacro === "MIXTO"
-      ? cuotaEscenarios
-      : Math.ceil(maxPreguntas / 3);
+    const objetivo = tipoSimulacro === "MIXTO" ? cuotaEspecifica : maxPreguntas;
+    const numEscenarios = Math.ceil(objetivo / 3);
 
     const escenariosDB = await prisma.escenarioSituacional.findMany({
       where: {
@@ -91,16 +93,15 @@ export async function armarSimulacro(
         contenido: esc.contenido,
         preguntas: esc.preguntas.slice(0, 3).map(mapPregunta),
       });
-      preguntasRestantes -= 3;
+      preguntasRestantes -= Math.min(3, esc.preguntas.length);
     }
   }
 
   // ── FUNCIONAL TRANSVERSAL (preguntas individuales con 4 opciones) ──
   // Pool global compartido entre todas las OPECs — normatividad/gestión pública.
-  // En MIXTO: lo que sobra del 60% knowledge tras los escenarios.
   if (tiposAIncluir.includes("FUNCIONAL_TRANSVERSAL") && preguntasRestantes > 0) {
     const cantidad = tipoSimulacro === "MIXTO"
-      ? Math.max(0, preguntasRestantes - cuotaComport)
+      ? Math.min(preguntasRestantes, cuotaTransversal)
       : preguntasRestantes;
 
     const preguntas = await prisma.pregunta.findMany({
