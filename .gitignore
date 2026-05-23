@@ -53,3 +53,16 @@ scripts/*.png
 
 .vercel
 .env*.local
+
+# claude code local config
+.claude/
+
+# carpeta de experimentos / scratch (no se versiona)
+scratch/
+
+# dumps temporales del scraper / batches a procesar
+/batch_*.json
+/batch_to_*.json
+/clean_opecs.json
+/next_*.json
+/opecs_*.json
