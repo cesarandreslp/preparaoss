@@ -158,7 +158,7 @@ export default function LandingPage() {
               ) : (
                 <>
                   <Link href="/registro" className="btn-primary text-base px-8 py-4">
-                    Empezar gratis · 3 simulacros/mes
+                    Empezar gratis · sin tarjeta
                   </Link>
                   <Link href="/login" className="btn-secondary text-base px-8 py-4">
                     Ya tengo cuenta
@@ -605,47 +605,39 @@ export default function LandingPage() {
               <span className="text-gradient-gold">Resultados máximos</span>.
             </h2>
             <p className="mt-6 text-lg max-w-2xl" style={{ color: "var(--text-secondary)" }}>
-              Empieza gratis. Sube de plan cuando estés listo. Cancela cuando quieras.
+              Practica gratis con el manual general del funcionario. Cuando quieras las
+              preguntas específicas de tu cargo, pagas por evento — sin suscripciones.
             </p>
           </Reveal>
 
-          <div className="mt-16 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="mt-16 grid md:grid-cols-3 gap-5 max-w-5xl">
             {[
               {
-                name: "Gratuito",
+                name: "Gratis",
                 price: "$0",
-                period: "para siempre",
-                features: ["3 simulacros/mes", "10 preguntas por simulacro", "1 OPEC inscrita", "Ranking básico"],
-                cta: "Empezar",
+                period: "para probar",
+                features: ["Simulacros con el manual general del funcionario", "Transversales + comportamentales", "3 gratis por cada OPEC", "Sin tarjeta"],
+                cta: "Empezar gratis",
                 href: "/registro",
                 highlight: false,
               },
               {
-                name: "Básico",
-                price: "$15.000",
-                period: "/mes",
-                features: ["10 simulacros/mes", "20 preguntas", "3 OPECs inscritas", "Estadísticas detalladas"],
-                cta: "Suscribirme",
+                name: "Pase diario",
+                price: "$6.000",
+                period: "por simulacro",
+                features: ["Un simulacro completo de tu OPEC", "Incluye las preguntas de tu cargo", "Válido 24 horas", "Perfecto para foguearte"],
+                cta: "Registrarme",
                 href: "/registro",
                 highlight: false,
               },
               {
-                name: "Pro",
-                price: "$35.000",
-                period: "/mes",
-                features: ["Simulacros ilimitados", "40 preguntas", "OPECs ilimitadas", "Rankings avanzados", "Modo carrera"],
-                cta: "Más popular",
+                name: "Hasta el examen",
+                price: "$49.900",
+                period: "pago único",
+                features: ["Práctica ILIMITADA de tu OPEC", "Hasta el día del examen", "Todas las preguntas de tu cargo", "El menor costo por día de estudio"],
+                cta: "Registrarme",
                 href: "/registro",
                 highlight: true,
-              },
-              {
-                name: "Premium",
-                price: "$60.000",
-                period: "/mes",
-                features: ["Todo lo del Pro", "60 preguntas", "Tutor IA personalizado", "Análisis de debilidades", "Plan de estudio semanal"],
-                cta: "Suscribirme",
-                href: "/registro",
-                highlight: false,
               },
             ].map((p, i) => (
               <Reveal key={p.name} delay={i * 80}>
@@ -724,16 +716,16 @@ export default function LandingPage() {
                     a: "No, eso es imposible — las preguntas reales son secretas hasta el día del examen. Lo que hacemos es entrenarte con preguntas en el formato exacto, dificultad calibrada por nivel y temas alineados con el manual oficial.",
                   },
                   {
-                    q: "¿Cuántas OPECs puedo seguir simultáneamente?",
-                    a: "En el plan gratuito, 1. Plan Básico: 3. Pro y Premium: ilimitadas. Cada OPEC genera su propio banco de preguntas y rankings independientes.",
+                    q: "¿Cómo se paga? ¿Hay suscripción?",
+                    a: "No hay suscripción. Practicas gratis con el manual general del funcionario (preguntas transversales y comportamentales). Para las preguntas específicas de tu cargo, pagas por evento: un pase diario de $6.000 (un simulacro completo válido 24h) o el desbloqueo por $49.900 con práctica ilimitada hasta el día del examen. Pago único, sin mensualidades.",
                   },
                   {
                     q: "¿Funciona desde el celular?",
                     a: "Sí — la app es PWA (puedes instalarla como app nativa desde el navegador). Está optimizada para celular: simulacros en vertical, una pregunta a la vez, y guarda tu progreso si pierdes la conexión.",
                   },
                   {
-                    q: "¿Qué pasa si cancelo el plan?",
-                    a: "Mantienes tu progreso, racha y XP. Vuelves al plan gratuito (3 simulacros/mes, 1 OPEC) sin perder nada. Puedes reactivar cuando quieras.",
+                    q: "¿Puedo practicar sin pagar?",
+                    a: "Sí. Con tu cuenta gratis practicas simulacros del manual general del funcionario (preguntas transversales y comportamentales) para cualquier OPEC. Las preguntas específicas de tu cargo se desbloquean con el pase diario ($6.000) o el pago por evento ($49.900).",
                   },
                   {
                     q: "¿Cómo se actualiza la información de las OPECs?",
