@@ -56,14 +56,20 @@ export default function OpecsPage() {
         <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
           {total.toLocaleString("es-CO")} OPECs disponibles · sincronizadas a diario
         </p>
-        <a
-          href="/opecs/cargar"
-          className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium"
-          style={{ color: "#4A90D9" }}
-        >
-          ¿No encuentras tu OPEC? Cárgala tú mismo →
-        </a>
       </div>
+
+      {/* Botón flotante: cargar OPEC — siempre visible, sin scroll.
+          bottom alto en móvil para no chocar con la BottomNav. */}
+      <a
+        href="/opecs/cargar"
+        className="fixed right-4 md:right-8 bottom-24 md:bottom-8 z-40 inline-flex items-center gap-2 px-5 py-3 rounded-full shadow-lg font-semibold text-sm transition-transform hover:scale-105"
+        style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+        </svg>
+        Cargar mi OPEC
+      </a>
 
       {/* Búsqueda */}
       <div className="relative">
