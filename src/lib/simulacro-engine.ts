@@ -51,7 +51,10 @@ export async function armarSimulacro(
   opecId: string,
   tipoSimulacro: TipoSimulacro,
   maxPreguntas: number,
-  userId?: string
+  userId?: string,
+  // Trial (no pagado) = solo pools globales (transversal + comportamental),
+  // "manual general del funcionario". Las específicas del cargo son de pago.
+  incluirEspecifica: boolean = true
 ): Promise<{
   escenarios: {
     id: string;
@@ -64,7 +67,9 @@ export async function armarSimulacro(
   const preguntasIndividuales: PreguntaConOpciones[] = [];
 
   const tiposAIncluir: TipoPregunta[] = tipoSimulacro === "MIXTO"
-    ? ["FUNCIONAL_ESPECIFICA", "FUNCIONAL_TRANSVERSAL", "COMPORTAMENTAL"]
+    ? (incluirEspecifica
+        ? ["FUNCIONAL_ESPECIFICA", "FUNCIONAL_TRANSVERSAL", "COMPORTAMENTAL"]
+        : ["FUNCIONAL_TRANSVERSAL", "COMPORTAMENTAL"])
     : [tipoSimulacro as TipoPregunta];
 
   let preguntasRestantes = maxPreguntas;
@@ -96,8 +101,9 @@ export async function armarSimulacro(
   let cuotaTransversal = 0;
   let cuotaComport = 0;
   if (tipoSimulacro === "MIXTO") {
-    cuotaEspecifica = Math.round(maxPreguntas * 0.3);
-    cuotaTransversal = Math.round(maxPreguntas * 0.3);
+    // Con específicas: 30/30/40. Sin específicas (trial): 60 transversal / 40 comport.
+    cuotaEspecifica = incluirEspecifica ? Math.round(maxPreguntas * 0.3) : 0;
+    cuotaTransversal = Math.round(maxPreguntas * (incluirEspecifica ? 0.3 : 0.6));
     cuotaComport = maxPreguntas - cuotaEspecifica - cuotaTransversal;
   }
 

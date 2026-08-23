@@ -34,11 +34,14 @@ export async function POST(request: Request) {
   const maxPreguntas = acceso.maxPreguntas;
 
   // Armar el banco de preguntas
+  // Trial (no pagado) = solo pools globales (transversal + comportamental).
+  // Las específicas del cargo se desbloquean al pagar.
   const { escenarios, preguntasIndividuales } = await armarSimulacro(
     opecId,
     tipoSimulacro,
     maxPreguntas,
-    userId
+    userId,
+    acceso.pagado
   );
 
   if (escenarios.length === 0 && preguntasIndividuales.length === 0) {
