@@ -35,7 +35,6 @@ export const authConfig = {
         path.startsWith("/ranking") ||
         path.startsWith("/suscripcion") ||
         path.startsWith("/api/simulacros") ||
-        path.startsWith("/api/opecs") ||
         path.startsWith("/api/ranking") ||
         path.startsWith("/api/usuarios");
 
