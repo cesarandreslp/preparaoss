@@ -36,6 +36,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  const montoCop = tx.amount_in_cents ? Math.round(tx.amount_in_cents / 100) : null;
+
+  if (ref.tipo === "diario") {
+    // Pase diario: UN simulacro válido 24h. Idempotente por referenciaPago.
+    const existe = await prisma.paseDiario.findUnique({
+      where: { referenciaPago: tx.reference },
+      select: { id: true },
+    });
+    if (!existe) {
+      await prisma.paseDiario.create({
+        data: {
+          userId: ref.userId,
+          opecId: ref.opecId,
+          referenciaPago: tx.reference,
+          montoCop,
+          venceAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+    return NextResponse.json({ ok: true });
+  }
+
+  // Pase evento: acceso ilimitado hasta el examen (+gracia).
   const opec = await prisma.opec.findUnique({
     where: { id: ref.opecId },
     select: { fechaExamen: true },
@@ -43,7 +66,6 @@ export async function POST(request: Request) {
   const accesoHasta = opec?.fechaExamen
     ? new Date(opec.fechaExamen.getTime() + DIAS_GRACIA * 86_400_000)
     : null;
-  const montoCop = tx.amount_in_cents ? Math.round(tx.amount_in_cents / 100) : null;
 
   // Upsert: el usuario puede no estar inscrito aún. Idempotente ante reintentos.
   await prisma.userOpec.upsert({

@@ -65,6 +65,16 @@ export async function POST(request: Request) {
     select: { id: true, iniciadoAt: true },
   });
 
+  // Si el acceso vino de un pase diario, lo consumimos atándolo a este
+  // simulacro (así el pase no puede iniciar un segundo).
+  // ponytail: updateMany con guard simulacroId:null evita doble consumo en carrera.
+  if (acceso.modo === "diario" && acceso.paseDiarioId) {
+    await prisma.paseDiario.updateMany({
+      where: { id: acceso.paseDiarioId, simulacroId: null },
+      data: { simulacroId: simulacro.id },
+    });
+  }
+
   // Incrementar contador mensual
   await prisma.userProfile.update({
     where: { id: userId },
@@ -75,6 +85,7 @@ export async function POST(request: Request) {
     simulacroId: simulacro.id,
     iniciadoAt: simulacro.iniciadoAt,
     pagado: acceso.pagado,
+    modo: acceso.modo,
     simulacrosFreeRestantes: acceso.simulacrosFreeRestantes,
     escenarios,        // Escenarios de juicio situacional
     preguntas: preguntasIndividuales, // Transversales + Comportamentales

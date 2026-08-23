@@ -11,9 +11,10 @@ interface Props {
   inscrito: boolean;
   accesoPagado: boolean;
   precioCop: number;
+  precioDiarioCop: number;
 }
 
-export function OpecCTA({ opecId, tienePreguntas, inscrito, accesoPagado, precioCop }: Props) {
+export function OpecCTA({ opecId, tienePreguntas, inscrito, accesoPagado, precioCop, precioDiarioCop }: Props) {
   const router = useRouter();
   const [cargando, setCargando] = useState(false);
 
@@ -42,7 +43,7 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito, accesoPagado, precio
               ✓ Acceso ilimitado activo hasta el examen
             </div>
           ) : (
-            <DesbloquearOpec opecId={opecId} precioCop={precioCop} />
+            <DesbloquearOpec opecId={opecId} precioCop={precioCop} precioDiarioCop={precioDiarioCop} />
           )}
         </>
       ) : (

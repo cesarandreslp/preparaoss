@@ -7,7 +7,13 @@ import { createHash, randomBytes } from "crypto";
 // ─────────────────────────────────────────────────────────────
 
 export const PRECIO_OPEC_COP = Number(process.env.PRECIO_OPEC_COP ?? 49900);
+export const PRECIO_DIARIO_COP = Number(process.env.PRECIO_DIARIO_COP ?? 6000);
 export const CURRENCY = "COP";
+
+export type TipoPase = "evento" | "diario";
+export function precioDe(tipo: TipoPase): number {
+  return tipo === "diario" ? PRECIO_DIARIO_COP : PRECIO_OPEC_COP;
+}
 const CHECKOUT_URL = "https://checkout.wompi.co/p/";
 const REF_PREFIJO = "POSS";
 
@@ -17,19 +23,32 @@ function env(name: string): string {
   return v;
 }
 
-// reference = POSS-<opecId>-<userId>-<nonce>. opecId/userId son cuid (sin
-// guiones), así el guion es delimitador seguro. La firma de integridad impide
-// alterar el monto; el checksum del webhook prueba que el evento es de Wompi.
-export function nuevaReferencia(opecId: string, userId: string): string {
-  return `${REF_PREFIJO}-${opecId}-${userId}-${randomBytes(6).toString("hex")}`;
+// reference = POSS-<tipo>-<opecId>-<userId>-<nonce>. opecId/userId son cuid
+// (sin guiones) y tipo/nonce tampoco, así el guion es delimitador seguro. La
+// firma de integridad impide alterar el monto; el checksum del webhook prueba
+// que el evento es de Wompi.
+export function nuevaReferencia(
+  opecId: string,
+  userId: string,
+  tipo: TipoPase
+): string {
+  return `${REF_PREFIJO}-${tipo}-${opecId}-${userId}-${randomBytes(6).toString("hex")}`;
 }
 
 export function parseReferencia(
   ref: string
-): { opecId: string; userId: string } | null {
+): { tipo: TipoPase; opecId: string; userId: string } | null {
   const p = ref.split("-");
-  if (p.length !== 4 || p[0] !== REF_PREFIJO) return null;
-  return { opecId: p[1], userId: p[2] };
+  if (p[0] !== REF_PREFIJO) return null;
+  // Nuevo formato: POSS-<tipo>-<opecId>-<userId>-<nonce>
+  if (p.length === 5 && (p[1] === "evento" || p[1] === "diario")) {
+    return { tipo: p[1] as TipoPase, opecId: p[2], userId: p[3] };
+  }
+  // Compat: formato viejo POSS-<opecId>-<userId>-<nonce> (siempre evento)
+  if (p.length === 4) {
+    return { tipo: "evento", opecId: p[1], userId: p[2] };
+  }
+  return null;
 }
 
 // SHA256(reference + amountInCents + currency + integritySecret)

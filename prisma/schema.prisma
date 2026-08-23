@@ -602,3 +602,22 @@ model Lead {
   @@index([source, createdAt])
   @@index([convertido])
 }
+
+// ─────────────────────────────────────────────────────────────
+// Pase diario ($6.000): compra UN simulacro válido 24h, retomable,
+// con retroalimentación solo al final. Incluye específicas (es pago).
+// Es el tier de enganche barato que empuja al plan por evento.
+// ─────────────────────────────────────────────────────────────
+model PaseDiario {
+  id             String   @id @default(cuid())
+  userId         String
+  opecId         String
+  referenciaPago String?  @unique // referencia Wompi del pago
+  montoCop       Int?
+  compradoAt     DateTime @default(now())
+  venceAt        DateTime           // compradoAt + 24h
+  // Simulacro que consumió el pase. null = aún no ha iniciado su simulacro.
+  simulacroId    String?  @unique
+
+  @@index([userId, opecId])
+}

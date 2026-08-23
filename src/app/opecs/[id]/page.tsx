@@ -230,6 +230,7 @@ export default async function OpecDetailPage({
         inscrito={inscrito}
         accesoPagado={!!inscripcion?.accesoPagado}
         precioCop={Number(process.env.PRECIO_OPEC_COP ?? 49900)}
+        precioDiarioCop={Number(process.env.PRECIO_DIARIO_COP ?? 6000)}
       />
     </div>
   );
