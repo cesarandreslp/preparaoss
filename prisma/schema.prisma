@@ -257,6 +257,14 @@ model UserOpec {
   inscritoAt  DateTime    @default(now())
   fechaExamen DateTime?   // copia de opec.fechaExamen para plan de estudio
 
+  // ── Acceso pagado por evento (pago único) ──
+  // false = seguidor gratis (trial). true = desbloqueó práctica ilimitada de
+  // esta OPEC hasta accesoHasta (día del examen + gracia).
+  accesoPagado   Boolean   @default(false)
+  accesoHasta    DateTime?
+  referenciaPago String?   // referencia Wompi/Bold del pago
+  montoCop       Int?
+
   @@unique([userId, opecId])
   @@index([userId])
 }
@@ -570,4 +578,27 @@ model OpecEspecial {
 
   @@unique([entidadId, externalId])
   @@index([entidadId, esActiva])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Captación (embudo top-of-funnel). Un Lead es un correo capturado
+// por el "Probador de OPEC" público ANTES de crear cuenta. Es el
+// activo central del plan de crecimiento: la lista propia de correos.
+// ─────────────────────────────────────────────────────────────
+model Lead {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  // OPEC de interés declarada al probar (puede ser null si entró por otro imán)
+  opecId    String?
+  // De dónde vino: "probador", "landing", "grupo-fb", "telegram", etc.
+  source    String   @default("probador")
+  // Resultado del mini-simulacro (aciertos/total) — señal de intención de compra
+  score     Int?
+  // Ya se convirtió en UserProfile registrado
+  convertido Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([source, createdAt])
+  @@index([convertido])
 }

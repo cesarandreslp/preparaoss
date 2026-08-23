@@ -22,10 +22,36 @@ export const PREGUNTAS_POR_PLAN = {
 // Selecciona preguntas aleatorieas según el tipo
 // ─────────────────────────────────────────────────
 
+// Baraja sin sesgo posicional (Math.random()-0.5 en sort es sesgado).
+function barajar<T>(a: T[]): T[] {
+  const r = [...a];
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+
+// Prioriza lo que el usuario NO ha visto; solo repite si el pool no alcanza.
+// Este es el corazón de la frescura: con pago por evento y acceso ilimitado,
+// el aspirante practica muchas veces y no debe toparse con las mismas.
+function elegirNoVistasPrimero<T>(
+  candidatos: T[],
+  n: number,
+  esVista: (t: T) => boolean
+): T[] {
+  const noVistas = barajar(candidatos.filter((c) => !esVista(c)));
+  if (noVistas.length >= n) return noVistas.slice(0, n);
+  // ponytail: cuando se agota lo no visto, rellena repitiendo. La solución de
+  // fondo (que el pool crezca) es el cron de generación, no este muestreo.
+  return [...noVistas, ...barajar(candidatos.filter(esVista))].slice(0, n);
+}
+
 export async function armarSimulacro(
   opecId: string,
   tipoSimulacro: TipoSimulacro,
-  maxPreguntas: number
+  maxPreguntas: number,
+  userId?: string
 ): Promise<{
   escenarios: {
     id: string;
@@ -50,6 +76,18 @@ export async function armarSimulacro(
     select: { nivelResponsabilidad: true },
   });
   const nivelOpec = opec?.nivelResponsabilidad ?? 3;
+
+  // Preguntas que este usuario ya respondió (en cualquier simulacro previo).
+  // Una sola consulta; se usa para no repetir.
+  const vistas = new Set<string>();
+  if (userId) {
+    const previas = await prisma.respuestaUsuario.findMany({
+      where: { simulacro: { userId } },
+      select: { preguntaId: true },
+      distinct: ["preguntaId"],
+    });
+    for (const p of previas) vistas.add(p.preguntaId);
+  }
 
   // ── Composición MIXTO: 30% específica + 30% transversal + 40% comportamental ──
   // Si la OPEC no tiene banco de específicas validadas, ese 30% se reasigna a
@@ -84,7 +122,11 @@ export async function armarSimulacro(
       orderBy: { createdAt: "desc" },
     });
 
-    const mezclados = escenariosDB.sort(() => Math.random() - 0.5).slice(0, numEscenarios);
+    const mezclados = elegirNoVistasPrimero(
+      escenariosDB,
+      numEscenarios,
+      (e) => e.preguntas.some((p) => vistas.has(p.id))
+    );
 
     for (const esc of mezclados) {
       if (preguntasRestantes <= 0) break;
@@ -109,7 +151,7 @@ export async function armarSimulacro(
       include: { opciones: true },
     });
 
-    const seleccionadas = preguntas.sort(() => Math.random() - 0.5).slice(0, cantidad);
+    const seleccionadas = elegirNoVistasPrimero(preguntas, cantidad, (p) => vistas.has(p.id));
     preguntasIndividuales.push(...seleccionadas.map(mapPregunta));
     preguntasRestantes -= seleccionadas.length;
   }
@@ -126,7 +168,7 @@ export async function armarSimulacro(
       include: { opciones: true },
     });
 
-    const seleccionadas = preguntas.sort(() => Math.random() - 0.5).slice(0, preguntasRestantes);
+    const seleccionadas = elegirNoVistasPrimero(preguntas, preguntasRestantes, (p) => vistas.has(p.id));
     preguntasIndividuales.push(...seleccionadas.map(mapPregunta));
   }
 

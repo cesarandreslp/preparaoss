@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { armarSimulacro, PREGUNTAS_POR_PLAN } from "@/lib/simulacro-engine";
-import { verificarLimiteSimulacro } from "@/lib/gamification";
+import { armarSimulacro } from "@/lib/simulacro-engine";
+import { verificarAccesoOpec } from "@/lib/acceso";
 import { TipoSimulacro } from "@prisma/client";
 
 // POST /api/simulacros — Crear nuevo simulacro
@@ -21,26 +21,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "opecId es requerido" }, { status: 400 });
   }
 
-  // Verificar límite de suscripción
-  const limite = await verificarLimiteSimulacro(userId);
-  if (!limite.permitido) {
-    return NextResponse.json({ error: limite.razon }, { status: 403 });
+  // Gate por evento: ¿pagó esta OPEC, o le quedan simulacros gratis?
+  const acceso = await verificarAccesoOpec(userId, opecId);
+  if (!acceso.permitido) {
+    // 402 Payment Required: la UI muestra el paywall de la OPEC.
+    return NextResponse.json(
+      { error: acceso.razon, requierePago: true, opecId },
+      { status: 402 }
+    );
   }
 
-  // Obtener el plan del usuario para saber cuántas preguntas puede ver
-  const user = await prisma.userProfile.findUnique({
-    where: { id: userId },
-    select: { suscripcion: { select: { plan: true, preguntasPorSimulacro: true } } },
-  });
-
-  const maxPreguntas =
-    user?.suscripcion?.preguntasPorSimulacro ?? PREGUNTAS_POR_PLAN.GRATUITO;
+  const maxPreguntas = acceso.maxPreguntas;
 
   // Armar el banco de preguntas
   const { escenarios, preguntasIndividuales } = await armarSimulacro(
     opecId,
     tipoSimulacro,
-    maxPreguntas
+    maxPreguntas,
+    userId
   );
 
   if (escenarios.length === 0 && preguntasIndividuales.length === 0) {
@@ -73,6 +71,8 @@ export async function POST(request: Request) {
   return NextResponse.json({
     simulacroId: simulacro.id,
     iniciadoAt: simulacro.iniciadoAt,
+    pagado: acceso.pagado,
+    simulacrosFreeRestantes: acceso.simulacrosFreeRestantes,
     escenarios,        // Escenarios de juicio situacional
     preguntas: preguntasIndividuales, // Transversales + Comportamentales
     totalPreguntas:

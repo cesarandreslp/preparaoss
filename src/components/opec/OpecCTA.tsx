@@ -3,14 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { DesbloquearOpec } from "./DesbloquearOpec";
 
 interface Props {
   opecId: string;
   tienePreguntas: boolean;
   inscrito: boolean;
+  accesoPagado: boolean;
+  precioCop: number;
 }
 
-export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
+export function OpecCTA({ opecId, tienePreguntas, inscrito, accesoPagado, precioCop }: Props) {
   const router = useRouter();
   const [cargando, setCargando] = useState(false);
 
@@ -24,12 +27,24 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito }: Props) {
   return (
     <div className="space-y-3 pb-4">
       {tienePreguntas ? (
-        <Link
-          href={`/opecs/${opecId}/simulacro`}
-          className="btn-primary block w-full text-center px-6 py-4 text-lg rounded-2xl"
-        >
-          🚀 Iniciar simulacro
-        </Link>
+        <>
+          <Link
+            href={`/opecs/${opecId}/simulacro`}
+            className="btn-primary block w-full text-center px-6 py-4 text-lg rounded-2xl"
+          >
+            🚀 Iniciar simulacro
+          </Link>
+          {accesoPagado ? (
+            <div
+              className="w-full px-6 py-3 rounded-2xl text-center text-sm font-medium"
+              style={{ background: "rgba(39,174,96,0.12)", color: "var(--success)", border: "1px solid rgba(39,174,96,0.30)" }}
+            >
+              ✓ Acceso ilimitado activo hasta el examen
+            </div>
+          ) : (
+            <DesbloquearOpec opecId={opecId} precioCop={precioCop} />
+          )}
+        </>
       ) : (
         <div
           className="w-full px-6 py-4 rounded-2xl text-center"

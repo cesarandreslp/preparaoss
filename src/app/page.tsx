@@ -7,6 +7,7 @@ import { Reveal } from "@/components/landing/Reveal";
 import { Counter } from "@/components/landing/Counter";
 import { FAQ } from "@/components/landing/FAQ";
 import { ConcursosSlider } from "@/components/landing/ConcursosSlider";
+import { ProbadorHero } from "@/components/landing/ProbadorHero";
 
 export default function LandingPage() {
   const { status } = useSession();
@@ -133,6 +134,8 @@ export default function LandingPage() {
       {/* ─── HERO ─── */}
       <section className="relative pt-40 pb-32">
         <div className="container-app relative">
+         <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
           <Reveal>
             <span className="eyebrow">Concursos de méritos · CNSC</span>
           </Reveal>
@@ -171,6 +174,12 @@ export default function LandingPage() {
               Sin tarjeta de crédito · Datos directos de SIMO-CNSC · Cancela cuando quieras
             </p>
           </Reveal>
+          </div>
+
+          <Reveal delay={240}>
+            <ProbadorHero />
+          </Reveal>
+         </div>
 
           {/* Stats row */}
           <Reveal delay={480}>
