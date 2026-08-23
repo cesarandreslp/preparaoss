@@ -44,8 +44,11 @@ export default async function OpecDetailPage({
       },
     }),
   ]);
-  const simulacroDisponible =
-    especificaCount >= 30 && transversalCount >= 30 && comportCount >= 40;
+  // El trial usa solo pools globales (transversal + comportamental), así que el
+  // simulacro está disponible apenas esos pools existan — aunque las específicas
+  // del cargo aún se estén generando (caso OPEC recién cargada por el usuario).
+  const simulacroDisponible = transversalCount >= 30 && comportCount >= 40;
+  void especificaCount; // se conserva por si se quiere mostrar estado del banco
 
   const inscripcion = await prisma.userOpec.findUnique({
     where: { userId_opecId: { userId, opecId: id } },

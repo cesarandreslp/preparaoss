@@ -17,6 +17,8 @@ export async function GET(request: Request) {
   const soloAbiertas = searchParams.get("soloAbiertas") === "1";
   const where: Record<string, unknown> = {
     estado: soloAbiertas ? "ACTIVA" : { in: ["ACTIVA", "EN_PRUEBAS"] },
+    // Las OPECs cargadas por un usuario son privadas: no salen en el buscador.
+    creadoPorUserId: null,
   };
   if (departamento) where.departamento = departamento;
   if (entidad) where.entidad = { contains: entidad, mode: "insensitive" };

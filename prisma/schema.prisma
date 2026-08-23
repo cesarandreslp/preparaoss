@@ -115,6 +115,10 @@ model Opec {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
+  // Si la cargó un usuario (no viene de SIMO): su userId. null = OPEC de SIMO.
+  // Las cargadas por usuario son privadas: no aparecen en el listado público.
+  creadoPorUserId  String?
+
   escenarios       EscenarioSituacional[]
   preguntas        Pregunta[]
   simulacros       Simulacro[]
@@ -124,6 +128,7 @@ model Opec {
 
   @@index([estado, departamento])
   @@index([entidad])
+  @@index([creadoPorUserId])
 }
 
 // ─────────────────────────────────────────────────────────

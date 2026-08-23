@@ -56,6 +56,13 @@ export default function OpecsPage() {
         <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
           {total.toLocaleString("es-CO")} OPECs disponibles · sincronizadas a diario
         </p>
+        <a
+          href="/opecs/cargar"
+          className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium"
+          style={{ color: "#4A90D9" }}
+        >
+          ¿No encuentras tu OPEC? Cárgala tú mismo →
+        </a>
       </div>
 
       {/* Búsqueda */}
