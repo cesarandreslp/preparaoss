@@ -53,7 +53,7 @@ export default function LandingPage() {
             <img
               src="/logo-lockup.png"
               alt="PreparaOSS"
-              className="h-12 w-auto"
+              className="h-14 w-auto"
             />
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -668,7 +668,7 @@ export default function LandingPage() {
               <img
                 src="/logo-lockup.png"
                 alt="PreparaOSS"
-                className="h-14 w-auto"
+                className="h-16 w-auto"
               />
             </Link>
             <p className="mt-4 text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
