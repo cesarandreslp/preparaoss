@@ -11,3 +11,7 @@ REM Concursos en desarrollo (CNSC) — mismo bloqueo de IP en Vercel.
 echo [%date% %time%] Iniciando scraper CNSC en-desarrollo >> "C:\projects\preparaoss\scraper.log"
 call npx ts-node --transpile-only --project tsconfig.scripts.json scripts/scrape-cnsc.ts >> "C:\projects\preparaoss\scraper.log" 2>&1
 echo [%date% %time%] Fin scraper CNSC (exit %errorlevel%) >> "C:\projects\preparaoss\scraper.log"
+REM Entidades especiales (Procuraduria, etc.) — mismo bloqueo de IP en Vercel.
+echo [%date% %time%] Iniciando scraper entidades especiales >> "C:\projects\preparaoss\scraper.log"
+call npx ts-node --transpile-only --project tsconfig.scripts.json scripts/scrape-entidades.ts >> "C:\projects\preparaoss\scraper.log" 2>&1
+echo [%date% %time%] Fin scraper entidades (exit %errorlevel%) >> "C:\projects\preparaoss\scraper.log"
