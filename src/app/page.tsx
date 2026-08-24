@@ -49,11 +49,11 @@ export default function LandingPage() {
         }}
       >
         <div className="container-app flex items-center justify-between py-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
+          <Link href="/" className="flex items-center gap-2 font-bold text-lg shrink-0" style={{ fontFamily: "var(--font-display)" }}>
             <img
               src="/logo-lockup.png"
               alt="PreparaOSS"
-              className="h-14 w-auto"
+              className="h-12 md:h-14 w-auto max-w-none"
             />
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -65,11 +65,11 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-3">
             {isAuthed ? (
-              <Link href="/dashboard" className="btn-primary">Mi dashboard →</Link>
+              <Link href="/dashboard" className="btn-primary hidden md:inline-flex">Mi dashboard →</Link>
             ) : (
               <>
-                <Link href="/login" className="btn-ghost hidden sm:inline-flex">Iniciar sesión</Link>
-                <Link href="/registro" className="btn-primary hidden sm:inline-flex">Empezar gratis</Link>
+                <Link href="/login" className="btn-ghost hidden md:inline-flex">Iniciar sesión</Link>
+                <Link href="/registro" className="btn-primary hidden md:inline-flex">Empezar gratis</Link>
               </>
             )}
             <button
@@ -113,6 +113,14 @@ export default function LandingPage() {
               <Link href="/biblioteca" onClick={() => setMobileNavOpen(false)} className="px-4 py-3 rounded-lg text-base font-medium hover:bg-black/5 transition-colors">Biblioteca</Link>
               <a href="#planes" onClick={() => setMobileNavOpen(false)} className="px-4 py-3 rounded-lg text-base font-medium hover:bg-black/5 transition-colors">Planes</a>
               <a href="#faq" onClick={() => setMobileNavOpen(false)} className="px-4 py-3 rounded-lg text-base font-medium hover:bg-black/5 transition-colors">FAQ</a>
+
+              {isAuthed && (
+                <div className="mt-3 pt-3 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+                  <Link href="/dashboard" onClick={() => setMobileNavOpen(false)} className="btn-primary w-full text-center">
+                    Mi dashboard →
+                  </Link>
+                </div>
+              )}
 
               {!isAuthed && (
                 <div className="mt-3 pt-3 border-t flex flex-col gap-2" style={{ borderColor: "var(--border-subtle)" }}>
