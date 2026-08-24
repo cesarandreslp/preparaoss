@@ -12,18 +12,22 @@
 import { gemini, GEMINI_MODEL } from "./gemini";
 import { groq, GROQ_MODEL } from "./groq";
 import { zhipu, ZHIPU_MODEL } from "./zhipu";
+import { mistral, MISTRAL_MODEL } from "./mistral";
 
 interface ChatMessage {
   role: "system" | "user" | "assistant";
   content: string;
 }
 
+export type Provider = "gemini" | "groq" | "zhipu" | "mistral";
+
 interface ChatOptions {
   temperature?: number;
   json?: boolean;
+  // Fuerza un proveedor específico (sin cadena de fallback). Lo usa el
+  // backfill paralelo: un worker dedicado por proveedor.
+  provider?: Provider;
 }
-
-type Provider = "gemini" | "groq" | "zhipu";
 
 interface ChatResult {
   content: string;
@@ -125,10 +129,46 @@ async function callZhipu(
   return completion.choices[0]?.message?.content ?? "";
 }
 
+async function callMistral(
+  messages: ChatMessage[],
+  opts: ChatOptions
+): Promise<string> {
+  const completion = await mistral.chat.completions.create(
+    {
+      model: MISTRAL_MODEL,
+      messages,
+      temperature: opts.temperature ?? 0.7,
+      ...(opts.json ? { response_format: { type: "json_object" as const } } : {}),
+    },
+    { maxRetries: 0 }
+  );
+  return completion.choices[0]?.message?.content ?? "";
+}
+
+// Un solo proveedor, sin fallback — para el backfill paralelo (1 worker c/u).
+async function callProvider(
+  provider: Provider,
+  messages: ChatMessage[],
+  opts: ChatOptions
+): Promise<string> {
+  switch (provider) {
+    case "gemini": return callGemini(messages, opts);
+    case "groq": return callGroq(messages, opts);
+    case "zhipu": return callZhipu(messages, opts);
+    case "mistral": return callMistral(messages, opts);
+  }
+}
+
 export async function llmChat(
   messages: ChatMessage[],
   opts: ChatOptions = {}
 ): Promise<ChatResult> {
+  // Proveedor forzado: sin cadena de fallback (deja que el llamador maneje errores).
+  if (opts.provider) {
+    const content = await callProvider(opts.provider, messages, opts);
+    return { content, provider: opts.provider };
+  }
+
   const geminiEnCooldown = Date.now() < geminiCooldownUntil;
   const groqEnCooldown = Date.now() < groqCooldownUntil;
 

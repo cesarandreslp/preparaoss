@@ -8,7 +8,7 @@
  * 3. COMPORTAMENTAL        → Escala Likert 1-5 según nivel de responsabilidad del cargo
  */
 
-import { llmJson } from "./llm";
+import { llmJson, type Provider } from "./llm";
 import { prisma } from "./prisma";
 import { z } from "zod";
 
@@ -138,7 +138,8 @@ const PreguntaComportamentalSchema = z.object({
 
 export async function generarPreguntasFuncionalEspecifica(
   opecId: string,
-  cantidad: number = 2 // Cuántos escenarios generar (cada uno = 3 preguntas)
+  cantidad: number = 2, // Cuántos escenarios generar (cada uno = 3 preguntas)
+  provider?: Provider // Fuerza un proveedor (backfill paralelo); omitir = fallback
 ): Promise<void> {
   const opec = await prisma.opec.findUniqueOrThrow({
     where: { id: opecId },
@@ -196,7 +197,7 @@ Responde ÚNICAMENTE con JSON válido con esta estructura exacta — un objeto c
   ]
 }`;
 
-  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7 });
+  const { data: raw } = await llmJson<unknown>(prompt, { temperature: 0.7, provider });
   const items = Array.isArray(raw)
     ? raw
     : (raw as { escenarios?: unknown[] })?.escenarios ?? [];
@@ -418,7 +419,10 @@ export interface ResultadoBanco {
 export const ESPECIFICAS_OBJETIVO = 30;
 const PREGUNTAS_POR_ESCENARIO = 3;
 
-export async function generarBancoCompleto(opecId: string): Promise<ResultadoBanco> {
+export async function generarBancoCompleto(
+  opecId: string,
+  provider?: Provider
+): Promise<ResultadoBanco> {
   // Calcula el déficit: cuántos escenarios faltan para llegar al objetivo.
   // Los pools transversal y comportamental son globales — se generan una vez
   // vía /api/admin/pools/generar y se reusan en TODAS las OPECs.
@@ -436,7 +440,7 @@ export async function generarBancoCompleto(opecId: string): Promise<ResultadoBan
   console.log(`[IA] OPEC ${opecId}: ${validadas} validadas, generando ${escenariosFaltantes} escenarios (un solo request al LLM)`);
 
   try {
-    await generarPreguntasFuncionalEspecifica(opecId, escenariosFaltantes);
+    await generarPreguntasFuncionalEspecifica(opecId, escenariosFaltantes, provider);
     const total = escenariosFaltantes * PREGUNTAS_POR_ESCENARIO;
     console.log(`[IA] 🎉 Banco específico generado para OPEC ${opecId} (+${total} preguntas)`);
     return { total, escenarios: escenariosFaltantes, transversales: 0, comportamentales: 0 };
