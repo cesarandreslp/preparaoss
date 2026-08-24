@@ -62,8 +62,13 @@ export default function OpecsPage() {
           bottom alto en móvil para no chocar con la BottomNav. */}
       <a
         href="/opecs/cargar"
-        className="fixed right-4 md:right-8 bottom-24 md:bottom-8 z-40 inline-flex items-center gap-2 px-5 py-3 rounded-full shadow-lg font-semibold text-sm transition-transform hover:scale-105"
-        style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
+        className="fixed right-4 md:right-8 z-50 inline-flex items-center gap-2 px-5 py-3 rounded-full shadow-lg font-semibold text-sm transition-transform hover:scale-105"
+        style={{
+          background: "var(--gradient-gold)",
+          color: "var(--btn-gold-text)",
+          // Sobre la BottomNav (móvil) + safe-area; en desktop pega abajo.
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 6.5rem)",
+        }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
