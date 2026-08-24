@@ -27,7 +27,6 @@ export default async function PerfilPage() {
       simulacrosTotal: true,
       preguntasRespondidas: true,
       preguntasCorrectas: true,
-      suscripcion: { select: { plan: true, simulacrosMes: true } },
       badges: {
         include: { badge: true },
         orderBy: { obtenidoAt: "desc" },
@@ -76,9 +75,6 @@ export default async function PerfilPage() {
         <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
           {user.email}
         </p>
-        <div className="mt-5 flex justify-center">
-          <span className="tag tag-blue">{user.suscripcion?.plan ?? "GRATUITO"}</span>
-        </div>
       </div>
 
       {/* Nivel y XP */}
@@ -194,32 +190,6 @@ export default async function PerfilPage() {
 
       {/* Pase trimestral: OPECs cubiertas, vencimiento y renovación */}
       <MiPase />
-
-      {/* CTA upgrade */}
-      {(!user.suscripcion || user.suscripcion.plan === "GRATUITO") && (
-        <div
-          className="rounded-2xl p-6 relative overflow-hidden"
-          style={{
-            background:
-              "radial-gradient(circle at 100% 0%, rgba(208, 74, 28, 0.18) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
-            border: "1px solid rgba(208, 74, 28, 0.35)",
-          }}
-        >
-          <span className="eyebrow">Desbloquear todo</span>
-          <h3
-            className="text-xl font-bold mt-2"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            ¿Listo para subir de plan?
-          </h3>
-          <p className="text-sm mt-2 mb-5" style={{ color: "var(--text-secondary)" }}>
-            Con el Plan Pro tienes simulacros ilimitados, 40 preguntas por banco y rankings avanzados.
-          </p>
-          <a href="/#planes" className="btn-primary">
-            Ver planes →
-          </a>
-        </div>
-      )}
     </div>
   );
 }
