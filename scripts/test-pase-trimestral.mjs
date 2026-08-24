@@ -70,7 +70,48 @@ try {
   assert.ok(vencida.accesoHasta > new Date(), "acceso vigente mientras el pase no venza");
   assert.ok(!(new Date("2020-01-01") > new Date()), "un accesoHasta pasado no da acceso");
 
-  console.log("✅ pase trimestral: 3 meses, 3 cupos, sin doble cobro de cupo y renovación acumulativa");
+  // — Trimestre vencido: se cae el acceso, y al renovar puede seguir con las
+  //   mismas OPECs o cambiarlas —
+  const ayer = new Date(Date.now() - 86_400_000);
+  await prisma.paseTrimestral.update({ where: { id: pase.id }, data: { venceAt: ayer } });
+  await prisma.userOpec.updateMany({ where: { paseId: pase.id }, data: { accesoHasta: ayer } });
+
+  const tras = await prisma.userOpec.findFirst({ where: { paseId: pase.id }, select: { accesoHasta: true } });
+  assert.ok(tras.accesoHasta < new Date(), "vencido el pase, el acceso deja de ser vigente");
+
+  const renovacion = await prisma.paseTrimestral.create({
+    data: { userId, referenciaPago: `TEST-R-${Date.now()}`, montoCop: 49900, venceAt: venceTrimestre() },
+  });
+
+  // "Sigue con las mismas": mueve las OPECs al pase nuevo.
+  for (const opec of opecs.slice(0, CUPOS)) {
+    await prisma.userOpec.update({
+      where: { userId_opecId: { userId, opecId: opec.id } },
+      data: { accesoPagado: true, accesoHasta: renovacion.venceAt, paseId: renovacion.id },
+    });
+  }
+  assert.equal(await cuposUsados(renovacion.id), CUPOS, "al renovar con las mismas, los 3 cupos quedan en el pase nuevo");
+  assert.equal(await cuposUsados(pase.id), 0, "el pase viejo ya no retiene cupos");
+
+  const revivida = await prisma.userOpec.findFirst({ where: { paseId: renovacion.id }, select: { accesoHasta: true } });
+  assert.ok(revivida.accesoHasta > new Date(), "las mismas OPECs vuelven a estar vigentes");
+
+  // "Cambiarlas": liberar una y usar el cupo en otra OPEC distinta.
+  await prisma.userOpec.update({
+    where: { userId_opecId: { userId, opecId: opecs[0].id } },
+    data: { accesoPagado: false, accesoHasta: null, paseId: null },
+  });
+  assert.equal(await cuposUsados(renovacion.id), CUPOS - 1, "soltar una OPEC libera su cupo");
+
+  await prisma.userOpec.upsert({
+    where: { userId_opecId: { userId, opecId: opecs[3].id } },
+    create: { userId, opecId: opecs[3].id, accesoPagado: true, accesoHasta: renovacion.venceAt, paseId: renovacion.id },
+    update: { accesoPagado: true, accesoHasta: renovacion.venceAt, paseId: renovacion.id },
+  });
+  assert.equal(await cuposUsados(renovacion.id), CUPOS, "el cupo liberado se puede gastar en otra OPEC");
+
+  console.log("✅ pase trimestral: 3 meses, 3 cupos, sin doble cobro, renovación acumulativa,");
+  console.log("   y al renovar puede seguir con las mismas OPECs o cambiarlas");
 } finally {
   if (userId) {
     await prisma.userOpec.deleteMany({ where: { userId } });

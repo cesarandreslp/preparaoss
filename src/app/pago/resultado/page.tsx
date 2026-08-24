@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MiPase } from "@/components/opec/MiPase";
 
 // Wompi redirige aquí tras el pago con ?opec=<id>&id=<txId>. El desbloqueo
 // real lo hace el webhook (segundos); aquí solo confirmamos y encaminamos.
@@ -14,9 +15,13 @@ export default async function PagoResultadoPage({
       <div className="text-5xl">🎯</div>
       <h1 className="text-2xl font-bold">¡Gracias por tu pago!</h1>
       <p style={{ color: "var(--text-secondary)" }}>
-        Estamos confirmando la transacción. Tu acceso ilimitado se activa en unos
-        segundos. Si no aparece de inmediato, refresca la página de la OPEC.
+        Estamos confirmando la transacción. Tu pase se activa en unos segundos.
+        Si no aparece de inmediato, refresca la página.
       </p>
+
+      <div className="text-left">
+        <MiPase />
+      </div>
       <div className="flex flex-col gap-3">
         {opec && (
           <Link href={`/opecs/${opec}`} className="btn-primary px-6 py-3 rounded-2xl">

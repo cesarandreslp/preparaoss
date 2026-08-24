@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { MiPase } from "@/components/opec/MiPase";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
@@ -190,6 +191,9 @@ export default async function PerfilPage() {
           </div>
         )}
       </div>
+
+      {/* Pase trimestral: OPECs cubiertas, vencimiento y renovación */}
+      <MiPase />
 
       {/* CTA upgrade */}
       {(!user.suscripcion || user.suscripcion.plan === "GRATUITO") && (

@@ -27,6 +27,90 @@ export type PaseActivo = {
   disponibles: number;
 };
 
+export type OpecDelPase = { id: string; nombreCargo: string; entidad: string };
+
+export type EstadoPase = {
+  activo: (PaseActivo & { opecs: OpecDelPase[] }) | null;
+  /** Último pase vencido: sus OPECs son las que puede "seguir" al renovar. */
+  anterior: { venceAt: Date; opecs: OpecDelPase[] } | null;
+};
+
+/**
+ * Estado del pase para la UI: el vigente con sus OPECs y cupos, y el anterior
+ * para poder ofrecer "sigue con las mismas" al renovar.
+ */
+export async function estadoPase(userId: string): Promise<EstadoPase> {
+  const pases = await prisma.paseTrimestral.findMany({
+    where: { userId },
+    orderBy: { venceAt: "desc" },
+    take: 2,
+    select: {
+      id: true,
+      venceAt: true,
+      opecs: {
+        select: { opec: { select: { id: true, nombreCargo: true, entidad: true } } },
+      },
+    },
+  });
+
+  const ahora = new Date();
+  const vigente = pases.find((p) => p.venceAt >= ahora) ?? null;
+  const previo = pases.find((p) => p !== vigente && p.venceAt < ahora) ?? null;
+
+  return {
+    activo: vigente
+      ? {
+          id: vigente.id,
+          venceAt: vigente.venceAt,
+          usados: vigente.opecs.length,
+          disponibles: Math.max(0, CUPOS_PASE - vigente.opecs.length),
+          opecs: vigente.opecs.map((u) => u.opec),
+        }
+      : null,
+    anterior: previo
+      ? { venceAt: previo.venceAt, opecs: previo.opecs.map((u) => u.opec) }
+      : null,
+  };
+}
+
+export type EstadoDiario = {
+  opec: OpecDelPase;
+  venceAt: Date;
+  /** Ya lo gastó en un simulacro. */
+  usado: boolean;
+  /** Comprado, sin usar y aún dentro de las 24 h. */
+  vigente: boolean;
+};
+
+/**
+ * Último pase diario del usuario, con la OPEC en la que lo compró — para
+ * ofrecerle repetir ahí o cambiar de OPEC cuando se le acabe.
+ */
+export async function estadoPaseDiario(userId: string): Promise<EstadoDiario | null> {
+  const pase = await prisma.paseDiario.findFirst({
+    where: { userId },
+    orderBy: { compradoAt: "desc" },
+    select: { opecId: true, venceAt: true, simulacroId: true },
+  });
+  if (!pase) return null;
+
+  // PaseDiario no tiene relación con Opec (se guarda solo el id), así que la
+  // OPEC se busca aparte.
+  const opec = await prisma.opec.findUnique({
+    where: { id: pase.opecId },
+    select: { id: true, nombreCargo: true, entidad: true },
+  });
+  if (!opec) return null;
+
+  const usado = pase.simulacroId !== null;
+  return {
+    opec,
+    venceAt: pase.venceAt,
+    usado,
+    vigente: !usado && pase.venceAt >= new Date(),
+  };
+}
+
 /** Pase vigente del usuario con cupos libres, si tiene. */
 export async function paseTrimestralActivo(userId: string): Promise<PaseActivo | null> {
   const pase = await prisma.paseTrimestral.findFirst({
