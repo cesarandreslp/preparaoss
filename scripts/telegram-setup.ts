@@ -19,7 +19,9 @@ try {
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
+// El webhook DEBE ser https público; ignoramos el localhost de .env (dev).
+const envUrl = process.env.NEXT_PUBLIC_APP_URL;
+const APP_URL = envUrl && envUrl.startsWith("https://") ? envUrl : "https://preparaoss.vercel.app";
 
 async function tg(method: string, body: unknown) {
   const res = await fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {
