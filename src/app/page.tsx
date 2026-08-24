@@ -687,7 +687,8 @@ export default function LandingPage() {
             <h4 className="text-sm font-semibold mb-4" style={{ fontFamily: "var(--font-display)" }}>Producto</h4>
             <ul className="space-y-2 text-sm" style={{ color: "var(--text-muted)" }}>
               <li><a href="#como-funciona" className="hover:text-[#D4AF37] transition-colors">Cómo funciona</a></li>
-              <li><a href="#opecs" className="hover:text-[#D4AF37] transition-colors">OPECs activas</a></li>
+              <li><Link href="/convocatorias" className="hover:text-[#D4AF37] transition-colors">Convocatorias</Link></li>
+              <li><Link href="/entidades" className="hover:text-[#D4AF37] transition-colors">Entidades</Link></li>
               <li><a href="#planes" className="hover:text-[#D4AF37] transition-colors">Planes</a></li>
               <li><a href="#faq" className="hover:text-[#D4AF37] transition-colors">FAQ</a></li>
             </ul>
