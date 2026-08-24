@@ -87,6 +87,10 @@ model Opec {
   id               String     @id @default(cuid())
   simoId           String     @unique // ID interno de SIMO/CNSC
   numerConvocatoria String?
+  // Convocatoria de SIMO: agrupa cientos de OPECs. La fecha de examen se fija
+  // por convocatoria (una sola vez), no OPEC por OPEC.
+  convocatoriaId     Int?
+  convocatoriaNombre String?
   nombreCargo      String
   entidad          String
   nivelJerarquico  String     // Profesional, Técnico, Auxiliar, Directivo, etc.
@@ -129,6 +133,7 @@ model Opec {
   @@index([estado, departamento])
   @@index([entidad])
   @@index([creadoPorUserId])
+  @@index([convocatoriaId])
 }
 
 // ─────────────────────────────────────────────────────────

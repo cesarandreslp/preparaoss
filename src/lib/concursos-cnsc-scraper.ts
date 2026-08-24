@@ -30,7 +30,7 @@ export async function fetchConcursosEnDesarrollo(): Promise<Scraped[]> {
         "Mozilla/5.0 (PreparaOss-Scraper/1.0; +https://preparaoss.vercel.app)",
       Accept: "text/html",
     },
-    next: { revalidate: 0 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`CNSC HTTP ${res.status}`);
 

@@ -69,7 +69,7 @@ async function fetchPagina(
       ...HEADERS,
       Referer: webUrl ?? new URL(apiUrl).origin + "/",
     },
-    next: { revalidate: 0 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} en página ${page} (${url})`);
   const data = await res.json();

@@ -50,6 +50,7 @@ export interface SimoOpecItem {
     asignacionSalarial?: number;
     gradoNivel: { grado: string; nivelNombre: string };
     convocatoria: {
+      id: number;
       nombre: string;
       codigo: string;
       agno: number;
@@ -105,6 +106,8 @@ export function mapToPrisma(item: SimoOpecItem) {
   return {
     simoId: item.id.toString(),
     numerConvocatoria: `${e.convocatoria.codigo}/${e.convocatoria.agno}`,
+    convocatoriaId: e.convocatoria.id ?? null,
+    convocatoriaNombre: e.convocatoria.nombre ?? null,
     nombreCargo: e.denominacion.nombre,
     entidad: e.convocatoria.entidad.nombre,
     nivelJerarquico: e.gradoNivel.nivelNombre,
@@ -133,6 +136,8 @@ export function mapToPrisma(item: SimoOpecItem) {
 function camposActualizables(data: ReturnType<typeof mapToPrisma>) {
   return {
     nombreCargo: data.nombreCargo,
+    convocatoriaId: data.convocatoriaId,
+    convocatoriaNombre: data.convocatoriaNombre,
     entidad: data.entidad,
     nivelJerarquico: data.nivelJerarquico,
     grado: data.grado,
@@ -162,7 +167,7 @@ export async function fetchPage(page: number): Promise<SimoOpecItem[]> {
       Accept: "application/json",
       "User-Agent": "PreparaOss-Scraper/1.0 (preparacion-concursos-cnsc)",
     },
-    next: { revalidate: 0 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`SIMO HTTP ${res.status} en página ${page}`);
   const data = await res.json();
@@ -178,7 +183,7 @@ export async function fetchPage(page: number): Promise<SimoOpecItem[]> {
 // SINCRONIZAR OPECs CON LA BASE DE DATOS
 // ─────────────────────────────────────────────────
 
-export async function sincronizarOpecs(): Promise<{
+export async function sincronizarOpecs(maxPages: number = MAX_PAGES): Promise<{
   nuevas: number;
   actualizadas: number;
   errores: number;
@@ -191,7 +196,7 @@ export async function sincronizarOpecs(): Promise<{
 
   let page = 0;
 
-  while (page < MAX_PAGES) {
+  while (page < maxPages) {
     let items: SimoOpecItem[];
     try {
       items = await fetchPage(page);
@@ -257,6 +262,12 @@ export async function sincronizarOpecs(): Promise<{
     },
     data: { estado: "CERRADA" },
   });
+
+  if (page >= maxPages) {
+    console.warn(
+      `[Scraper] ⚠️ Se alcanzó el techo de ${maxPages} páginas — puede haber OPECs sin sincronizar.`
+    );
+  }
 
   console.log(
     `[Scraper] ✅ Completo: ${nuevas} nuevas, ${actualizadas} actualizadas, ${errores} errores`

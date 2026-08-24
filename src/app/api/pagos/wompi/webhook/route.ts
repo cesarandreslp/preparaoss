@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { eventoValido, parseReferencia } from "@/lib/wompi";
-
-const DIAS_GRACIA = 3; // acceso sigue vivo unos días tras el examen
+import { accesoHastaDe } from "@/lib/acceso";
 
 // POST /api/pagos/wompi/webhook — Wompi notifica el resultado del pago.
 // No lleva auth de usuario: se valida con el checksum de eventos.
@@ -63,9 +62,7 @@ export async function POST(request: Request) {
     where: { id: ref.opecId },
     select: { fechaExamen: true },
   });
-  const accesoHasta = opec?.fechaExamen
-    ? new Date(opec.fechaExamen.getTime() + DIAS_GRACIA * 86_400_000)
-    : null;
+  const accesoHasta = accesoHastaDe(opec?.fechaExamen);
 
   // Upsert: el usuario puede no estar inscrito aún. Idempotente ante reintentos.
   await prisma.userOpec.upsert({

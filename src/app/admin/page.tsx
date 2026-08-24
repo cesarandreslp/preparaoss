@@ -124,6 +124,7 @@ export default function AdminPage() {
     { href: "/admin/configuracion",      icon: "✉️", title: "Email SMTP",        sub: "Configuración de correo" },
     { href: "/admin/documentos",         icon: "📚", title: "Documentos",        sub: "Manuales y guías por OPEC" },
     { href: "/admin/concursos",          icon: "🎯", title: "Concursos CNSC",    sub: "Slider de landing · CMS" },
+    { href: "/admin/convocatorias",      icon: "📅", title: "Fechas de examen",  sub: "Cronograma por convocatoria" },
     { href: "/admin/biblioteca",         icon: "📖", title: "Biblioteca",        sub: "Leyes y normas · subir PDFs" },
     { href: "/admin/entidades-especiales", icon: "🏛️", title: "Régimen especial", sub: "Procuraduría · Banrep · scraping" },
     { href: "/dashboard",                icon: "📊", title: "Dashboard",         sub: "Vista de usuario" },

@@ -9,7 +9,6 @@
     "lint": "eslint",
     "scraper": "ts-node --project tsconfig.scripts.json scripts/scraper-simo.ts",
     "scraper:test": "ts-node --project tsconfig.scripts.json scripts/scraper-simo.ts -- --max-pages 2",
-    "scraper:reset": "ts-node --project tsconfig.scripts.json scripts/scraper-simo.ts -- --reset",
     "seed:planes": "ts-node --project tsconfig.scripts.json scripts/seed-planes.ts"
   },
   "dependencies": {

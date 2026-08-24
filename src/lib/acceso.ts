@@ -7,6 +7,24 @@ import { prisma } from "./prisma";
 //   - trial  : gratis, solo pools globales (transversal+comportamental).
 // ─────────────────────────────────────────────────────────────
 
+export const DIAS_GRACIA_EXAMEN = 3; // el acceso sigue vivo unos días tras el examen
+export const MESES_ACCESO_SIN_FECHA = 12;
+
+// Ventana del pase de evento. SIMO no publica cronograma, así que la mayoría de
+// OPECs no tiene fechaExamen: sin este tope, un pago único daba acceso perpetuo.
+// Cuando el admin fija la fecha de la convocatoria, la ventana se recorta.
+export function accesoHastaDe(
+  fechaExamen: Date | null | undefined,
+  desde: Date = new Date()
+): Date {
+  if (fechaExamen) {
+    return new Date(fechaExamen.getTime() + DIAS_GRACIA_EXAMEN * 86_400_000);
+  }
+  const d = new Date(desde);
+  d.setMonth(d.getMonth() + MESES_ACCESO_SIN_FECHA);
+  return d;
+}
+
 export const LIMITE_FREE_POR_OPEC = 3; // simulacros gratis por OPEC (trial)
 export const PREGUNTAS_FREE = 10; // tamaño del simulacro en el trial
 export const PREGUNTAS_PAGADO = 100; // tamaño con acceso pagado
