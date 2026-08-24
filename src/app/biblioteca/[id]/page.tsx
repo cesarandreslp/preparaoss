@@ -23,6 +23,8 @@ export default async function RecursoBibliotecaPage({
   const r = await prisma.recursoBiblioteca.findUnique({ where: { id } });
   if (!r || !r.vigente) notFound();
 
+  const esPdf = !!r.pdfUrl?.toLowerCase().endsWith(".pdf");
+
   return (
     <main className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
@@ -53,6 +55,19 @@ export default async function RecursoBibliotecaPage({
           <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
             {r.descripcion}
           </p>
+        )}
+
+        {/* Android e iOS no pintan PDFs dentro de un iframe: sale en blanco.
+            Los documentos HTML sí, así que el aviso solo va en los PDF. */}
+        {esPdf && (
+          <a
+            href={r.pdfUrl!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-sm inline-block sm:hidden"
+          >
+            Abrir el PDF ↗
+          </a>
         )}
 
         {r.pdfUrl ? (
