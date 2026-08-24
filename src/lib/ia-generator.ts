@@ -384,7 +384,12 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
   const items = Array.isArray(raw)
     ? raw
     : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
-  const preguntas = z.array(PreguntaComportamentalSchema).parse(items).filter(unaCorrecta);
+  const preguntas = z
+    .array(PreguntaComportamentalSchema)
+    .parse(items)
+    .filter(unaCorrecta)
+    // Descarta enunciados truncados (terminan en "..." o "…") — quedaban incompletos.
+    .filter((q) => !/(\.\.\.|…)\s*$/.test(q.texto.trim()));
 
   for (const p of preguntas) {
     await prisma.pregunta.create({
@@ -565,6 +570,7 @@ Genera EXACTAMENTE ${cantidad} preguntas de comportamiento laboral en escala Lik
 
 REGLAS:
 - Cada pregunta describe una SITUACIÓN LABORAL concreta aplicable a cualquier cargo del nivel ${nivelResponsabilidad}.
+- El "texto" es un enunciado COMPLETO y autocontenido. NUNCA lo termines con puntos suspensivos ("..." ni "…"): debe leerse como una afirmación cerrada, no como una frase a medias.
 - El evaluado responde con qué frecuencia haría eso: 1=Nunca, 2=Casi nunca, 3=A veces, 4=Casi siempre, 5=Siempre.
 - La respuesta "socialmente deseable" (esCorrecta: true) va calibrada según el nivel ${nivelResponsabilidad}.
 - Para niveles directivos (4-5): se esperan frecuencias altas en liderazgo, iniciativa, decisión.
@@ -575,7 +581,7 @@ REGLAS:
 Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
 [
   {
-    "texto": "Cuando recibo instrucciones que considero no son óptimas...",
+    "texto": "Cuando recibo instrucciones que considero no son óptimas, expreso mis propuestas de mejora de forma respetuosa antes de ejecutar.",
     "opciones": [
       {"letra": "1", "texto": "Nunca consulto, solo ejecuto", "valorLikert": 1, "esCorrecta": false},
       {"letra": "2", "texto": "Casi nunca menciono mis dudas", "valorLikert": 2, "esCorrecta": false},
@@ -593,7 +599,12 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
   const items = Array.isArray(raw)
     ? raw
     : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
-  const preguntas = z.array(PreguntaComportamentalSchema).parse(items).filter(unaCorrecta);
+  const preguntas = z
+    .array(PreguntaComportamentalSchema)
+    .parse(items)
+    .filter(unaCorrecta)
+    // Descarta enunciados truncados (terminan en "..." o "…") — quedaban incompletos.
+    .filter((q) => !/(\.\.\.|…)\s*$/.test(q.texto.trim()));
 
   // El pool crece a diario: descarta lo que el LLM ya generó antes (texto exacto).
   const yaExiste = new Set(
