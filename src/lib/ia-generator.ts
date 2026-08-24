@@ -116,6 +116,11 @@ const PreguntaFuncTransSchema = z.object({
   dificultad: DificultadSchema,
 });
 
+// Una sola opción correcta, o la pregunta no sirve: con 2+ el puntaje queda
+// ambiguo (así entraron 10 comportamentales inservibles al pool en mayo).
+const unaCorrecta = (p: { opciones: { esCorrecta: boolean }[] }) =>
+  p.opciones.filter((o) => o.esCorrecta).length === 1;
+
 const PreguntaComportamentalSchema = z.object({
   texto: z.string(), // Enunciado de la situación laboral
   opciones: z.array(
@@ -292,7 +297,7 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos con esta est
   const items = Array.isArray(raw)
     ? raw
     : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
-  const preguntas = z.array(PreguntaFuncTransSchema).parse(items);
+  const preguntas = z.array(PreguntaFuncTransSchema).parse(items).filter(unaCorrecta);
 
   for (const p of preguntas) {
     await prisma.pregunta.create({
@@ -379,7 +384,7 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
   const items = Array.isArray(raw)
     ? raw
     : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
-  const preguntas = z.array(PreguntaComportamentalSchema).parse(items);
+  const preguntas = z.array(PreguntaComportamentalSchema).parse(items).filter(unaCorrecta);
 
   for (const p of preguntas) {
     await prisma.pregunta.create({
@@ -493,9 +498,21 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos con esta est
   const items = Array.isArray(raw)
     ? raw
     : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
-  const preguntas = z.array(PreguntaFuncTransSchema).parse(items);
+  const preguntas = z.array(PreguntaFuncTransSchema).parse(items).filter(unaCorrecta);
+
+  // El pool crece a diario: descarta lo que el LLM ya generó antes (texto exacto).
+  const yaExiste = new Set(
+    (
+      await prisma.pregunta.findMany({
+        where: { poolKey: "TRANSVERSAL_GLOBAL" },
+        select: { texto: true },
+      })
+    ).map((q) => q.texto)
+  );
+  let creadas = 0;
 
   for (const p of preguntas) {
+    if (yaExiste.has(p.texto)) continue;
     await prisma.pregunta.create({
       data: {
         tipo: "FUNCIONAL_TRANSVERSAL",
@@ -514,9 +531,11 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos con esta est
         },
       },
     });
+    yaExiste.add(p.texto);
+    creadas++;
   }
 
-  return preguntas.length;
+  return creadas;
 }
 
 /**
@@ -574,9 +593,21 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
   const items = Array.isArray(raw)
     ? raw
     : (raw as { preguntas?: unknown[] })?.preguntas ?? raw;
-  const preguntas = z.array(PreguntaComportamentalSchema).parse(items);
+  const preguntas = z.array(PreguntaComportamentalSchema).parse(items).filter(unaCorrecta);
+
+  // El pool crece a diario: descarta lo que el LLM ya generó antes (texto exacto).
+  const yaExiste = new Set(
+    (
+      await prisma.pregunta.findMany({
+        where: { poolKey: `COMPORT_NIVEL_${nivelResponsabilidad}` },
+        select: { texto: true },
+      })
+    ).map((q) => q.texto)
+  );
+  let creadas = 0;
 
   for (const p of preguntas) {
+    if (yaExiste.has(p.texto)) continue;
     await prisma.pregunta.create({
       data: {
         tipo: "COMPORTAMENTAL",
@@ -597,7 +628,9 @@ Responde ÚNICAMENTE con JSON válido: array de ${cantidad} objetos:
         },
       },
     });
+    yaExiste.add(p.texto);
+    creadas++;
   }
 
-  return preguntas.length;
+  return creadas;
 }

@@ -10,7 +10,12 @@
  * que es de teoremas Lean 4) y añadiéndolo a GEN_PROVIDERS.
  */
 import { getOpecssinPreguntas } from "../src/lib/scraper";
-import { generarBancoCompleto } from "../src/lib/ia-generator";
+import {
+  generarBancoCompleto,
+  generarLotePoolTransversal,
+  generarLotePoolComportamental,
+} from "../src/lib/ia-generator";
+import { prisma } from "../src/lib/prisma";
 import type { Provider } from "../src/lib/llm";
 
 const PROVIDERS = (process.env.GEN_PROVIDERS ?? "gemini,groq,zhipu")
@@ -19,6 +24,13 @@ const GEN_MAX = Number(process.env.GEN_MAX ?? 3000);
 const PAUSA_MS = Number(process.env.GEN_PAUSA_MS ?? 4000);
 const BACKOFF_MS = 60_000;
 const MAX_RATE_HITS = 6;
+
+// Pools globales (transversal + comportamental por nivel): son el 70% de un
+// simulacro pagado. Si no crecen, el que compró "práctica ilimitada" ve las
+// mismas preguntas desde el segundo intento.
+const POOL_OBJETIVO = Number(process.env.POOL_OBJETIVO ?? 300);
+const POOL_LOTES = Number(process.env.POOL_LOTES ?? 6); // techo por pool y corrida
+const POOL_LOTE = 10; // preguntas por llamada al LLM
 
 const queue: string[] = [];
 const seen = new Set<string>();
@@ -34,6 +46,42 @@ async function refill(): Promise<void> {
     if (nuevos.length === 0) agotado = true;
   } finally {
     refilling = false;
+  }
+}
+
+async function topUpPools(): Promise<void> {
+  // Solo los niveles que de verdad tienen OPECs (hoy 2, 3 y 4): generar para
+  // niveles vacíos fue lo que dejó 100 preguntas sin dueño.
+  const niveles = (
+    await prisma.opec.groupBy({ by: ["nivelResponsabilidad"] })
+  ).map((n) => n.nivelResponsabilidad);
+
+  const pools = [
+    { key: "TRANSVERSAL_GLOBAL", generar: (n: number) => generarLotePoolTransversal(n) },
+    ...niveles.map((nivel) => ({
+      key: `COMPORT_NIVEL_${nivel}`,
+      generar: (n: number) => generarLotePoolComportamental(nivel, n),
+    })),
+  ];
+
+  for (const pool of pools) {
+    let actual = await prisma.pregunta.count({
+      where: { poolKey: pool.key, validada: true },
+    });
+    for (let i = 0; i < POOL_LOTES && actual < POOL_OBJETIVO; i++) {
+      try {
+        const n = await pool.generar(Math.min(POOL_LOTE, POOL_OBJETIVO - actual));
+        actual += n;
+        console.log(`🧩 [pool] ${pool.key}: +${n} → ${actual}/${POOL_OBJETIVO}`);
+        // 0 nuevas = el LLM solo devolvió repetidas; insistir hoy es quemar cuota.
+        if (n === 0) break;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(`❌ [pool] ${pool.key}: ${msg.slice(0, 120)}`);
+        break;
+      }
+      await new Promise((r) => setTimeout(r, PAUSA_MS));
+    }
   }
 }
 
@@ -72,6 +120,7 @@ async function worker(provider: Provider): Promise<void> {
 
 async function main() {
   console.log(`Backfill PARALELO — proveedores: ${PROVIDERS.join(", ")} | techo ${GEN_MAX}`);
+  await topUpPools();
   await refill();
   await Promise.all(PROVIDERS.map((p) => worker(p)));
   console.log(`\nRESUMEN: ${hechas} bancos generados, ${errores} errores.`);

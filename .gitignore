@@ -71,3 +71,6 @@ scratch/
 scraper.log
 generar-lote.log
 generar-paralelo.log
+
+# imágenes de trabajo (fuentes de logo, capturas) — no van al repo
+/images
