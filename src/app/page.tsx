@@ -573,20 +573,24 @@ export default function LandingPage() {
 
       {/* ─── FAQ ─── */}
       <section id="faq" className="section">
-        <div className="container-narrow">
-          <Reveal>
-            <span className="eyebrow">Preguntas frecuentes</span>
-            <h2 className="display-2 mt-4">
-              ¿Lo de siempre?
-            </h2>
-          </Reveal>
-          <Reveal delay={120}>
-            <div className="mt-12">
+        <div className="container-app">
+          <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-12 items-start">
+            <Reveal>
+              <div className="lg:sticky lg:top-28">
+                <span className="eyebrow">Preguntas frecuentes</span>
+                <h2 className="display-2 mt-4">Lo que todos preguntan.</h2>
+                <p className="mt-5 text-lg" style={{ color: "var(--text-secondary)" }}>
+                  Cómo funciona, los pagos, de dónde salen las preguntas. Y si te queda
+                  una duda, escríbenos por WhatsApp.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal delay={120}>
               <FAQ
                 items={[
                   {
                     q: "¿De dónde salen las preguntas?",
-                    a: "Las genera Llama 3.3 70B (Groq) usando como contexto las funciones, requisitos y manuales del cargo específico al que aspiras. No son preguntas genéricas reutilizadas: cada banco es único para tu OPEC.",
+                    a: "Las genera nuestra IA especializada usando como contexto las funciones, requisitos y manuales del cargo específico al que aspiras. No son preguntas genéricas reutilizadas: cada banco es único para tu OPEC.",
                   },
                   {
                     q: "¿Las preguntas son las mismas que saldrán en el examen real?",
@@ -610,17 +614,17 @@ export default function LandingPage() {
                   },
                 ]}
               />
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
         </div>
       </section>
 
       {/* ─── CTA FINAL ─── */}
       <section className="section">
-        <div className="container-narrow">
+        <div className="container-app">
           <Reveal>
             <div
-              className="rounded-3xl p-12 text-center relative overflow-hidden"
+              className="rounded-3xl p-12 md:p-16 text-center relative overflow-hidden"
               style={{
                 background:
                   "radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.20) 0%, transparent 70%), linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%)",
