@@ -50,11 +50,8 @@ export default function LandingPage() {
       >
         <div className="container-app flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
-            <span
-              className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-              style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
-            >
-              P
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white overflow-hidden shrink-0">
+              <img src="/brand-icon.png" alt="PreparaOSS" width={36} height={36} className="w-full h-full object-cover scale-[1.15]" />
             </span>
             <span className="text-gradient-gold">PreparaOSS</span>
           </Link>
@@ -667,11 +664,8 @@ export default function LandingPage() {
         <div className="container-app py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
-              <span
-                className="inline-flex items-center justify-center w-8 h-8 rounded-lg"
-                style={{ background: "var(--gradient-gold)", color: "var(--btn-gold-text)" }}
-              >
-                P
+              <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white overflow-hidden shrink-0">
+                <img src="/brand-icon.png" alt="PreparaOSS" width={36} height={36} className="w-full h-full object-cover scale-[1.15]" />
               </span>
               <span className="text-gradient-gold">PreparaOSS</span>
             </Link>

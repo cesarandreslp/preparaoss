@@ -17,12 +17,32 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
+const DESC =
+  "Prepárate para los concursos de méritos de la CNSC con simulacros generados por IA a la medida de tu OPEC. Practica gratis, paga solo por tu cargo.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: "PreparaOSS — Concursos de Méritos CNSC",
-  description:
-    "Prepárate para los concursos de méritos de la CNSC con simulacros generados por IA, gamificación estilo Duolingo y competencias entre aspirantes.",
+  description: DESC,
   applicationName: "PreparaOSS",
   manifest: "/manifest.json",
+  icons: { icon: "/favicon.png", apple: "/icons/icon-192x192.png" },
+  openGraph: {
+    title: "PreparaOSS — Prepárate hoy, conquista tu mañana",
+    description: DESC,
+    url: APP_URL,
+    siteName: "PreparaOSS",
+    images: [{ url: "/og.png", width: 1200, height: 480, alt: "PreparaOSS" }],
+    locale: "es_CO",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PreparaOSS — Concursos de Méritos CNSC",
+    description: DESC,
+    images: ["/og.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
