@@ -174,9 +174,18 @@ export default function LandingPage() {
                 </div>
               </Reveal>
               <Reveal delay={320}>
-                <p className="mt-4 text-xs" style={{ color: "var(--text-muted)" }}>
-                  Sin tarjeta de crédito · Datos directos de SIMO-CNSC · Practica gratis
-                </p>
+                <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                  {["Preguntas de tu cargo específico", "Datos directos de SIMO-CNSC", "Practica gratis, sin tarjeta"].map((li) => (
+                    <li key={li} className="flex items-center gap-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                      <span className="inline-flex items-center justify-center w-4 h-4 rounded-full shrink-0" style={{ background: "var(--gold-500)", color: "#0B1733" }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      {li}
+                    </li>
+                  ))}
+                </ul>
               </Reveal>
             </div>
 
