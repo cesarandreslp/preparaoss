@@ -8,6 +8,16 @@ export const revalidate = 3600;
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
 
+// Pre-renderiza las ~165 páginas en build; ISR las refresca cada hora.
+export async function generateStaticParams() {
+  const ents = await prisma.opec.findMany({
+    where: { creadoPorUserId: null },
+    select: { entidad: true },
+    distinct: ["entidad"],
+  });
+  return ents.map((e) => ({ slug: slugify(e.entidad) }));
+}
+
 async function resolverEntidad(slug: string): Promise<string | null> {
   const ents = await prisma.opec.findMany({
     where: { creadoPorUserId: null },

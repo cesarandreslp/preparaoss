@@ -655,3 +655,14 @@ model PaseDiario {
 
   @@index([userId, opecId])
 }
+
+/// Suscriptor del bot de Telegram. Canal de reenganche gratuito: capturamos el
+/// chatId al hacer /start para difundir nuevas convocatorias sin pagar pauta.
+model TelegramSub {
+  chatId    BigInt   @id
+  username  String?
+  nombre    String?
+  activo    Boolean  @default(true) // false = el usuario bloqueó el bot
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

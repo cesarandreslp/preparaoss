@@ -8,6 +8,18 @@ export const revalidate = 3600; // ISR: se regenera cada hora
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
 
+// Pre-renderiza las ~84 páginas en build; ISR las refresca cada hora.
+export async function generateStaticParams() {
+  const convs = await prisma.opec.findMany({
+    where: { creadoPorUserId: null },
+    select: { numerConvocatoria: true },
+    distinct: ["numerConvocatoria"],
+  });
+  return convs
+    .filter((c) => convocatoriaValida(c.numerConvocatoria))
+    .map((c) => ({ slug: slugify(c.numerConvocatoria!) }));
+}
+
 // slug → numerConvocatoria (comparando slugs sobre la lista distinta)
 async function resolverConvocatoria(slug: string): Promise<string | null> {
   const convs = await prisma.opec.findMany({
