@@ -71,7 +71,7 @@ export default function RegistroPage() {
           </h2>
           <ul className="mt-10 space-y-4">
             {[
-              "3 simulacros gratis cada mes para siempre",
+              "Un simulacro de prueba gratis, sin tarjeta",
               "Acceso a 3.000+ OPECs sincronizadas con SIMO-CNSC",
               "Bancos de preguntas únicos generados con IA",
               "Sin tarjeta de crédito, sin compromiso",

@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 // Gate de simulacros. Tres modos de acceso, en orden de prioridad:
 //   - evento : pase trimestral → práctica ilimitada 3 meses, hasta 3 OPECs.
 //   - diario : pase de $6.000 → UN simulacro válido 24h (incluye específicas).
-//   - trial  : gratis, solo pools globales (transversal+comportamental).
+//   - trial  : UN simulacro gratis por cuenta, solo pools globales.
 // ─────────────────────────────────────────────────────────────
 
 // ── Pase trimestral ($49.900): 3 meses, hasta 3 OPECs ──
@@ -128,7 +128,9 @@ export async function paseTrimestralActivo(userId: string): Promise<PaseActivo |
   };
 }
 
-export const LIMITE_FREE_POR_OPEC = 3; // simulacros gratis por OPEC (trial)
+// La prueba gratis es UNA por cuenta, no por OPEC: con 5.000 OPECs en el
+// catálogo, "3 gratis por OPEC" era gratis infinito.
+export const SIMULACROS_FREE_POR_CUENTA = 1;
 export const PREGUNTAS_FREE = 10; // tamaño del simulacro en el trial
 export const PREGUNTAS_PAGADO = 100; // tamaño con acceso pagado
 // ponytail: valores fijos por ahora. Si hay que ajustarlos por convocatoria,
@@ -180,9 +182,9 @@ export async function verificarAccesoOpec(
     };
   }
 
-  // 3) Trial gratis: cuenta simulacros que el usuario ya hizo de ESTA OPEC.
-  const usados = await prisma.simulacro.count({ where: { userId, opecId } });
-  const restantes = LIMITE_FREE_POR_OPEC - usados;
+  // 3) Trial gratis: UNA vez por registro, contando simulacros de CUALQUIER OPEC.
+  const usados = await prisma.simulacro.count({ where: { userId } });
+  const restantes = SIMULACROS_FREE_POR_CUENTA - usados;
 
   if (restantes <= 0) {
     return {
@@ -192,7 +194,7 @@ export async function verificarAccesoOpec(
       modo: "bloqueado",
       simulacrosFreeRestantes: 0,
       razon:
-        "Usaste tus simulacros gratis de esta OPEC. Compra un pase diario ($6.000) o desbloquéala hasta el examen.",
+        "Ya usaste tu simulacro de prueba. Sigue con un pase diario ($6.000) o el pase trimestral ($49.900, 3 meses en hasta 3 OPECs).",
     };
   }
 

@@ -498,8 +498,8 @@ export default function LandingPage() {
               {
                 name: "Gratis",
                 price: "$0",
-                period: "para probar",
-                features: ["Simulacros con el manual general del funcionario", "Transversales + comportamentales", "3 gratis por cada OPEC", "Sin tarjeta"],
+                period: "un simulacro",
+                features: ["Un simulacro de prueba con el manual general del funcionario", "Transversales + comportamentales", "Una vez por cuenta", "Sin tarjeta"],
                 cta: "Empezar gratis",
                 href: "/registro",
                 highlight: false,
@@ -604,7 +604,7 @@ export default function LandingPage() {
                   },
                   {
                     q: "¿Cómo se paga? ¿Hay suscripción?",
-                    a: "No hay suscripción. Practicas gratis con el manual general del funcionario (preguntas transversales y comportamentales). Para las preguntas específicas de tu cargo, pagas por evento: un pase diario de $6.000 (un simulacro completo válido 24h) o el pase trimestral de $49.900: práctica ilimitada durante 3 meses en hasta 3 OPECs. Pago único, sin mensualidades — no se renueva solo.",
+                    a: "No hay suscripción. Al registrarte tienes un simulacro de prueba gratis con el manual general del funcionario (preguntas transversales y comportamentales). Después pagas solo lo que uses: pase diario de $6.000 (un simulacro completo válido 24h) o pase trimestral de $49.900 (práctica ilimitada durante 3 meses en hasta 3 OPECs). Pago único, sin mensualidades — no se renueva solo.",
                   },
                   {
                     q: "¿Funciona desde el celular?",
@@ -612,7 +612,7 @@ export default function LandingPage() {
                   },
                   {
                     q: "¿Puedo practicar sin pagar?",
-                    a: "Sí. Con tu cuenta gratis practicas simulacros del manual general del funcionario (preguntas transversales y comportamentales) para cualquier OPEC. Las preguntas específicas de tu cargo se desbloquean con el pase diario ($6.000) o el pase trimestral ($49.900).",
+                    a: "Sí. Al registrarte haces un simulacro de prueba con el manual general del funcionario (preguntas transversales y comportamentales), en la OPEC que quieras. Las preguntas específicas de tu cargo, y seguir practicando, van con el pase diario ($6.000) o el trimestral ($49.900).",
                   },
                   {
                     q: "¿Cómo se actualiza la información de las OPECs?",
