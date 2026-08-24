@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { tgSend, esc } from "@/lib/telegram";
-import { slugify } from "@/lib/slug";
+import { buscarOpecs, hubEntidad, APP_URL } from "@/lib/bot-busqueda";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
 const SECRET = process.env.TELEGRAM_WEBHOOK_SECRET || "";
 const UTM = "utm_source=telegram&utm_medium=bot";
 const registro = `${APP_URL}/registro?${UTM}`;
@@ -75,20 +74,7 @@ async function responderBusqueda(chatId: bigint, q: string) {
     return;
   }
 
-  const opecs = await prisma.opec.findMany({
-    where: {
-      creadoPorUserId: null,
-      estado: { in: ["ACTIVA", "EN_PRUEBAS"] },
-      OR: [
-        { nombreCargo: { contains: q, mode: "insensitive" } },
-        { entidad: { contains: q, mode: "insensitive" } },
-        { numerConvocatoria: { contains: q, mode: "insensitive" } },
-      ],
-    },
-    select: { nombreCargo: true, entidad: true, municipio: true, numVacantes: true },
-    orderBy: { numVacantes: "desc" },
-    take: 8,
-  });
+  const { cargos: opecs, entidades } = await buscarOpecs(q);
 
   if (opecs.length === 0) {
     await tgSend(
@@ -105,9 +91,8 @@ async function responderBusqueda(chatId: bigint, q: string) {
     .join("\n");
 
   // Enlaces a los hubs públicos de las entidades encontradas (máx 4).
-  const entidades = [...new Set(opecs.map((o) => o.entidad))].slice(0, 4);
   const links = entidades
-    .map((e) => `🏛 <a href="${APP_URL}/entidades/${slugify(e)}">${esc(e)}</a>`)
+    .map((e) => `🏛 <a href="${hubEntidad(e)}">${esc(e)}</a>`)
     .join("\n");
 
   await tgSend(
