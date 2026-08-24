@@ -52,8 +52,8 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
             <img
               src="/logo-lockup.png"
-              alt="PreparaOSS — Prepárate hoy, conquista tu mañana"
-              className="h-10 w-auto rounded-lg bg-white px-2 py-1 shadow-sm"
+              alt="PreparaOSS"
+              className="h-12 w-auto"
             />
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -667,8 +667,8 @@ export default function LandingPage() {
             <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
               <img
                 src="/logo-lockup.png"
-                alt="PreparaOSS — Prepárate hoy, conquista tu mañana"
-                className="h-11 w-auto rounded-lg bg-white px-2 py-1 shadow-sm"
+                alt="PreparaOSS"
+                className="h-14 w-auto"
               />
             </Link>
             <p className="mt-4 text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
