@@ -285,107 +285,113 @@ p { color: var(--text-secondary); }
   color: transparent;
 }
 
-/* ─── Buttons ────────────────────────────────────────────────── */
+/* Los .btn-* van en @layer components a propósito: sin capa le ganaban a las
+   utilidades de Tailwind, y un `hidden md:inline-flex` sobre un botón no
+   ocultaba nada (así se colaba "Empezar gratis" en la barra móvil). Dentro de
+   la capa, las utilidades mandan. */
+@layer components {
+  /* ─── Buttons ────────────────────────────────────────────────── */
 
-/* Primario: DORADO. CTA principal: Inscribirse, Iniciar simulacro,
-   Continuar, Guardar. Texto oscuro para contraste sobre el dorado. */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.75rem;
-  border-radius: var(--radius-full);
-  background: var(--gradient-gold);
-  color: var(--btn-gold-text);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.9375rem;
-  letter-spacing: -0.01em;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  cursor: pointer;
-  box-shadow: 0 8px 24px var(--btn-gold-glow), 0 2px 8px rgba(212, 175, 55, 0.18);
-  transition: transform var(--t-fast), box-shadow var(--t-fast), filter var(--t-fast);
-  white-space: nowrap;
+  /* Primario: DORADO. CTA principal: Inscribirse, Iniciar simulacro,
+     Continuar, Guardar. Texto oscuro para contraste sobre el dorado. */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: var(--radius-full);
+    background: var(--gradient-gold);
+    color: var(--btn-gold-text);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    cursor: pointer;
+    box-shadow: 0 8px 24px var(--btn-gold-glow), 0 2px 8px rgba(212, 175, 55, 0.18);
+    transition: transform var(--t-fast), box-shadow var(--t-fast), filter var(--t-fast);
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.06);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--btn-gold-glow), 0 4px 12px rgba(212, 175, 55, 0.28);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+    filter: brightness(0.96);
+  }
+
+  /* Compat: la variante .is-red histórica ya NO se debe usar en UI pública.
+     Se mantiene como alias del nuevo .btn-destructive para no romper páginas
+     públicas que aún tengan la clase aplicada. */
+  .btn-primary.is-red,
+  .btn-destructive {
+    background: var(--btn-red);
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px var(--btn-red-glow), 0 2px 8px rgba(206, 17, 38, 0.18);
+  }
+
+  .btn-primary.is-red:hover,
+  .btn-destructive:hover {
+    background: var(--btn-red-hover);
+    filter: none;
+    box-shadow: 0 12px 32px rgba(206, 17, 38, 0.42), 0 4px 12px rgba(206, 17, 38, 0.22);
+  }
+
+  /* Secundario: PLATEADO. Acciones secundarias: Cancelar, Volver,
+     Cerrar modal, Ver detalle. Outline traslúcido por defecto;
+     se rellena al hover. */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: var(--radius-full);
+    background: rgba(199, 204, 212, 0.06);
+    color: var(--btn-silver);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border: 1.5px solid var(--btn-silver);
+    cursor: pointer;
+    transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+    white-space: nowrap;
+  }
+
+  .btn-secondary:hover {
+    background: var(--gradient-silver);
+    color: var(--btn-silver-text);
+    border-color: var(--btn-silver-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(199, 204, 212, 0.18);
+  }
+
+  .btn-secondary:active {
+    transform: translateY(0);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    transition: color var(--t-fast);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-ghost:hover { color: var(--accent-500); }
 }
-
-.btn-primary:hover {
-  filter: brightness(1.06);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px var(--btn-gold-glow), 0 4px 12px rgba(212, 175, 55, 0.28);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-  filter: brightness(0.96);
-}
-
-/* Compat: la variante .is-red histórica ya NO se debe usar en UI pública.
-   Se mantiene como alias del nuevo .btn-destructive para no romper páginas
-   públicas que aún tengan la clase aplicada. */
-.btn-primary.is-red,
-.btn-destructive {
-  background: var(--btn-red);
-  color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px var(--btn-red-glow), 0 2px 8px rgba(206, 17, 38, 0.18);
-}
-
-.btn-primary.is-red:hover,
-.btn-destructive:hover {
-  background: var(--btn-red-hover);
-  filter: none;
-  box-shadow: 0 12px 32px rgba(206, 17, 38, 0.42), 0 4px 12px rgba(206, 17, 38, 0.22);
-}
-
-/* Secundario: PLATEADO. Acciones secundarias: Cancelar, Volver,
-   Cerrar modal, Ver detalle. Outline traslúcido por defecto;
-   se rellena al hover. */
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.75rem;
-  border-radius: var(--radius-full);
-  background: rgba(199, 204, 212, 0.06);
-  color: var(--btn-silver);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  border: 1.5px solid var(--btn-silver);
-  cursor: pointer;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
-  white-space: nowrap;
-}
-
-.btn-secondary:hover {
-  background: var(--gradient-silver);
-  color: var(--btn-silver-text);
-  border-color: var(--btn-silver-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(199, 204, 212, 0.18);
-}
-
-.btn-secondary:active {
-  transform: translateY(0);
-}
-
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 0.9375rem;
-  transition: color var(--t-fast);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-ghost:hover { color: var(--accent-500); }
 
 /* ─── Cards ──────────────────────────────────────────────────── */
 .card {
