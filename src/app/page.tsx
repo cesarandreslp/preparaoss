@@ -50,10 +50,11 @@ export default function LandingPage() {
       >
         <div className="container-app flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
-            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white overflow-hidden shrink-0">
-              <img src="/brand-icon.png" alt="PreparaOSS" width={36} height={36} className="w-full h-full object-cover scale-[1.15]" />
-            </span>
-            <span className="text-gradient-gold">PreparaOSS</span>
+            <img
+              src="/logo-lockup.png"
+              alt="PreparaOSS — Prepárate hoy, conquista tu mañana"
+              className="h-10 w-auto rounded-lg bg-white px-2 py-1 shadow-sm"
+            />
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#como-funciona" className="btn-ghost">Cómo funciona</a>
@@ -664,10 +665,11 @@ export default function LandingPage() {
         <div className="container-app py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 font-bold text-lg" style={{ fontFamily: "var(--font-display)" }}>
-              <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white overflow-hidden shrink-0">
-                <img src="/brand-icon.png" alt="PreparaOSS" width={36} height={36} className="w-full h-full object-cover scale-[1.15]" />
-              </span>
-              <span className="text-gradient-gold">PreparaOSS</span>
+              <img
+                src="/logo-lockup.png"
+                alt="PreparaOSS — Prepárate hoy, conquista tu mañana"
+                className="h-11 w-auto rounded-lg bg-white px-2 py-1 shadow-sm"
+              />
             </Link>
             <p className="mt-4 text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
               Preparación inteligente para concursos de méritos de la CNSC.
