@@ -141,9 +141,12 @@ export default function LandingPage() {
                 <span className="eyebrow">Concursos de méritos · CNSC</span>
               </Reveal>
               <Reveal delay={80}>
-                <h1 className="display-1 mt-4">
+                <h1
+                  className="display-1 mt-4"
+                  style={{ fontSize: "clamp(2.25rem, 3.4vw, 3.5rem)", lineHeight: 1.05 }}
+                >
                   Conquista tu cargo público con{" "}
-                  <span className="text-gradient-gold">simulacros de IA</span> hechos a la medida.
+                  <span className="text-gradient-gold">simulacros de IA</span> a tu medida.
                 </h1>
               </Reveal>
               <Reveal delay={160}>

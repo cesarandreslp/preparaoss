@@ -97,8 +97,8 @@
   --font-body:    var(--font-dm-sans, 'DM Sans', sans-serif);
 
   /* Spacing scale (for sections) */
-  --section-py: clamp(4rem, 10vw, 8rem);
-  --section-py-sm: clamp(3rem, 6vw, 5rem);
+  --section-py: clamp(2.75rem, 5vw, 4.5rem);
+  --section-py-sm: clamp(2rem, 3.5vw, 3rem);
 
   /* Radii */
   --radius-sm:   8px;
