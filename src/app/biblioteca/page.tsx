@@ -64,7 +64,8 @@ export default async function BibliotecaPage() {
           <p className="mt-6 text-lg" style={{ color: "var(--text-secondary)" }}>
             Normas, leyes y manuales transversales a cualquier cargo del Estado colombiano.{" "}
             <strong style={{ color: "var(--text-primary)" }}>{recursos.length}</strong> documentos curados ·{" "}
-            <strong style={{ color: "var(--text-primary)" }}>{totalConPdf}</strong> con PDF disponible.
+            <strong style={{ color: "var(--text-primary)" }}>{totalConPdf}</strong> enlazados a su fuente
+            oficial, con el texto vigente.
           </p>
         </header>
 
