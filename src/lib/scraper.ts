@@ -15,6 +15,8 @@ import { EstadoOpec, DocumentType } from "@prisma/client";
 const SIMO_BASE = "https://simo.cnsc.gov.co";
 const PAGE_SIZE = 100;
 const MAX_PAGES = 40; // Techo de seguridad (3400+ OPECs ÷ 100 = ~34 páginas)
+// Pausa entre páginas: ritmo educado para no gatillar rate-limit/blacklist de SIMO.
+const DELAY_MS = Number(process.env.SCRAPER_DELAY_MS ?? 2000);
 
 // ─────────────────────────────────────────────────
 // TIPOS API SIMO
@@ -233,7 +235,7 @@ export async function sincronizarOpecs(): Promise<{
     page++;
     if (items.length < PAGE_SIZE) break;
     // Pausa respetuosa entre páginas
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, DELAY_MS));
   }
 
   // Reclasificación por fechas:
