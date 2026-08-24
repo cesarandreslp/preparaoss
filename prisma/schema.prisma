@@ -525,7 +525,10 @@ model RecursoBiblioteca {
   titulo      String           // "Carrera Administrativa"
   numeroNorma String?          // "Ley 909 de 2004"
   descripcion String?          @db.Text
-  /// URL del PDF (puede ser externa o Vercel Blob después de upload)
+  /// Enlace a la fuente OFICIAL (Senado / Gestor Normativo). Es el origen del
+  /// PDF alojado y lo que hay que consultar si la norma se reforma.
+  fuenteUrl   String?
+  /// URL del PDF servido por nosotros (GitHub Pages), para leerlo dentro de la app
   pdfUrl      String?
   /// Nombre del archivo (cuando se sube via Blob)
   pdfFileName String?

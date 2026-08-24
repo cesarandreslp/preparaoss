@@ -40,7 +40,7 @@ export default async function BibliotecaPage() {
     grouped.get(r.bloque)!.push(r);
   }
 
-  const totalConPdf = recursos.filter((r) => r.pdfUrl).length;
+  const totalConDocumento = recursos.filter((r) => r.pdfUrl || r.fuenteUrl).length;
 
   return (
     <main className="min-h-screen noise-overlay" style={{ background: "var(--gradient-hero)" }}>
@@ -64,8 +64,8 @@ export default async function BibliotecaPage() {
           <p className="mt-6 text-lg" style={{ color: "var(--text-secondary)" }}>
             Normas, leyes y manuales transversales a cualquier cargo del Estado colombiano.{" "}
             <strong style={{ color: "var(--text-primary)" }}>{recursos.length}</strong> documentos curados ·{" "}
-            <strong style={{ color: "var(--text-primary)" }}>{totalConPdf}</strong> enlazados a su fuente
-            oficial, con el texto vigente.
+            <strong style={{ color: "var(--text-primary)" }}>{totalConDocumento}</strong> con documento
+            para leer aquí mismo.
           </p>
         </header>
 
@@ -82,22 +82,30 @@ export default async function BibliotecaPage() {
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {items.map((r) => {
+                  // Con PDF propio se lee dentro de la app; si solo hay
+                  // fuente oficial, se abre fuera hasta que se publique.
                   const Wrapper = r.pdfUrl
                     ? ({ children }: { children: React.ReactNode }) => (
-                        <a
-                          href={r.pdfUrl!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="card group h-full flex flex-col cursor-pointer"
-                        >
+                        <Link href={`/biblioteca/${r.id}`} className="card group h-full flex flex-col cursor-pointer">
                           {children}
-                        </a>
+                        </Link>
                       )
-                    : ({ children }: { children: React.ReactNode }) => (
-                        <div className="card h-full flex flex-col opacity-70 cursor-not-allowed">
-                          {children}
-                        </div>
-                      );
+                    : r.fuenteUrl
+                      ? ({ children }: { children: React.ReactNode }) => (
+                          <a
+                            href={r.fuenteUrl!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="card group h-full flex flex-col cursor-pointer"
+                          >
+                            {children}
+                          </a>
+                        )
+                      : ({ children }: { children: React.ReactNode }) => (
+                          <div className="card h-full flex flex-col opacity-70 cursor-not-allowed">
+                            {children}
+                          </div>
+                        );
 
                   return (
                     <Wrapper key={r.id}>
@@ -120,14 +128,14 @@ export default async function BibliotecaPage() {
                       )}
                       <div
                         className="mt-auto pt-4 text-xs flex items-center gap-1.5"
-                        style={{ color: r.pdfUrl ? "var(--accent-500)" : "var(--text-muted)" }}
+                        style={{ color: r.pdfUrl || r.fuenteUrl ? "var(--accent-500)" : "var(--text-muted)" }}
                       >
-                        {r.pdfUrl ? (
+                        {r.pdfUrl || r.fuenteUrl ? (
                           <>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                               <path d="M14 2v4a2 2 0 002 2h4M5 4a2 2 0 012-2h7l5 5v13a2 2 0 01-2 2H7a2 2 0 01-2-2V4z" stroke="currentColor" strokeWidth="2" />
                             </svg>
-                            {r.pdfUrl.toLowerCase().includes(".pdf") ? "Descargar PDF ↗" : "Ver texto oficial ↗"}
+                            {r.pdfUrl ? "Leer aquí" : "Ver texto oficial ↗"}
                           </>
                         ) : (
                           <>📦 PDF próximamente</>
