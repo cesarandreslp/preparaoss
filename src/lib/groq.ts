@@ -8,5 +8,7 @@ export const groq = new Groq({
 // Zod estricto. El 8b-instant es ~3× más rápido y tiene cuota TPD mayor,
 // pero no respeta los enums (devuelve "basico" en vez de "BASICO") ni la
 // cantidad exacta de opciones — lote completo falla en validación Zod.
-export const GROQ_MODEL = "llama-3.3-70b-versatile";
+// La cuenta ya no tiene acceso a los Llama; usa los modelos vigentes del catálogo.
+// Configurable por env por si cambia de nuevo.
+export const GROQ_MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
 export const GROQ_MODEL_FAST = "llama-3.1-8b-instant";
