@@ -8,7 +8,7 @@
 import OpenAI from "openai";
 
 export const mistral = new OpenAI({
-  apiKey: process.env.MISTRAL,
+  apiKey: process.env.MISTRAL || "unset", // no reventar el build si falta
   baseURL: "https://api.mistral.ai/v1",
 });
 

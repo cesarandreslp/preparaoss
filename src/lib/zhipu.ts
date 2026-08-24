@@ -9,7 +9,7 @@
 import OpenAI from "openai";
 
 export const zhipu = new OpenAI({
-  apiKey: process.env.ZHIPU_API_KEY,
+  apiKey: process.env.ZHIPU_API_KEY || "unset", // no reventar el build si falta
   baseURL: "https://open.bigmodel.cn/api/paas/v4",
 });
 
