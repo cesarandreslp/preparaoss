@@ -73,7 +73,7 @@ export default function RegistroPage() {
             {[
               "Un simulacro de prueba gratis, sin tarjeta",
               "Acceso a 3.000+ OPECs sincronizadas con SIMO-CNSC",
-              "Bancos de preguntas únicos generados con IA",
+              "Bancos de preguntas únicos para tu cargo",
               "Sin tarjeta de crédito, sin compromiso",
             ].map((li) => (
               <li key={li} className="flex items-start gap-3">

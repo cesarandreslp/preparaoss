@@ -58,7 +58,7 @@ export default function CargarOpecPage() {
       <h1 className="text-2xl font-bold mt-3">Carga tu OPEC</h1>
       <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
         ¿Tu OPEC no aparece en el buscador? Sube el <strong>manual de funciones</strong> de
-        tu cargo (PDF, Word, txt o una foto legible) y la IA genera tu banco de preguntas.
+        tu cargo (PDF, Word, txt o una foto legible) y el sistema genera tu banco de preguntas.
         Mientras se genera, ya puedes practicar las transversales y comportamentales.
       </p>
 

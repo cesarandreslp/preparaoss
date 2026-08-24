@@ -91,7 +91,7 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
 
       {/* ─── RETROALIMENTACIÓN ───────────────────────────────
           Se muestra AL FINAL del simulacro (nunca durante)
-          Justifica cada respuesta con la explicación de la IA
+          Justifica cada respuesta con la explicación del sistema
       ───────────────────────────────────────────────────── */}
       <div>
         <h2 className="font-bold text-lg mb-4" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>📋 Retroalimentación</h2>
@@ -156,7 +156,7 @@ export function ResultadoScreen({ resultado, escenarios, preguntas, onVolver }: 
                   })}
                 </div>
 
-                {/* Explicación de la IA */}
+                {/* Explicación del sistema */}
                 <div className="rounded-xl p-4" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
                   <p className="text-xs font-semibold mb-1 uppercase tracking-wide" style={{ color: 'var(--gold-300)' }}>
                     Explicación

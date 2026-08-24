@@ -137,7 +137,7 @@ export default function AdminPage() {
           <span className="eyebrow">Panel admin</span>
           <h1 className="display-2 mt-3">🛠️ Centro de control</h1>
           <p className="mt-3 text-base max-w-xl" style={{ color: "var(--text-secondary)" }}>
-            Generación masiva de bancos de preguntas IA y CMS de toda la plataforma.
+            Generación masiva de bancos de preguntas y CMS de toda la plataforma.
           </p>
         </header>
 

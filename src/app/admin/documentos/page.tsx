@@ -202,7 +202,7 @@ export default function AdminDocumentosPage() {
 
       <h1 className="text-3xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>📚 Documentos por OPEC</h1>
       <p className="mb-8" style={{ color: "var(--text-muted)" }}>
-        Sube manuales y guías oficiales. La IA los usará como contexto al generar preguntas.
+        Sube manuales y guías oficiales. El sistema los usará como contexto al generar preguntas.
       </p>
 
       {/* Buscador OPEC */}
@@ -392,8 +392,8 @@ export default function AdminDocumentosPage() {
             <h3 className="font-semibold mb-2" style={{ color: "var(--text-primary)" }}>🤖 Generar banco de preguntas</h3>
             <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
               {docs.filter((d) => d.isParsed).length > 0
-                ? `La IA usará los ${docs.filter((d) => d.isParsed).length} documento(s) cargado(s) como contexto al generar las preguntas.`
-                : "No hay documentos parseados; la IA generará a partir de las competencias y datos de la OPEC."}
+                ? `El sistema usará los ${docs.filter((d) => d.isParsed).length} documento(s) cargado(s) como contexto al generar las preguntas.`
+                : "No hay documentos parseados; el sistema generará a partir de las competencias y datos de la OPEC."}
             </p>
 
             <label className="flex items-center gap-2 mb-4 text-sm" style={{ color: "var(--text-secondary)" }}>

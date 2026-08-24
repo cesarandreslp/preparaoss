@@ -19,7 +19,7 @@ const dmSans = DM_Sans({
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
 const DESC =
-  "Prepárate para los concursos de méritos de la CNSC con simulacros generados por IA a la medida de tu OPEC. Practica gratis, paga solo por tu cargo.";
+  "Prepárate para los concursos de méritos de la CNSC con simulacros generados por nuestro sistema a la medida de tu OPEC. Practica gratis, paga solo por tu cargo.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),

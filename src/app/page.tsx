@@ -152,7 +152,7 @@ export default function LandingPage() {
                   style={{ fontSize: "clamp(2.25rem, 3.4vw, 3.5rem)", lineHeight: 1.05 }}
                 >
                   Conquista tu cargo público con{" "}
-                  <span className="text-gradient-gold">simulacros de IA</span> a tu medida.
+                  <span className="text-gradient-gold">simulacros a tu medida</span>.
                 </h1>
               </Reveal>
               <Reveal delay={160}>
@@ -366,8 +366,8 @@ export default function LandingPage() {
               },
               {
                 n: "02",
-                t: "Generamos tu banco con IA",
-                d: "Nuestra IA produce hasta 100 preguntas únicas a partir de las funciones, requisitos y manuales de tu cargo. Sin contenido genérico.",
+                t: "Generamos tu banco de preguntas",
+                d: "El sistema produce hasta 100 preguntas únicas a partir de las funciones, requisitos y manuales de tu cargo. Sin contenido genérico.",
               },
               {
                 n: "03",
@@ -596,7 +596,7 @@ export default function LandingPage() {
                 items={[
                   {
                     q: "¿De dónde salen las preguntas?",
-                    a: "Las genera nuestra IA especializada usando como contexto las funciones, requisitos y manuales del cargo específico al que aspiras. No son preguntas genéricas reutilizadas: cada banco es único para tu OPEC.",
+                    a: "Las genera nuestro sistema usando como contexto las funciones, requisitos y manuales del cargo específico al que aspiras. No son preguntas genéricas reutilizadas: cada banco es único para tu OPEC.",
                   },
                   {
                     q: "¿Las preguntas son las mismas que saldrán en el examen real?",
