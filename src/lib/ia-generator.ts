@@ -74,12 +74,17 @@ function bloqueContexto(contexto: string): string {
  * uppercase + sin diacríticos antes de validar contra el enum.
  */
 const DificultadSchema = z.preprocess((v) => {
-  if (typeof v !== "string") return v;
-  return v
+  if (typeof v !== "string") return "INTERMEDIO";
+  const s = v
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "") // quita acentos
     .toUpperCase()
     .trim();
+  // Mapea sinónimos frecuentes del LLM (español) al enum. Cualquier valor
+  // desconocido cae a INTERMEDIO: así este campo NUNCA rompe el parse del lote.
+  if (["BASICO", "FACIL", "BAJA", "BAJO", "SENCILLO", "ELEMENTAL"].includes(s)) return "BASICO";
+  if (["AVANZADO", "DIFICIL", "ALTA", "ALTO", "COMPLEJO", "EXPERTO"].includes(s)) return "AVANZADO";
+  return "INTERMEDIO";
 }, z.enum(["BASICO", "INTERMEDIO", "AVANZADO"]));
 
 const OpcionSchema = z.object({
@@ -195,7 +200,15 @@ Responde ÚNICAMENTE con JSON válido con esta estructura exacta — un objeto c
   const items = Array.isArray(raw)
     ? raw
     : (raw as { escenarios?: unknown[] })?.escenarios ?? [];
-  const escenarios = z.array(PreguntaFuncEspSchema).parse(items);
+  // Tolerante: conserva los escenarios válidos y descarta los malformados,
+  // en vez de tirar todo el lote si uno falla.
+  const escenarios = items.flatMap((it) => {
+    const r = PreguntaFuncEspSchema.safeParse(it);
+    return r.success ? [r.data] : [];
+  });
+  if (escenarios.length === 0) {
+    throw new Error("El LLM no devolvió ningún escenario válido");
+  }
 
   for (const parsed of escenarios) {
     const escenario = await prisma.escenarioSituacional.create({

@@ -66,3 +66,7 @@ scratch/
 /clean_opecs.json
 /next_*.json
 /opecs_*.json
+
+# logs de tareas locales
+scraper.log
+generar-lote.log
