@@ -132,52 +132,114 @@ export default function LandingPage() {
       </nav>
 
       {/* ─── HERO ─── */}
-      <section className="relative pt-40 pb-32">
+      <section className="relative pt-32 pb-16">
         <div className="container-app relative">
-          <Reveal>
-            <span className="eyebrow">Concursos de méritos · CNSC</span>
-          </Reveal>
-          <Reveal delay={80}>
-            <h1 className="display-1 mt-4 max-w-5xl">
-              Conquista tu cargo público con{" "}
-              <span className="text-gradient-gold">simulacros de IA</span> hechos a la medida.
-            </h1>
-          </Reveal>
-          <Reveal delay={160}>
-            <p className="mt-6 text-lg max-w-2xl" style={{ color: "var(--text-secondary)" }}>
-              Genera bancos de preguntas únicos para tu OPEC, mide tu progreso por niveles
-              y compite con otros aspirantes. Sin libros viejos. Sin academias caras.
-            </p>
-          </Reveal>
-          <Reveal delay={240}>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              {isAuthed ? (
-                <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
-                  Ir al dashboard →
-                </Link>
-              ) : (
-                <>
-                  <Link href="/registro" className="btn-primary text-base px-8 py-4">
-                    Empezar gratis · sin tarjeta
-                  </Link>
-                  <Link href="/login" className="btn-secondary text-base px-8 py-4">
-                    Ya tengo cuenta
-                  </Link>
-                </>
-              )}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Izquierda: mensaje + CTA */}
+            <div>
+              <Reveal>
+                <span className="eyebrow">Concursos de méritos · CNSC</span>
+              </Reveal>
+              <Reveal delay={80}>
+                <h1 className="display-1 mt-4">
+                  Conquista tu cargo público con{" "}
+                  <span className="text-gradient-gold">simulacros de IA</span> hechos a la medida.
+                </h1>
+              </Reveal>
+              <Reveal delay={160}>
+                <p className="mt-6 text-lg" style={{ color: "var(--text-secondary)" }}>
+                  Genera bancos de preguntas únicos para tu OPEC, mide tu progreso por niveles
+                  y compite con otros aspirantes. Sin libros viejos. Sin academias caras.
+                </p>
+              </Reveal>
+              <Reveal delay={240}>
+                <div className="mt-10 flex flex-wrap items-center gap-4">
+                  {isAuthed ? (
+                    <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
+                      Ir al dashboard →
+                    </Link>
+                  ) : (
+                    <>
+                      <Link href="/registro" className="btn-primary text-base px-8 py-4">
+                        Empezar gratis · sin tarjeta
+                      </Link>
+                      <Link href="/login" className="btn-secondary text-base px-8 py-4">
+                        Ya tengo cuenta
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </Reveal>
+              <Reveal delay={320}>
+                <p className="mt-4 text-xs" style={{ color: "var(--text-muted)" }}>
+                  Sin tarjeta de crédito · Datos directos de SIMO-CNSC · Practica gratis
+                </p>
+              </Reveal>
             </div>
-          </Reveal>
-          <Reveal delay={320}>
-            <p className="mt-4 text-xs" style={{ color: "var(--text-muted)" }}>
-              Sin tarjeta de crédito · Datos directos de SIMO-CNSC · Cancela cuando quieras
-            </p>
-          </Reveal>
 
-          <Reveal delay={400}>
-            <div className="mt-12 max-w-2xl">
-              <ProbadorHero />
-            </div>
-          </Reveal>
+            {/* Derecha: vista del producto (simulacro real) */}
+            <Reveal delay={200}>
+              <div className="card-glow p-6 md:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
+                    <span className="inline-block w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--success)" }} />
+                    Simulacro en progreso
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-mono" style={{ color: "var(--gold-300)" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                      <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    01:24
+                  </div>
+                </div>
+                <p className="text-xs uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>
+                  Pregunta 12 de 30 · Funcional transversal
+                </p>
+                <p className="text-base font-medium leading-relaxed mb-6">
+                  ¿Cuál es el término máximo para resolver una petición de copias o información, según el
+                  Art. 14 de la Ley 1755 de 2015?
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { l: "A", t: "5 días hábiles", state: "default" },
+                    { l: "B", t: "10 días hábiles", state: "correct" },
+                    { l: "C", t: "15 días hábiles", state: "default" },
+                    { l: "D", t: "30 días hábiles", state: "wrong" },
+                  ].map((opt) => (
+                    <div
+                      key={opt.l}
+                      className="flex items-center gap-3 p-3 rounded-lg border"
+                      style={{
+                        background: opt.state === "correct" ? "rgba(34,197,94,0.08)" : opt.state === "wrong" ? "rgba(239,68,68,0.06)" : "rgba(10, 10, 10, 0.02)",
+                        borderColor: opt.state === "correct" ? "rgba(34,197,94,0.40)" : opt.state === "wrong" ? "rgba(239,68,68,0.30)" : "var(--border-subtle)",
+                      }}
+                    >
+                      <span
+                        className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold"
+                        style={{
+                          background: opt.state === "correct" ? "var(--success)" : opt.state === "wrong" ? "var(--error)" : "rgba(10, 10, 10, 0.06)",
+                          color: opt.state === "default" ? "var(--text-secondary)" : "white",
+                        }}
+                      >
+                        {opt.l}
+                      </span>
+                      <span
+                        className="text-sm flex-1"
+                        style={{ color: opt.state === "correct" ? "var(--success)" : opt.state === "wrong" ? "var(--error)" : "var(--text-primary)" }}
+                      >
+                        {opt.t}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
+                  <span>+15 XP por acierto</span>
+                  <span>🔥 Racha actual: 7 días</span>
+                </div>
+              </div>
+            </Reveal>
+          </div>
 
           {/* Stats row */}
           <Reveal delay={480}>
@@ -201,6 +263,15 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ─── PROBADOR (gancho interactivo, sin registro) ─── */}
+      <section className="section-sm">
+        <div className="container-narrow">
+          <Reveal>
+            <ProbadorHero />
           </Reveal>
         </div>
       </section>
@@ -330,268 +401,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── PREVIEW SIMULACRO MOCK ─── */}
-      <section className="section">
-        <div className="container-app grid lg:grid-cols-2 gap-16 items-center">
-          <Reveal>
-            <span className="eyebrow">Vista previa</span>
-            <h2 className="display-2 mt-4">
-              Cada pregunta viene con{" "}
-              <span className="text-gradient-blue">explicación detallada</span>.
-            </h2>
-            <p className="mt-6 text-lg" style={{ color: "var(--text-secondary)" }}>
-              No solo te decimos si fallaste. Te mostramos por qué la respuesta correcta es la
-              correcta y dónde profundizar. Aprendes con cada error.
-            </p>
-            <ul className="mt-8 space-y-3">
-              {[
-                "100 preguntas por banco · regenerable cuando quieras",
-                "Tiempo por pregunta: 90s para conocimientos, sin límite en comportamental",
-                "XP variable según dificultad y velocidad",
-                "Historial completo: revisa simulacros pasados",
-              ].map((li) => (
-                <li key={li} className="flex items-start gap-3" style={{ color: "var(--text-secondary)" }}>
-                  <span
-                    className="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0"
-                    style={{ background: "rgba(212, 175, 55, 0.15)", color: "var(--gold-500)" }}
-                  >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                  {li}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={160}>
-            <div className="card-glow p-6 md:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
-                  <span
-                    className="inline-block w-2 h-2 rounded-full animate-pulse"
-                    style={{ background: "var(--success)" }}
-                  />
-                  Simulacro en progreso
-                </div>
-                <div className="flex items-center gap-2 text-xs font-mono" style={{ color: "var(--gold-300)" }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-                    <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  01:24
-                </div>
-              </div>
-
-              <p className="text-xs uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>
-                Pregunta 12 de 30 · Funcional transversal
-              </p>
-              <p className="text-base font-medium leading-relaxed mb-6">
-                ¿Cuál es el término máximo para resolver una petición de copias o información, según el
-                Art. 14 de la Ley 1755 de 2015?
-              </p>
-
-              <div className="space-y-2">
-                {[
-                  { l: "A", t: "5 días hábiles", state: "default" },
-                  { l: "B", t: "10 días hábiles", state: "correct" },
-                  { l: "C", t: "15 días hábiles", state: "default" },
-                  { l: "D", t: "30 días hábiles", state: "wrong" },
-                ].map((opt) => (
-                  <div
-                    key={opt.l}
-                    className="flex items-center gap-3 p-3 rounded-lg border transition-colors"
-                    style={{
-                      background:
-                        opt.state === "correct"
-                          ? "rgba(34,197,94,0.08)"
-                          : opt.state === "wrong"
-                          ? "rgba(239,68,68,0.06)"
-                          : "rgba(10, 10, 10, 0.02)",
-                      borderColor:
-                        opt.state === "correct"
-                          ? "rgba(34,197,94,0.40)"
-                          : opt.state === "wrong"
-                          ? "rgba(239,68,68,0.30)"
-                          : "var(--border-subtle)",
-                    }}
-                  >
-                    <span
-                      className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold"
-                      style={{
-                        background:
-                          opt.state === "correct"
-                            ? "var(--success)"
-                            : opt.state === "wrong"
-                            ? "var(--error)"
-                            : "rgba(10, 10, 10, 0.06)",
-                        color: opt.state === "default" ? "var(--text-secondary)" : "white",
-                      }}
-                    >
-                      {opt.l}
-                    </span>
-                    <span
-                      className="text-sm flex-1"
-                      style={{
-                        color:
-                          opt.state === "correct"
-                            ? "var(--success)"
-                            : opt.state === "wrong"
-                            ? "var(--error)"
-                            : "var(--text-primary)",
-                      }}
-                    >
-                      {opt.t}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
-                <span>+15 XP por acierto</span>
-                <span>🔥 Racha actual: 7 días</span>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ─── OPECs ACTIVAS ─── */}
       <section id="opecs" className="section">
         <div className="container-app">
           <Reveal>
-            <div className="flex items-end justify-between flex-wrap gap-6">
-              <div>
-                <span className="eyebrow">OPECs activas</span>
-                <h2 className="display-2 mt-4 max-w-2xl">
-                  3.000+ vacantes esperándote ahora mismo.
-                </h2>
-              </div>
-              <Link href="/opecs" className="btn-secondary">
-                Explorar todas →
+            <span className="eyebrow">OPECs reales de SIMO</span>
+            <h2 className="display-2 mt-4 max-w-3xl">
+              Miles de OPECs sincronizadas a diario.{" "}
+              <span className="text-gradient-gold">La tuya está aquí.</span>
+            </h2>
+            <p className="mt-6 text-lg max-w-2xl" style={{ color: "var(--text-secondary)" }}>
+              Traemos las ofertas directo de SIMO-CNSC. Busca tu cargo, practica su banco
+              específico, y si no aparece, la cargas tú en segundos.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link href="/opecs" className="btn-primary text-base px-8 py-4">
+                Explorar todas las OPECs →
+              </Link>
+              <Link href="/opecs/cargar" className="btn-secondary text-base px-8 py-4">
+                Cargar mi OPEC
               </Link>
             </div>
           </Reveal>
 
-          <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              {
-                entidad: "Procuraduría General de la Nación",
-                cargo: "Profesional Universitario · Grado 12",
-                vac: 248,
-                nivel: "Profesional",
-              },
-              {
-                entidad: "DIAN",
-                cargo: "Inspector III · Tributario",
-                vac: 156,
-                nivel: "Asesor",
-              },
-              {
-                entidad: "Fiscalía General de la Nación",
-                cargo: "Asistente de Fiscal II",
-                vac: 412,
-                nivel: "Técnico",
-              },
-              {
-                entidad: "Ministerio de Educación",
-                cargo: "Profesional en Pedagogía",
-                vac: 89,
-                nivel: "Profesional",
-              },
-              {
-                entidad: "ICBF",
-                cargo: "Defensor de Familia",
-                vac: 67,
-                nivel: "Profesional",
-              },
-              {
-                entidad: "Contraloría General",
-                cargo: "Auxiliar Administrativo",
-                vac: 134,
-                nivel: "Asistencial",
-              },
-            ].map((o, i) => (
-              <Reveal key={o.entidad + o.cargo} delay={(i % 3) * 80}>
-                <div className="card h-full flex flex-col">
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <span className="tag tag-blue">{o.nivel}</span>
-                    <span
-                      className="text-xs font-semibold"
-                      style={{ color: "var(--gold-300)", fontFamily: "var(--font-display)" }}
-                    >
-                      {o.vac} vacantes
-                    </span>
-                  </div>
-                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>{o.entidad}</p>
-                  <h3 className="mt-1 text-lg font-bold leading-snug">{o.cargo}</h3>
-                  <div className="mt-auto pt-5 flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
-                    <span>📅 Inscripciones abiertas</span>
-                    <span>→</span>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── TESTIMONIOS ─── */}
-      <section className="section">
-        <div className="container-app">
-          <Reveal>
-            <span className="eyebrow">Casos de éxito</span>
-            <h2 className="display-2 mt-4 max-w-3xl">
-              Aspirantes reales, <span className="text-gradient-gold">cargos reales</span>.
-            </h2>
-          </Reveal>
-
-          <div className="mt-16 grid md:grid-cols-3 gap-6">
-            {[
-              {
-                nombre: "María C.",
-                cargo: "Asistencial · Auxiliar Administrativo",
-                entidad: "Alcaldía de Medellín",
-                texto:
-                  "Llevaba 2 años intentando pasar. Con simulacros diarios y la racha gamificada, por fin entré al puesto 3 de mi OPEC.",
-              },
-              {
-                nombre: "Andrés R.",
-                cargo: "Técnico · Inspector de Tránsito",
-                entidad: "Secretaría de Movilidad",
-                texto:
-                  "Lo que más me gustó fue la explicación de cada respuesta. No memorizo, entiendo. Eso hace la diferencia el día del examen.",
-              },
-              {
-                nombre: "Diana O.",
-                cargo: "Profesional · Abogada Senior",
-                entidad: "Ministerio de Justicia",
-                texto:
-                  "Las preguntas de juicio situacional son idénticas en formato a las del examen real. Llegué con un nivel de confianza enorme.",
-              },
-            ].map((t, i) => (
-              <Reveal key={t.nombre} delay={i * 100}>
-                <figure className="card h-full">
-                  <svg width="32" height="24" viewBox="0 0 32 24" fill="none" style={{ color: "var(--gold-500)" }}>
-                    <path
-                      d="M0 24V14C0 6.27 4.5 1 12 0v4c-3.5 1-5 4-5 7h5v13H0zm17 0V14c0-7.73 4.5-13 12-14v4c-3.5 1-5 4-5 7h5v13H17z"
-                      fill="currentColor"
-                      opacity="0.5"
-                    />
-                  </svg>
-                  <blockquote className="mt-4 text-base leading-relaxed" style={{ color: "var(--text-primary)" }}>
-                    {t.texto}
-                  </blockquote>
-                  <figcaption className="mt-6 pt-6 border-t" style={{ borderColor: "var(--border-subtle)" }}>
-                    <p className="font-semibold">{t.nombre}</p>
-                    <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{t.cargo}</p>
-                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{t.entidad}</p>
-                  </figcaption>
-                </figure>
-              </Reveal>
-            ))}
-          </div>
         </div>
       </section>
 
