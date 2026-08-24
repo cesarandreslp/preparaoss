@@ -164,15 +164,15 @@ export default function LandingPage() {
               <Reveal delay={240}>
                 <div className="mt-10 flex flex-wrap items-center gap-4">
                   {isAuthed ? (
-                    <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
+                    <Link href="/dashboard" className="btn-primary text-[1rem] px-8 py-4">
                       Ir al dashboard →
                     </Link>
                   ) : (
                     <>
-                      <Link href="/registro" className="btn-primary text-base px-8 py-4">
+                      <Link href="/registro" className="btn-primary text-[1rem] px-8 py-4">
                         Empezar gratis · sin tarjeta
                       </Link>
-                      <Link href="/login" className="btn-secondary text-base px-8 py-4">
+                      <Link href="/login" className="btn-secondary text-[1rem] px-8 py-4">
                         Ya tengo cuenta
                       </Link>
                     </>
@@ -466,10 +466,10 @@ export default function LandingPage() {
               específico, y si no aparece, la cargas tú en segundos.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <Link href="/opecs" className="btn-primary text-base px-8 py-4">
+              <Link href="/opecs" className="btn-primary text-[1rem] px-8 py-4">
                 Explorar todas las OPECs →
               </Link>
-              <Link href="/opecs/cargar" className="btn-secondary text-base px-8 py-4">
+              <Link href="/opecs/cargar" className="btn-secondary text-[1rem] px-8 py-4">
                 Cargar mi OPEC
               </Link>
             </div>
@@ -646,11 +646,11 @@ export default function LandingPage() {
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 {isAuthed ? (
-                  <Link href="/dashboard" className="btn-primary text-base px-8 py-4">
+                  <Link href="/dashboard" className="btn-primary text-[1rem] px-8 py-4">
                     Ir al dashboard →
                   </Link>
                 ) : (
-                  <Link href="/registro" className="btn-primary text-base px-8 py-4">
+                  <Link href="/registro" className="btn-primary text-[1rem] px-8 py-4">
                     Crear cuenta gratis →
                   </Link>
                 )}
