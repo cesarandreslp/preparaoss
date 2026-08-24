@@ -58,10 +58,10 @@ export function DesbloquearOpec({
         disabled={cargando !== null}
         className="btn-primary block w-full text-center px-6 py-4 text-lg rounded-2xl disabled:opacity-60"
       >
-        {cargando === "evento" ? "Abriendo pago…" : `🔓 Ilimitado hasta el examen · $${evento}`}
+        {cargando === "evento" ? "Abriendo pago…" : `🔓 3 meses ilimitados · $${evento}`}
       </button>
       <p className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
-        Pago único · práctica ilimitada · PSE y tarjetas
+        Pago único · práctica ilimitada en hasta 3 OPECs · PSE y tarjetas
       </p>
 
       {error && (

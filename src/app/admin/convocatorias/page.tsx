@@ -60,9 +60,9 @@ export default function AdminConvocatoriasPage() {
             <p className="text-xs uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Admin · CMS</p>
             <h1 className="text-3xl font-bold mt-1" style={{ color: "var(--text-primary)" }}>Fechas de examen</h1>
             <p className="mt-1 text-sm max-w-2xl" style={{ color: "var(--text-muted)" }}>
-              SIMO no publica el cronograma: la fecha se carga a mano una vez por
-              convocatoria (la sacas del acuerdo o aviso de la CNSC) y baja a todas
-              sus OPECs. El acceso de quienes ya pagaron se recorta al examen + 3 días.
+              Opcional. El acceso pagado ya no depende de esta fecha (el pase es
+              trimestral): datar una convocatoria solo alimenta el plan de estudio
+              del aspirante y hace que el scraper cierre las OPECs cuyo examen ya pasó.
             </p>
           </div>
           <a href="/admin" className="btn-secondary text-sm">← Volver</a>

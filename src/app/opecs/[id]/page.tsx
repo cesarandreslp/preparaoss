@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { OpecCTA } from "@/components/opec/OpecCTA";
+import { paseTrimestralActivo } from "@/lib/acceso";
 import Link from "next/link";
 
 export default async function OpecDetailPage({
@@ -55,6 +56,13 @@ export default async function OpecDetailPage({
   });
 
   const inscrito = !!inscripcion;
+  const ahora = new Date();
+  const accesoVigente =
+    !!inscripcion?.accesoPagado &&
+    !!inscripcion.accesoHasta &&
+    inscripcion.accesoHasta >= ahora;
+  // Cupos del pase trimestral: si le quedan, puede desbloquear esta OPEC sin pagar de nuevo.
+  const pase = accesoVigente ? null : await paseTrimestralActivo(userId);
 
   return (
     <div className="space-y-8">
@@ -231,7 +239,10 @@ export default async function OpecDetailPage({
         opecId={id}
         tienePreguntas={simulacroDisponible}
         inscrito={inscrito}
-        accesoPagado={!!inscripcion?.accesoPagado}
+        accesoPagado={accesoVigente}
+        accesoHasta={inscripcion?.accesoHasta?.toISOString() ?? null}
+        cuposPase={pase?.disponibles ?? 0}
+        paseVenceAt={pase?.venceAt.toISOString() ?? null}
         precioCop={Number(process.env.PRECIO_OPEC_COP ?? 49900)}
         precioDiarioCop={Number(process.env.PRECIO_DIARIO_COP ?? 6000)}
       />

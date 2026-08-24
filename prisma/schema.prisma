@@ -274,9 +274,14 @@ model UserOpec {
   accesoHasta    DateTime?
   referenciaPago String?   // referencia Wompi/Bold del pago
   montoCop       Int?
+  // Pase trimestral que gastó un cupo en esta OPEC (null = desbloqueo viejo,
+  // de cuando el pago era por OPEC). Los cupos usados se cuentan por aquí.
+  paseId         String?
+  pase           PaseTrimestral? @relation(fields: [paseId], references: [id], onDelete: SetNull)
 
   @@unique([userId, opecId])
   @@index([userId])
+  @@index([paseId])
 }
 
 // ─────────────────────────────────────────────────────────
@@ -618,6 +623,22 @@ model Lead {
 // con retroalimentación solo al final. Incluye específicas (es pago).
 // Es el tier de enganche barato que empuja al plan por evento.
 // ─────────────────────────────────────────────────────────────
+/// Pase trimestral: 3 meses de práctica ilimitada en hasta 3 OPECs.
+/// Los cupos gastados son las UserOpec que apuntan a este pase — así no hay
+/// contador que se desincronice.
+model PaseTrimestral {
+  id             String   @id @default(cuid())
+  userId         String
+  referenciaPago String?  @unique // referencia Wompi del pago
+  montoCop       Int?
+  compradoAt     DateTime @default(now())
+  venceAt        DateTime // compradoAt + 3 meses
+
+  opecs          UserOpec[]
+
+  @@index([userId, venceAt])
+}
+
 model PaseDiario {
   id             String   @id @default(cuid())
   userId         String

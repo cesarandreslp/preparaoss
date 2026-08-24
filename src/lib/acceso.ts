@@ -2,27 +2,46 @@ import { prisma } from "./prisma";
 
 // ─────────────────────────────────────────────────────────────
 // Gate de simulacros. Tres modos de acceso, en orden de prioridad:
-//   - evento : pagó la OPEC → práctica ilimitada hasta el día del examen.
+//   - evento : pase trimestral → práctica ilimitada 3 meses, hasta 3 OPECs.
 //   - diario : pase de $6.000 → UN simulacro válido 24h (incluye específicas).
 //   - trial  : gratis, solo pools globales (transversal+comportamental).
 // ─────────────────────────────────────────────────────────────
 
-export const DIAS_GRACIA_EXAMEN = 3; // el acceso sigue vivo unos días tras el examen
-export const MESES_ACCESO_SIN_FECHA = 12;
+// ── Pase trimestral ($49.900): 3 meses, hasta 3 OPECs ──
+// El acceso NO se ata a la fecha de examen: la CNSC no la publica de forma
+// obtenible y un proceso puede arrastrarse años. Una ventana fija es lo único
+// que se le puede prometer al usuario y medir sin depender de nadie.
+export const MESES_PASE = 3;
+export const CUPOS_PASE = 3;
 
-// Ventana del pase de evento. SIMO no publica cronograma, así que la mayoría de
-// OPECs no tiene fechaExamen: sin este tope, un pago único daba acceso perpetuo.
-// Cuando el admin fija la fecha de la convocatoria, la ventana se recorta.
-export function accesoHastaDe(
-  fechaExamen: Date | null | undefined,
-  desde: Date = new Date()
-): Date {
-  if (fechaExamen) {
-    return new Date(fechaExamen.getTime() + DIAS_GRACIA_EXAMEN * 86_400_000);
-  }
+export function venceTrimestre(desde: Date = new Date()): Date {
   const d = new Date(desde);
-  d.setMonth(d.getMonth() + MESES_ACCESO_SIN_FECHA);
+  d.setMonth(d.getMonth() + MESES_PASE);
   return d;
+}
+
+export type PaseActivo = {
+  id: string;
+  venceAt: Date;
+  usados: number;
+  disponibles: number;
+};
+
+/** Pase vigente del usuario con cupos libres, si tiene. */
+export async function paseTrimestralActivo(userId: string): Promise<PaseActivo | null> {
+  const pase = await prisma.paseTrimestral.findFirst({
+    where: { userId, venceAt: { gte: new Date() } },
+    orderBy: { compradoAt: "desc" },
+    select: { id: true, venceAt: true, _count: { select: { opecs: true } } },
+  });
+  if (!pase) return null;
+  const usados = pase._count.opecs;
+  return {
+    id: pase.id,
+    venceAt: pase.venceAt,
+    usados,
+    disponibles: Math.max(0, CUPOS_PASE - usados),
+  };
 }
 
 export const LIMITE_FREE_POR_OPEC = 3; // simulacros gratis por OPEC (trial)
@@ -50,13 +69,13 @@ export async function verificarAccesoOpec(
 ): Promise<ResultadoAcceso> {
   const ahora = new Date();
 
-  // 1) Pase evento (ilimitado hasta el examen)
+  // 1) Cupo del pase trimestral gastado en esta OPEC (ilimitado hasta venceAt).
   const uo = await prisma.userOpec.findUnique({
     where: { userId_opecId: { userId, opecId } },
     select: { accesoPagado: true, accesoHasta: true },
   });
-  const eventoValido =
-    !!uo?.accesoPagado && (!uo.accesoHasta || uo.accesoHasta >= ahora);
+  // accesoHasta es obligatorio: sin él, un desbloqueo viejo daría acceso eterno.
+  const eventoValido = !!uo?.accesoPagado && !!uo.accesoHasta && uo.accesoHasta >= ahora;
   if (eventoValido) {
     return { pagado: true, permitido: true, maxPreguntas: PREGUNTAS_PAGADO, modo: "evento" };
   }

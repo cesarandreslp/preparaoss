@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { eventoValido, parseReferencia } from "@/lib/wompi";
-import { accesoHastaDe } from "@/lib/acceso";
+import { venceTrimestre } from "@/lib/acceso";
 
 // POST /api/pagos/wompi/webhook — Wompi notifica el resultado del pago.
 // No lleva auth de usuario: se valida con el checksum de eventos.
@@ -57,12 +57,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // Pase evento: acceso ilimitado hasta el examen (+gracia).
-  const opec = await prisma.opec.findUnique({
-    where: { id: ref.opecId },
-    select: { fechaExamen: true },
+  // Pase trimestral: 3 meses de práctica ilimitada en hasta 3 OPECs. Aquí se
+  // crea el pase y se gasta el primer cupo en la OPEC desde la que pagó; los
+  // otros dos los elige después en /api/opecs/[id]/usar-pase.
+  const yaCreado = await prisma.paseTrimestral.findUnique({
+    where: { referenciaPago: tx.reference },
+    select: { id: true, venceAt: true },
   });
-  const accesoHasta = accesoHastaDe(opec?.fechaExamen);
+
+  // Renovar antes de que venza no debe quitarle los días que le quedan: el
+  // trimestre nuevo arranca donde termina el vigente.
+  const vigente = await prisma.paseTrimestral.findFirst({
+    where: { userId: ref.userId, venceAt: { gte: new Date() } },
+    orderBy: { venceAt: "desc" },
+    select: { venceAt: true },
+  });
+
+  const pase =
+    yaCreado ??
+    (await prisma.paseTrimestral.create({
+      data: {
+        userId: ref.userId,
+        referenciaPago: tx.reference,
+        montoCop,
+        venceAt: venceTrimestre(vigente?.venceAt ?? new Date()),
+      },
+      select: { id: true, venceAt: true },
+    }));
 
   // Upsert: el usuario puede no estar inscrito aún. Idempotente ante reintentos.
   await prisma.userOpec.upsert({
@@ -71,13 +92,15 @@ export async function POST(request: Request) {
       userId: ref.userId,
       opecId: ref.opecId,
       accesoPagado: true,
-      accesoHasta,
+      accesoHasta: pase.venceAt,
+      paseId: pase.id,
       referenciaPago: tx.reference,
       montoCop,
     },
     update: {
       accesoPagado: true,
-      accesoHasta,
+      accesoHasta: pase.venceAt,
+      paseId: pase.id,
       referenciaPago: tx.reference,
       montoCop,
     },

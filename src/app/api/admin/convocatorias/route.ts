@@ -3,13 +3,14 @@ import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
-import { accesoHastaDe } from "@/lib/acceso";
 
 // ─────────────────────────────────────────────────────────────
-// Fecha de examen por convocatoria.
+// Fecha de examen por convocatoria — OPCIONAL.
 // SIMO no expone cronograma (ni /convocatorias/{id} ni /empleos traen fechas
-// de pruebas) y CNSC la publica en PDFs por etapa. Así que la fecha se carga
-// a mano UNA vez por convocatoria y baja a sus cientos de OPECs.
+// de pruebas) y CNSC la publica en PDFs por etapa, así que no hay de dónde
+// tomarla. El ACCESO PAGADO ya no depende de ella (el pase es trimestral):
+// datar una convocatoria solo sirve para el plan de estudio del usuario y
+// para que el scraper cierre las OPECs cuyo examen ya pasó.
 //
 // Clave de agrupación: el id de convocatoria de SIMO cuando existe
 // ("id:548594064"); para las OPECs que SIMO ya retiró y por eso nunca
@@ -73,7 +74,7 @@ const patchSchema = z.object({
 });
 
 // PATCH /api/admin/convocatorias — fija la fecha en todas las OPECs de la
-// convocatoria y recorta el acceso de quienes ya pagaron.
+// convocatoria y la copia al plan de estudio de sus inscritos.
 export async function PATCH(req: NextRequest) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
@@ -99,23 +100,16 @@ export async function PATCH(req: NextRequest) {
 
   await prisma.opec.updateMany({ where, data: { fechaExamen: fecha } });
 
-  // La fecha es la misma para toda la convocatoria, así que el acceso también:
-  // un solo updateMany en vez de recalcular fila por fila.
-  const [inscripciones, accesos] = await Promise.all([
-    prisma.userOpec.updateMany({
-      where: { opecId: { in: opecIds } },
-      data: { fechaExamen: fecha },
-    }),
-    prisma.userOpec.updateMany({
-      where: { opecId: { in: opecIds }, accesoPagado: true },
-      data: { accesoHasta: accesoHastaDe(fecha) },
-    }),
-  ]);
+  // Copia para el plan de estudio del inscrito. No toca accesoHasta: el pase
+  // trimestral dura lo que dura, sin importar cuándo sea el examen.
+  const inscripciones = await prisma.userOpec.updateMany({
+    where: { opecId: { in: opecIds } },
+    data: { fechaExamen: fecha },
+  });
 
   return NextResponse.json({
     ok: true,
     opecs: opecIds.length,
     inscripciones: inscripciones.count,
-    accesosRecalculados: accesos.count,
   });
 }

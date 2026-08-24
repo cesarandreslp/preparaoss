@@ -10,13 +10,42 @@ interface Props {
   tienePreguntas: boolean;
   inscrito: boolean;
   accesoPagado: boolean;
+  accesoHasta: string | null;
+  /** Cupos libres del pase trimestral (3 OPECs por pase). */
+  cuposPase: number;
+  paseVenceAt: string | null;
   precioCop: number;
   precioDiarioCop: number;
 }
 
-export function OpecCTA({ opecId, tienePreguntas, inscrito, accesoPagado, precioCop, precioDiarioCop }: Props) {
+const fmtFecha = (iso: string) =>
+  new Date(iso).toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+
+export function OpecCTA({
+  opecId,
+  tienePreguntas,
+  inscrito,
+  accesoPagado,
+  accesoHasta,
+  cuposPase,
+  paseVenceAt,
+  precioCop,
+  precioDiarioCop,
+}: Props) {
   const router = useRouter();
   const [cargando, setCargando] = useState(false);
+  const [usandoPase, setUsandoPase] = useState(false);
+
+  async function usarPase() {
+    setUsandoPase(true);
+    const res = await fetch(`/api/opecs/${opecId}/usar-pase`, { method: "POST" });
+    if (!res.ok) {
+      const b = await res.json().catch(() => ({}));
+      alert(b.error ?? "No se pudo usar el pase.");
+    }
+    router.refresh();
+    setUsandoPase(false);
+  }
 
   async function toggleInscripcion() {
     setCargando(true);
@@ -40,8 +69,22 @@ export function OpecCTA({ opecId, tienePreguntas, inscrito, accesoPagado, precio
               className="w-full px-6 py-3 rounded-2xl text-center text-sm font-medium"
               style={{ background: "rgba(39,174,96,0.12)", color: "var(--success)", border: "1px solid rgba(39,174,96,0.30)" }}
             >
-              ✓ Acceso ilimitado activo hasta el examen
+              ✓ Práctica ilimitada activa
+              {accesoHasta && ` hasta el ${fmtFecha(accesoHasta)}`}
             </div>
+          ) : cuposPase > 0 ? (
+            <>
+              <button
+                onClick={usarPase}
+                disabled={usandoPase}
+                className="btn-primary block w-full text-center px-6 py-4 text-lg rounded-2xl disabled:opacity-60"
+              >
+                {usandoPase ? "Desbloqueando…" : `🔓 Usar un cupo de tu pase (te quedan ${cuposPase})`}
+              </button>
+              <p className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
+                Sin pagar de nuevo{paseVenceAt && ` · tu pase vence el ${fmtFecha(paseVenceAt)}`}
+              </p>
+            </>
           ) : (
             <DesbloquearOpec opecId={opecId} precioCop={precioCop} precioDiarioCop={precioDiarioCop} />
           )}
