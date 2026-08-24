@@ -246,12 +246,12 @@ export default function LandingPage() {
 
           {/* Stats row */}
           <Reveal delay={480}>
-            <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 pt-10 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+            <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-8 pt-10 border-t" style={{ borderColor: "var(--border-subtle)" }}>
               {[
-                { v: 3126, label: "OPECs sincronizadas", suffix: "+" },
-                { v: 24, label: "Entidades nacionales", suffix: "" },
+                { v: 5000, label: "OPECs de SIMO", suffix: "+" },
+                { v: 100, label: "Preguntas por simulacro", suffix: "" },
+                { v: 3, label: "Tipos de prueba oficiales", suffix: "" },
                 { v: 5, label: "Niveles jerárquicos", suffix: "" },
-                { v: 100, label: "Preguntas por banco", suffix: "" },
               ].map((s) => (
                 <div key={s.label}>
                   <p
@@ -272,10 +272,43 @@ export default function LandingPage() {
 
       {/* ─── PROBADOR (gancho interactivo, sin registro) ─── */}
       <section className="section-sm">
-        <div className="container-narrow">
-          <Reveal>
-            <ProbadorHero />
-          </Reveal>
+        <div className="container-app">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <Reveal>
+              <div>
+                <span className="eyebrow">Sin registro · sin tarjeta</span>
+                <h2 className="display-3 mt-3">
+                  No nos creas. <span className="text-gradient-gold">Pruébalo.</span>
+                </h2>
+                <p className="mt-5 text-lg" style={{ color: "var(--text-secondary)" }}>
+                  Digita tu OPEC y enfréntate a 5 preguntas reales de tu cargo ahora mismo.
+                  Ve tu puntaje al instante — sin crear cuenta.
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {[
+                    "Preguntas alineadas al manual de funciones de tu cargo",
+                    "Explicación de por qué cada respuesta es correcta",
+                    "En menos de 60 segundos",
+                  ].map((li) => (
+                    <li key={li} className="flex items-start gap-3" style={{ color: "var(--text-secondary)" }}>
+                      <span
+                        className="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0"
+                        style={{ background: "rgba(212, 175, 55, 0.15)", color: "var(--gold-500)" }}
+                      >
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+            <Reveal delay={160}>
+              <ProbadorHero />
+            </Reveal>
+          </div>
         </div>
       </section>
 
@@ -314,12 +347,12 @@ export default function LandingPage() {
               {
                 n: "01",
                 t: "Encuentra tu OPEC",
-                d: "Buscamos en SIMO-CNSC y traemos las 3.000+ vacantes activas con todos los detalles: requisitos, vacantes, salario, fecha límite.",
+                d: "Sincronizamos SIMO-CNSC a diario y traemos miles de vacantes con todos los detalles: requisitos, vacantes, salario, fecha límite. Si la tuya no está, la cargas tú.",
               },
               {
                 n: "02",
                 t: "Generamos tu banco con IA",
-                d: "Llama 3.3 produce 100 preguntas únicas a partir de las funciones, requisitos y manuales del cargo. Sin contenido genérico.",
+                d: "Nuestra IA produce hasta 100 preguntas únicas a partir de las funciones, requisitos y manuales de tu cargo. Sin contenido genérico.",
               },
               {
                 n: "03",
