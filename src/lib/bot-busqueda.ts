@@ -8,7 +8,7 @@ export type ResultadoBusqueda = { cargos: Cargo[]; entidades: string[] };
 
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://")
   ? process.env.NEXT_PUBLIC_APP_URL
-  : "https://preparaoss.vercel.app";
+  : "https://preparaoss.lat";
 
 export function hubEntidad(entidad: string): string {
   return `${APP_URL}/entidades/${slugify(entidad)}`;

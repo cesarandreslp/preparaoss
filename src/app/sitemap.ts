@@ -4,7 +4,7 @@ import { slugify, convocatoriaValida } from "@/lib/slug";
 
 export const revalidate = 3600;
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.lat";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [convs, ents] = await Promise.all([

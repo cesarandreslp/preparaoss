@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { prisma } from "@/lib/prisma";
 
-const APP_URL = process.env.APP_URL ?? "https://preparaoss.vercel.app";
+const APP_URL = process.env.APP_URL ?? "https://preparaoss.lat";
 
 // ──────────────────────────────────────────────
 // Carga configuración SMTP desde DB, con fallback a env vars
@@ -180,7 +180,7 @@ function baseTemplate(content: string): string {
         <tr>
           <td style="padding:16px 32px;border-top:1px solid #1E3D6E;text-align:center;">
             <p style="margin:0;font-size:11px;color:#3A5A8A;">
-              © 2026 PreparaOSS · <a href="${APP_URL}" style="color:#4A90D9;text-decoration:none;">preparaoss.vercel.app</a>
+              © 2026 PreparaOSS · <a href="${APP_URL}" style="color:#4A90D9;text-decoration:none;">preparaoss.lat</a>
             </p>
           </td>
         </tr>

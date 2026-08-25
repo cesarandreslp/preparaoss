@@ -17,7 +17,7 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.lat";
 const DESC =
   "Prepárate para los concursos de méritos de la CNSC con simulacros generados por nuestro sistema a la medida de tu OPEC. Practica gratis, paga solo por tu cargo.";
 

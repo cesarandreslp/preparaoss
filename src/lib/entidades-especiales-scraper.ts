@@ -38,7 +38,7 @@ interface ItemOrigen {
 
 const HEADERS = {
   "User-Agent":
-    "Mozilla/5.0 (compatible; PreparaOss-Scraper/1.0; +https://preparaoss.vercel.app)",
+    "Mozilla/5.0 (compatible; PreparaOss-Scraper/1.0; +https://preparaoss.lat)",
   Accept: "application/json",
 };
 

@@ -27,7 +27,7 @@ export async function fetchConcursosEnDesarrollo(): Promise<Scraped[]> {
   const res = await fetch(SOURCE_URL, {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (PreparaOss-Scraper/1.0; +https://preparaoss.vercel.app)",
+        "Mozilla/5.0 (PreparaOss-Scraper/1.0; +https://preparaoss.lat)",
       Accept: "text/html",
     },
     cache: "no-store",

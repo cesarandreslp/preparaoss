@@ -14,6 +14,17 @@ const nextConfig: NextConfig = {
     "sharp",
     "unpdf",
   ],
+  // Consolida el dominio: www → apex (evita contenido duplicado en SEO).
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.preparaoss.lat" }],
+        destination: "https://preparaoss.lat/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

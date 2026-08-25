@@ -7,7 +7,7 @@ import HubContenido, { agregadosHub } from "@/components/HubContenido";
 
 export const revalidate = 3600;
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.vercel.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://preparaoss.lat";
 
 // Pre-renderiza las ~165 páginas en build; ISR las refresca cada hora.
 export async function generateStaticParams() {
