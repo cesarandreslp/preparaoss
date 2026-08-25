@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
         destination: "https://preparaoss.lat/:path*",
         permanent: true,
       },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "preparaoss.vercel.app" }],
+        destination: "https://preparaoss.lat/:path*",
+        permanent: true,
+      },
     ];
   },
 };
