@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { slugify, convocatoriaValida } from "@/lib/slug";
+import HubContenido, { agregadosHub } from "@/components/HubContenido";
 
 export const revalidate = 3600; // ISR: se regenera cada hora
 
@@ -73,8 +74,13 @@ export default async function ConvocatoriaPage({ params }: { params: Promise<{ s
     take: 80,
   });
 
-  const totalCargos = await prisma.opec.count({ where: { numerConvocatoria: num, creadoPorUserId: null } });
-  const totalVacantes = opecs.reduce((s, o) => s + (o.numVacantes ?? 0), 0);
+  const agg = await prisma.opec.aggregate({
+    where: { numerConvocatoria: num, creadoPorUserId: null },
+    _count: { _all: true },
+    _sum: { numVacantes: true },
+  });
+  const totalCargos = agg._count._all;
+  const totalVacantes = agg._sum.numVacantes ?? 0;
   const entidades = [...new Set(opecs.map((o) => o.entidad))];
 
   return (
@@ -124,6 +130,14 @@ export default async function ConvocatoriaPage({ params }: { params: Promise<{ s
             <Link href={`/opecs?q=${encodeURIComponent(num)}`} className="text-gradient-gold">Ver todos →</Link>
           </p>
         )}
+
+        <HubContenido
+          tipo="convocatoria"
+          nombre={num}
+          totalCargos={totalCargos}
+          totalVacantes={totalVacantes}
+          {...agregadosHub(opecs)}
+        />
       </div>
     </main>
   );

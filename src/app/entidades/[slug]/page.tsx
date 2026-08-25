@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { slugify, convocatoriaValida } from "@/lib/slug";
+import HubContenido, { agregadosHub } from "@/components/HubContenido";
 
 export const revalidate = 3600;
 
@@ -57,8 +58,13 @@ export default async function EntidadPage({ params }: { params: Promise<{ slug: 
     orderBy: [{ numVacantes: "desc" }],
     take: 80,
   });
-  const totalCargos = await prisma.opec.count({ where: { entidad, creadoPorUserId: null } });
-  const totalVacantes = opecs.reduce((s, o) => s + (o.numVacantes ?? 0), 0);
+  const agg = await prisma.opec.aggregate({
+    where: { entidad, creadoPorUserId: null, estado: { in: ["ACTIVA", "EN_PRUEBAS"] } },
+    _count: { _all: true },
+    _sum: { numVacantes: true },
+  });
+  const totalCargos = agg._count._all;
+  const totalVacantes = agg._sum.numVacantes ?? 0;
   const convocatorias = [...new Set(opecs.map((o) => o.numerConvocatoria).filter(convocatoriaValida))] as string[];
 
   return (
@@ -114,6 +120,14 @@ export default async function EntidadPage({ params }: { params: Promise<{ slug: 
             <Link href={`/opecs?q=${encodeURIComponent(entidad)}`} className="text-gradient-gold">Ver todos →</Link>
           </p>
         )}
+
+        <HubContenido
+          tipo="entidad"
+          nombre={entidad}
+          totalCargos={totalCargos}
+          totalVacantes={totalVacantes}
+          {...agregadosHub(opecs)}
+        />
       </div>
     </main>
   );

@@ -49,6 +49,10 @@ export const metadata: Metadata = {
     title: "PreparaOSS",
   },
   formatDetection: { telephone: false },
+  // Verificación de Google Search Console (solo emite la meta-tag si el env está).
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export const viewport: Viewport = {
