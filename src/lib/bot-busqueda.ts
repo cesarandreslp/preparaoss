@@ -15,15 +15,22 @@ export function hubEntidad(entidad: string): string {
 }
 
 export async function buscarOpecs(q: string): Promise<ResultadoBusqueda> {
+  // Tokeniza: cada palabra (>=2 letras) debe aparecer en ALGÚN campo.
+  // Así "auxiliar dian" cruza cargo+entidad, no exige la frase literal.
+  const tokens = q.split(/\s+/).map((t) => t.trim()).filter((t) => t.length >= 2).slice(0, 5);
+  const enAlgunCampo = (t: string) => ({
+    OR: [
+      { nombreCargo: { contains: t, mode: "insensitive" as const } },
+      { entidad: { contains: t, mode: "insensitive" as const } },
+      { municipio: { contains: t, mode: "insensitive" as const } },
+      { numerConvocatoria: { contains: t, mode: "insensitive" as const } },
+    ],
+  });
   const opecs = await prisma.opec.findMany({
     where: {
       creadoPorUserId: null,
       estado: { in: ["ACTIVA", "EN_PRUEBAS"] },
-      OR: [
-        { nombreCargo: { contains: q, mode: "insensitive" } },
-        { entidad: { contains: q, mode: "insensitive" } },
-        { numerConvocatoria: { contains: q, mode: "insensitive" } },
-      ],
+      ...(tokens.length ? { AND: tokens.map(enAlgunCampo) } : {}),
     },
     select: { nombreCargo: true, entidad: true, municipio: true, numVacantes: true },
     orderBy: { numVacantes: "desc" },
