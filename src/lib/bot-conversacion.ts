@@ -47,7 +47,19 @@ async function contextoOpecs(q: string) {
   });
 }
 
+// Solo intentamos el LLM si hay al menos una key configurada EN ESTE ENTORNO
+// (Vercel). Sin keys → null inmediato, cero llamadas y cero recursos extra:
+// el bot cae a la búsqueda determinística. Así activar/desactivar el modo
+// conversacional es solo poner o quitar una key en Vercel.
+const HAY_LLM = !!(
+  process.env.GEMINI_API_KEY ||
+  process.env.GROQ_API_KEY ||
+  process.env.ZHIPU_API_KEY ||
+  process.env.MISTRAL
+);
+
 export async function responderConversacional(mensaje: string): Promise<string | null> {
+  if (!HAY_LLM) return null;
   try {
     const opecs = await contextoOpecs(mensaje);
     const datos = opecs.length
