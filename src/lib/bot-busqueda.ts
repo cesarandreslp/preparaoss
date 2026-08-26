@@ -14,6 +14,18 @@ export function hubEntidad(entidad: string): string {
   return `${APP_URL}/entidades/${slugify(entidad)}`;
 }
 
+// Saludos / mensajes triviales → bienvenida instantánea (sin LLM). Así el
+// primer mensaje (casi siempre un saludo) no se pierde por cold start.
+const SALUDOS = new Set([
+  "hola", "holi", "holis", "ola", "buenas", "hi", "hello", "hey", "ey",
+  "menu", "menú", "start", "inicio", "quiubo", "que mas", "qué más",
+]);
+export function esSaludo(text: string): boolean {
+  const low = text.trim().toLowerCase().replace(/[!¡.,]/g, "");
+  if (low.length < 3) return true;
+  return SALUDOS.has(low) || low.startsWith("hola") || low.startsWith("buenas") || low.startsWith("buenos");
+}
+
 export async function buscarOpecs(q: string): Promise<ResultadoBusqueda> {
   // Tokeniza: cada palabra (>=2 letras) debe aparecer en ALGÚN campo.
   // Así "auxiliar dian" cruza cargo+entidad, no exige la frase literal.

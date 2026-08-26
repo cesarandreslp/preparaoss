@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { waSendText } from "@/lib/whatsapp";
-import { buscarOpecs, hubEntidad, APP_URL } from "@/lib/bot-busqueda";
+import { buscarOpecs, hubEntidad, APP_URL, esSaludo } from "@/lib/bot-busqueda";
 import { responderConversacional } from "@/lib/bot-conversacion";
 
 export const runtime = "nodejs";
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 
   try {
     const low = text.toLowerCase();
-    if (low.length < 3 || ["hola", "hi", "buenas", "menu", "menú", "start", "/start", "ayuda"].includes(low)) {
+    if (esSaludo(text) || low === "ayuda") {
       await waSendText(from, BIENVENIDA);
     } else {
       // Texto libre: intenta responder conversacionalmente (LLM); si no hay

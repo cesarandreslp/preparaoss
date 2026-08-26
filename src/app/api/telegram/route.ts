@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { tgSend, esc } from "@/lib/telegram";
-import { buscarOpecs, hubEntidad, APP_URL } from "@/lib/bot-busqueda";
+import { buscarOpecs, hubEntidad, APP_URL, esSaludo } from "@/lib/bot-busqueda";
 import { responderConversacional } from "@/lib/bot-conversacion";
 
 export const runtime = "nodejs";
@@ -57,6 +57,9 @@ export async function POST(req: Request) {
     } else if (text.startsWith("/entidades")) {
       await tgSend(chatId, `🏛 Todas las entidades con concurso:\n${APP_URL}/entidades`, { reply_markup: teclado });
     } else if (text.startsWith("/ayuda") || text.startsWith("/help")) {
+      await tgSend(chatId, START, { reply_markup: teclado });
+    } else if (esSaludo(text)) {
+      // Saludo → bienvenida instantánea (sin LLM), evita perder el 1er mensaje.
       await tgSend(chatId, START, { reply_markup: teclado });
     } else if (text.startsWith("/buscar")) {
       // Búsqueda explícita: lista determinística.
