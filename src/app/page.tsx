@@ -710,7 +710,11 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="container-app pb-10 pt-6 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-xs" style={{ borderColor: "var(--border-subtle)", color: "var(--text-muted)" }}>
-          <p>© 2026 PreparaOSS · Producto independiente, sin afiliación con CNSC.</p>
+          <p>
+            © 2026 PreparaOSS · Producto independiente, sin afiliación con CNSC. ·{" "}
+            <Link href="/privacidad" className="hover:text-[#D4AF37] transition-colors">Privacidad</Link> ·{" "}
+            <Link href="/terminos" className="hover:text-[#D4AF37] transition-colors">Términos</Link>
+          </p>
           <p>Hecho con ☕ en Colombia</p>
         </div>
       </footer>
