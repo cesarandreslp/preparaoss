@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { waSendText } from "@/lib/whatsapp";
 import { buscarOpecs, hubEntidad, APP_URL } from "@/lib/bot-busqueda";
+import { responderConversacional } from "@/lib/bot-conversacion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -71,7 +72,14 @@ export async function POST(req: Request) {
     if (low.length < 3 || ["hola", "hi", "buenas", "menu", "menú", "start", "/start", "ayuda"].includes(low)) {
       await waSendText(from, BIENVENIDA);
     } else {
-      await responderBusqueda(from, text);
+      // Texto libre: intenta responder conversacionalmente (LLM); si no hay
+      // LLM o falla, cae a la búsqueda determinística.
+      const conv = await responderConversacional(text);
+      if (conv) {
+        await waSendText(from, `${conv}\n\n👉 Practica gratis, sin tarjeta:\n${registro}`);
+      } else {
+        await responderBusqueda(from, text);
+      }
     }
   } catch (e) {
     console.error("whatsapp handler", e);

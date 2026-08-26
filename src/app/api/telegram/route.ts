@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { tgSend, esc } from "@/lib/telegram";
 import { buscarOpecs, hubEntidad, APP_URL } from "@/lib/bot-busqueda";
+import { responderConversacional } from "@/lib/bot-conversacion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -57,8 +58,18 @@ export async function POST(req: Request) {
       await tgSend(chatId, `🏛 Todas las entidades con concurso:\n${APP_URL}/entidades`, { reply_markup: teclado });
     } else if (text.startsWith("/ayuda") || text.startsWith("/help")) {
       await tgSend(chatId, START, { reply_markup: teclado });
-    } else {
+    } else if (text.startsWith("/buscar")) {
+      // Búsqueda explícita: lista determinística.
       await responderBusqueda(chatId, text.replace(/^\/buscar\s*/i, "").trim());
+    } else {
+      // Texto libre: intenta responder conversacionalmente (LLM); si no hay
+      // LLM o falla, cae a la búsqueda determinística.
+      const conv = await responderConversacional(text);
+      if (conv) {
+        await tgSend(chatId, `${esc(conv)}\n\n👉 Practica gratis: ${registro}`);
+      } else {
+        await responderBusqueda(chatId, text);
+      }
     }
   } catch (e) {
     // Nunca devolvemos error a Telegram (reintentaría en bucle). Log y 200.
